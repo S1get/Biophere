@@ -22,6 +22,7 @@ app = FastAPI(title="biosphere API")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        "https://biosphere-frontend.onrender.com",
         "https://biosfera-frontend.onrender.com",
         "http://localhost:5173",
         "http://127.0.0.1:5173"
@@ -49,6 +50,23 @@ def on_startup():
             print("Database tables created/verified")
         except Exception as e:
             print(f"Warning: Could not create tables: {e}")
+    else:
+        # Для PostgreSQL пытаемся запустить миграции автоматически
+        try:
+            import os
+            from alembic.config import Config
+            from alembic import command
+            # Определяем путь к alembic.ini
+            alembic_ini_path = os.path.join(os.path.dirname(__file__), "alembic.ini")
+            if os.path.exists(alembic_ini_path):
+                alembic_cfg = Config(alembic_ini_path)
+                command.upgrade(alembic_cfg, "head")
+                print("Database migrations completed")
+            else:
+                print("Warning: alembic.ini not found, skipping auto-migration")
+        except Exception as e:
+            print(f"Warning: Could not run migrations automatically: {e}")
+            print("Please run manually: cd backend && alembic upgrade head")
 
 @app.get("/")
 def root():
@@ -65,6 +83,11 @@ def health_check():
         return {"status": "healthy", "database": "connected"}
     except Exception as e:
         return {"status": "unhealthy", "error": str(e)}, 503
+
+@app.get("/ping")
+def ping():
+    """Ping endpoint to prevent Render from spinning down"""
+    return {"status": "ok", "timestamp": datetime.utcnow().isoformat()}
 
 @app.post("/admin/clear_all")
 def clear_all():
