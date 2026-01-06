@@ -52,3 +52,5 @@ python create_admin.py
 - Детальная инструкция: `DEPLOY_INSTRUCTIONS.md`
 
 
+
+

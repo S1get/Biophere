@@ -67,6 +67,23 @@ def on_startup():
         except Exception as e:
             print(f"Warning: Could not run migrations automatically: {e}")
             print("Please run manually: cd backend && alembic upgrade head")
+        
+        # Автоматически загружаем специалистов если база пустая
+        try:
+            from models import Specialist
+            from seed_specialists import seed_specialists
+            db = SessionLocal()
+            try:
+                specialist_count = db.query(Specialist).count()
+                if specialist_count == 0:
+                    print("База специалистов пуста, загружаем данные...")
+                    seed_specialists()
+                else:
+                    print(f"В базе уже есть {specialist_count} специалистов")
+            finally:
+                db.close()
+        except Exception as e:
+            print(f"Warning: Could not seed specialists: {e}")
 
 @app.get("/")
 def root():

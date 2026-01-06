@@ -5,43 +5,43 @@ from datetime import datetime
 # Данные специалистов из specialists-data.js
 specialists_data = [
     {
-        "name": "Орлова Роза Сергеевна"
-        "position": "Главный врач"
-        "specialization": "терапия, визуальная диагностика (УЗИ), кардиология, онкология, неврология"
-        "workplace": "ул. Солнечная, ул. Московская, д. 4"
-        "education": "Московская Ветеринарная Академия"
-        "extra_qual": "Кардиология, УЗИ-диагностика"
+        "name": "Орлова Роза Сергеевна",
+        "position": "Главный врач",
+        "specialization": "терапия, визуальная диагностика (УЗИ), кардиология, онкология, неврология",
+        "workplace": "ул. Солнечная, ул. Московская, д. 4",
+        "education": "Московская Ветеринарная Академия",
+        "extra_qual": "Кардиология, УЗИ-диагностика",
         "photo": "/doctors/rgogoleva.jpg"
-    }
+    },
     {
-        "name": "Черемисинова Анастасия Сергеевна"
-        "position": "Главный врач"
-        "specialization": "терапия, онкология"
-        "workplace": "пр-т. Строителей, д. 9, к. 1"
-        "education": "Московская Ветеринарная Академия"
-        "extra_qual": "Кардиология, УЗИ-диагностика"
+        "name": "Черемисинова Анастасия Сергеевна",
+        "position": "Главный врач",
+        "specialization": "терапия, онкология",
+        "workplace": "пр-т. Строителей, д. 9, к. 1",
+        "education": "Московская Ветеринарная Академия",
+        "extra_qual": "Кардиология, УЗИ-диагностика",
         "photo": "./doctors/ancheremisinova.jpg"
-    }
+    },
     {
-        "name": "Малышева Ольга Юрьевна"
-        "position": "Ветеринарный врач-хирург"
-        "specialization": "торакальная хирургия, абдоминальная хирургия, косметическая и реконструктивная хирургия"
-        "workplace": "ул. Чернышевского, д. 7, ул. Солнечная"
-        "education": "Московская Ветеринарная Академия"
-        "extra_qual": "Кардиология, УЗИ-диагностика"
+        "name": "Малышева Ольга Юрьевна",
+        "position": "Ветеринарный врач-хирург",
+        "specialization": "торакальная хирургия, абдоминальная хирургия, косметическая и реконструктивная хирургия",
+        "workplace": "ул. Чернышевского, д. 7, ул. Солнечная",
+        "education": "Московская Ветеринарная Академия",
+        "extra_qual": "Кардиология, УЗИ-диагностика",
         "photo": "./doctors/olmalisheva.jpg"
-    }
+    },
     {
-        "name": "Онегов Иван Александрович"
-        "position": "Ветеринарный врач-хирург"
-        "specialization": "хирургия, кардиология, рентгенология, стоматология, ортодонтия"
-        "workplace": "ул. Солнечная, ул. Чернышевского, д. 7"
-        "education": "Московская Ветеринарная Академия"
-        "extra_qual": "Кардиология, УЗИ-диагностика"
+        "name": "Онегов Иван Александрович",
+        "position": "Ветеринарный врач-хирург",
+        "specialization": "хирургия, кардиология, рентгенология, стоматология, ортодонтия",
+        "workplace": "ул. Солнечная, ул. Чернышевского, д. 7",
+        "education": "Московская Ветеринарная Академия",
+        "extra_qual": "Кардиология, УЗИ-диагностика",
         "photo": "./doctors/ivonegov.jpg"
-    }
+    },
     {
-        "name": "Жаворонков Олег Николаевич"
+        "name": "Жаворонков Олег Николаевич",
         "position": "Главный хирург сети клиник"
         "specialization": "травматология, ортопедия, нейрохирургия, абдоминальная и торакальная хирургия"
         "workplace": "ул. Московская, д. 4"
@@ -318,7 +318,7 @@ specialists_data = [
         "education": ""
         "extra_qual": ""
         "photo": "tyurchenko.jpg"
-    }
+    },
 ]
 
 def seed_specialists():
@@ -333,14 +333,14 @@ def seed_specialists():
         # Добавляем специалистов
         for specialist_data in specialists_data:
             specialist = Specialist(
-                name=specialist_data["name"]
-                position=specialist_data["position"]
-                specialization=specialist_data["specialization"]
-                workplace=specialist_data["workplace"]
-                education=specialist_data["education"]
-                extra_qual=specialist_data["extra_qual"]
-                photo=specialist_data["photo"]
-                created_at=datetime.utcnow()
+                name=specialist_data["name"],
+                position=specialist_data["position"],
+                specialization=specialist_data.get("specialization", ""),
+                workplace=specialist_data.get("workplace", ""),
+                education=specialist_data.get("education", ""),
+                extra_qual=specialist_data.get("extra_qual", ""),
+                photo=specialist_data.get("photo", ""),
+                created_at=datetime.utcnow(),
                 updated_at=datetime.utcnow()
             )
             db.add(specialist)
