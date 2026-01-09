@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from database import SessionLocal
+from models import User
 from auth import get_current_user, get_db
 import schemas
 
@@ -12,4 +12,4 @@ def get_me(current_user=Depends(get_current_user)):
 
 @router.get('/', response_model=list[schemas.UserRead])
 def get_users(db: Session = Depends(get_db)):
-    return db.query(db.User).all() 
+    return db.query(User).all()

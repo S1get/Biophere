@@ -24,14 +24,23 @@ from auth import get_current_user
 app = FastAPI(title="biosphere API")
 
 # CORS: разрешаем локальную разработку и продакшн
+# Динамическая настройка CORS: учитываем реальный фронтенд-домен из окружения и разрешаем поддомены Render
+frontend_url = os.getenv("FRONTEND_URL")
+allowed_origins = [
+    "https://biosphere-frontend.onrender.com",
+    "https://biosfera-frontend.onrender.com",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    # Минимакс превью домен (для тестов/предпросмотра)
+    "https://1y0ld6yrx4.space.minimax.io",
+]
+if frontend_url:
+    allowed_origins.append(frontend_url)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://biosphere-frontend.onrender.com",
-        "https://biosfera-frontend.onrender.com",
-        "http://localhost:5173",
-        "http://127.0.0.1:5173"
-    ],
+    allow_origins=allowed_origins,
+    allow_origin_regex=r"https://.*\\.onrender\\.com$|https://.*\\.space\\.minimax\\.io$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -104,7 +113,7 @@ def health_check():
         db.close()
         return {"status": "healthy", "database": "connected"}
     except Exception as e:
-        return {"status": "unhealthy", "error": str(e)}, 503
+        return JSONResponse(status_code=503, content={"status": "unhealthy", "error": str(e)})
 
 @app.get("/ping")
 def ping():
@@ -112,7 +121,12 @@ def ping():
     return {"status": "ok", "timestamp": datetime.utcnow().isoformat()}
 
 @app.post("/admin/clear_all")
-def clear_all():
+def clear_all(current_user: User = Depends(get_current_user)):
+    if not current_user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Недостаточно прав для доступа к этой функции"
+        )
     db = SessionLocal()
     db.query(Review).delete()
     db.query(Question).delete()
