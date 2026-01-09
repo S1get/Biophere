@@ -26,10 +26,15 @@ export function useQuestions() {
   const fetchQuestions = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/questions`);
-      if (!res.ok) throw new Error("Ошибка загрузки вопросов");
+      const res = await fetch(`${API_URL}/questions/`);
+      const contentType = res.headers.get("content-type") || "";
+      if (!res.ok || !contentType.includes("application/json")) {
+        const text = await res.text();
+        console.error("Ошибка ответа сервера (questions):", text);
+        throw new Error("Ошибка загрузки вопросов");
+      }
       const data = await res.json();
-      setQuestions(data);
+      setQuestions(Array.isArray(data) ? data : []);
       setError(null);
     } catch (e: any) {
       setError(e.message);
@@ -82,4 +87,4 @@ export function useQuestions() {
     markAsRead,
     markAsUnread
   };
-} 
+}

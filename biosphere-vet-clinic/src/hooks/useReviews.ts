@@ -26,10 +26,15 @@ export function useReviews() {
   const fetchReviews = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/reviews`);
-      if (!res.ok) throw new Error("Ошибка загрузки отзывов");
+      const res = await fetch(`${API_URL}/reviews/`);
+      const contentType = res.headers.get("content-type") || "";
+      if (!res.ok || !contentType.includes("application/json")) {
+        const text = await res.text();
+        console.error("Ошибка ответа сервера (reviews):", text);
+        throw new Error("Ошибка загрузки отзывов");
+      }
       const data = await res.json();
-      setReviews(data);
+      setReviews(Array.isArray(data) ? data : []);
       setError(null);
     } catch (e: any) {
       setError(e.message);
@@ -43,4 +48,4 @@ export function useReviews() {
   }, [API_URL]);
 
   return { reviews, loading, error, refetch: fetchReviews };
-} 
+}

@@ -21,8 +21,13 @@ export function useSpecialists() {
   const fetchSpecialists = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/specialists`);
-      if (!res.ok) throw new Error("Ошибка загрузки специалистов");
+      const res = await fetch(`${API_URL}/specialists/`);
+      const contentType = res.headers.get("content-type") || "";
+      if (!res.ok || !contentType.includes("application/json")) {
+        const text = await res.text();
+        console.error("Ошибка ответа сервера (specialists):", text);
+        throw new Error("Ошибка загрузки специалистов");
+      }
       const data = await res.json();
       setSpecialists(data);
       setError(null);
@@ -107,4 +112,4 @@ export function useSpecialists() {
     deleteSpecialist,
     refetch: fetchSpecialists
   };
-} 
+}
