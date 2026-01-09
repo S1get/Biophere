@@ -43,7 +43,7 @@ services:
         value: 20.x
 
   # PostgreSQL Database
-  - type: pspg
+  - type: postgres
     name: biosphere-db
     region: frankfurt
     plan: free
