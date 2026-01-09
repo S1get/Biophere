@@ -43,6 +43,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const res = await fetch(`${API_URL}/users/me`, {
         headers: { Authorization: `Bearer ${t}` },
+        credentials: 'include'
       });
       if (res.ok) {
         const data = await res.json();
@@ -65,6 +66,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({ username: email, password }),
+      credentials: 'include'
     });
     if (!res.ok) {
       if (res.status === 403) {
@@ -112,4 +114,4 @@ export const useAuth = () => {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error('useAuth must be used within AuthProvider');
   return ctx;
-}; 
+};

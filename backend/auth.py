@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
@@ -81,7 +81,7 @@ def register_admin(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return db_user
 
 @router.post('/token')
-def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db), response: Response = None):
     user = get_user_by_email(db, form_data.username)
     if not user or not verify_password(form_data.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Неверный email или пароль")
@@ -91,10 +91,20 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
         raise HTTPException(status_code=403, detail="Администраторы должны использовать специальную страницу входа")
     
     access_token = create_access_token(data={"sub": str(user.id)})
+    # Устанавливаем куки для cross-site
+    if response is not None:
+        response.set_cookie(
+            key="access_token",
+            value=access_token,
+            httponly=True,
+            secure=True,
+            samesite="none",
+            max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60
+        )
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.post('/admin/token')
-def admin_login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def admin_login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db), response: Response = None):
     user = get_user_by_email(db, form_data.username)
     if not user or not verify_password(form_data.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Неверный email или пароль")
@@ -104,17 +114,43 @@ def admin_login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
         raise HTTPException(status_code=403, detail="Доступ только для администраторов")
     
     access_token = create_access_token(data={"sub": str(user.id)})
+    # Устанавливаем куки для cross-site
+    if response is not None:
+        response.set_cookie(
+            key="access_token",
+            value=access_token,
+            httponly=True,
+            secure=True,
+            samesite="none",
+            max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60
+        )
     return {"access_token": access_token, "token_type": "bearer"}
 
 from fastapi import Request
 from fastapi.security.utils import get_authorization_scheme_param
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+def get_current_user(request: Request, db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+
+    token: Optional[str] = None
+    # Пытаемся получить токен из заголовка Authorization
+    auth_header = request.headers.get("Authorization")
+    if auth_header:
+        scheme, param = get_authorization_scheme_param(auth_header)
+        if scheme and scheme.lower() == "bearer" and param:
+            token = param
+
+    # Фоллбек: пробуем получить токен из куки (для cross-site входа)
+    if not token:
+        token = request.cookies.get("access_token")
+
+    if not token:
+        raise credentials_exception
+
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("sub")
@@ -122,7 +158,8 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
             raise credentials_exception
     except JWTError:
         raise credentials_exception
+
     user = db.query(User).filter(User.id == int(user_id)).first()
     if user is None:
         raise credentials_exception
-    return user 
+    return user
