@@ -83,18 +83,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const register = async (name: string, email: string, phone: string, password: string) => {
-    setLoading(true);
-    const res = await fetch(`${API_URL}/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, phone, password }),
-    });
-    if (!res.ok) {
-      const errorText = await res.text();
-      throw new Error('Ошибка регистрации: ' + errorText);
-    }
-    await login(email, password);
-    setLoading(false);
+    throw new Error("Регистрация отключена. Вы можете оставлять отзывы и вопросы как гость.");
   };
 
   const logout = () => {

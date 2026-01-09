@@ -32,15 +32,24 @@ export default function FAQSection() {
   const [timeUpdate, setTimeUpdate] = useState(0); // Для обновления времени каждую секунду
 
   const fetchQuestions = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/questions/`)
-      const data = await res.json()
-      setQuestions(data)
-    } catch {
-      setError('Ошибка загрузки вопросов')
+      const res = await fetch(`${API_URL}/questions/`);
+      const contentType = res.headers.get("content-type") || "";
+      if (!res.ok || !contentType.includes("application/json")) {
+        const text = await res.text();
+        console.error("Ошибка ответа сервера (questions):", text);
+        setError('Ошибка загрузки вопросов');
+        setQuestions([]);
+        return;
+      }
+      const data = await res.json();
+      setQuestions(Array.isArray(data) ? data : []);
+      setError(null);
+    } catch (e) {
+      setError('Ошибка загрузки вопросов');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 

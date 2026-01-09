@@ -11,10 +11,10 @@ router = APIRouter(prefix="/reviews", tags=["reviews"])
 @router.post("/", response_model=schemas.ReviewRead)
 def create_review(review: schemas.ReviewCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     if not current_user.is_admin:
-        five_minutes_ago = datetime.utcnow() - timedelta(minutes=5)
+        ten_minutes_ago = datetime.utcnow() - timedelta(minutes=10)
         last_review = db.query(Review).filter(Review.user_id == current_user.id).order_by(Review.created_at.desc()).first()
-        if last_review and last_review.created_at > five_minutes_ago:
-            raise HTTPException(status_code=429, detail="Можно оставлять отзыв не чаще, чем раз в 5 минут")
+        if last_review and last_review.created_at > ten_minutes_ago:
+            raise HTTPException(status_code=429, detail="Можно оставлять отзыв не чаще, чем раз в 10 минут")
     db_review = Review(user_id=current_user.id, rating=review.rating, text=review.text)
     db.add(db_review)
     db.commit()
@@ -71,6 +71,10 @@ def admin_reply_review(review_id: int, reply: str = Body(...), db: Session = Dep
 def create_guest_review(review: schemas.ReviewCreate, db: Session = Depends(get_db)):
     if not review.guest_name or not review.guest_phone:
         raise HTTPException(status_code=400, detail="Имя и телефон обязательны для гостевого отзыва")
+    ten_minutes_ago = datetime.utcnow() - timedelta(minutes=10)
+    last_guest_review = db.query(Review).filter(Review.guest_phone == review.guest_phone).order_by(Review.created_at.desc()).first()
+    if last_guest_review and last_guest_review.created_at > ten_minutes_ago:
+        raise HTTPException(status_code=429, detail="Можно оставлять гостевой отзыв не чаще, чем раз в 10 минут")
     db_review = Review(
         user_id=None,
         guest_name=review.guest_name,
@@ -81,4 +85,4 @@ def create_guest_review(review: schemas.ReviewCreate, db: Session = Depends(get_
     db.add(db_review)
     db.commit()
     db.refresh(db_review)
-    return db_review 
+    return db_review

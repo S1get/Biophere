@@ -35,15 +35,24 @@ export default function ReviewsPage() {
   const [guestModalOpen, setGuestModalOpen] = useState(false)
 
   const fetchReviews = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/reviews/`)
-      const data = await res.json()
-      setReviews(data)
-    } catch {
-      setError('Ошибка загрузки отзывов')
+      const res = await fetch(`${API_URL}/reviews/`);
+      const contentType = res.headers.get("content-type") || "";
+      if (!res.ok || !contentType.includes("application/json")) {
+        const text = await res.text();
+        console.error("Ошибка ответа сервера (reviews):", text);
+        setError('Ошибка загрузки отзывов');
+        setReviews([]);
+        return;
+      }
+      const data = await res.json();
+      setReviews(Array.isArray(data) ? data : []);
+      setError(null);
+    } catch (e) {
+      setError('Ошибка загрузки отзывов');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
@@ -306,4 +315,4 @@ export default function ReviewsPage() {
       </div>
     </section>
   )
-} 
+}

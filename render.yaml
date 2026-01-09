@@ -5,8 +5,10 @@ services:
     env: python
     region: frankfurt
     plan: free
-    buildCommand: pip install -r backend/requirements.txt
-    startCommand: sh -c "cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT"
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    postDeployCommand: alembic upgrade head && python create_admin.py && python fix_all_seed_errors.py && python seed_specialists.py
     healthCheckPath: /health
     autoDeploy: true
     envVars:
@@ -20,16 +22,14 @@ services:
         value: 3.13.4
 
   # Frontend Service
-  - type: web
+  - type: static
     name: biosphere-frontend
-    env: node
     region: frankfurt
     plan: free
-    buildCommand: npm install && npm run build
-    startCommand: npm run start
-    healthCheckPath: /
-    autoDeploy: true
     rootDir: biosphere-vet-clinic
+    buildCommand: npm install && npm run build
+    publishDir: dist
+    autoDeploy: true
     envVars:
       - key: VITE_API_URL
         fromService:
@@ -37,8 +37,6 @@ services:
           type: web
           property: host
         format: https://{{host}}
-      - key: PORT
-        value: 10000
       - key: NODE_VERSION
         value: 20.x
 
