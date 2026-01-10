@@ -33,7 +33,7 @@ export function GuestQuestionModal({ isOpen, onClose, onSuccess }: GuestQuestion
         body: JSON.stringify({ guest_name: name, guest_phone: phone, text })
       })
       if (!res.ok) throw new Error('Ошибка отправки')
-      toast({ title: 'Спасибо за вопрос!', description: 'Ваш вопрос отправлен и появится после проверки.' })
+      toast({ title: 'Спасибо за вопрос!', description: 'Ваш вопрос отправлен и сохранён.' })
       setName('')
       setPhone('')
       setText('')
@@ -92,4 +92,4 @@ export function GuestQuestionModal({ isOpen, onClose, onSuccess }: GuestQuestion
       </DialogContent>
     </Dialog>
   )
-} 
+}

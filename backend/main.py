@@ -16,6 +16,7 @@ from routers.specialists import router as specialists_router
 from models import User, Review, Question, Specialist
 from datetime import datetime
 from auth import get_current_user
+from create_admin import create_admin
 
 # ВАЖНО: Для запуска на Render используйте команду:
 # uvicorn backend.main:app --host 0.0.0.0 --port $PORT
@@ -33,6 +34,9 @@ allowed_origins = [
     "http://127.0.0.1:5173",
     # Минимакс превью домен (для тестов/предпросмотра)
     "https://1y0ld6yrx4.space.minimax.io",
+    # Продакшн домен сайта
+    "https://biosphere-kirov.ru",
+    "http://biosphere-kirov.ru",
 ]
 if frontend_url:
     allowed_origins.append(frontend_url)
@@ -40,7 +44,7 @@ if frontend_url:
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
-    allow_origin_regex=r"https://.*\\.onrender\\.com$|https://.*\\.space\\.minimax\\.io$",
+    allow_origin_regex=r"https://.*\\.onrender\\.com$|https://.*\\.space\\.minimax\\.io$|https://biosphere-kirov\\.ru$|http://biosphere-kirov\\.ru$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -98,6 +102,12 @@ def on_startup():
                 db.close()
         except Exception as e:
             print(f"Warning: Could not seed specialists: {e}")
+    # Обеспечиваем наличие администратора (admin@biosphere.ru / ADMINBIO)
+    try:
+        create_admin()
+        print("Admin user ensured")
+    except Exception as e:
+        print(f"Warning: Could not ensure admin user: {e}")
 
 @app.get("/")
 def root():

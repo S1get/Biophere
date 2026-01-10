@@ -139,6 +139,10 @@ export default function FAQSection() {
           const errorData = await res.json()
           throw new Error(errorData.detail || 'Время редактирования истекло')
         }
+        if (res.status === 429) {
+          const errorData = await res.json()
+          throw new Error(errorData.detail || 'Можно задавать вопрос не чаще, чем раз в 1 минуту')
+        }
         throw new Error('Ошибка сохранения')
       }
       setForm({ text: '' })

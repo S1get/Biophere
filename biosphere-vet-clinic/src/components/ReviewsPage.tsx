@@ -89,7 +89,7 @@ export default function ReviewsPage() {
         if (res.status === 429) {
           toast({
             title: 'Слишком часто',
-            description: 'Можно оставлять отзыв не чаще, чем раз в 5 минут.',
+            description: 'Можно оставлять отзыв не чаще, чем раз в 10 минут.',
             variant: 'destructive',
           })
           return

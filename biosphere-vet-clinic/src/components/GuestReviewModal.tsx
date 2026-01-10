@@ -35,7 +35,7 @@ export function GuestReviewModal({ isOpen, onClose, onSuccess }: GuestReviewModa
         body: JSON.stringify({ guest_name: name, guest_phone: phone, text, rating })
       })
       if (!res.ok) throw new Error('Ошибка отправки')
-      toast({ title: 'Спасибо за отзыв!', description: 'Ваш отзыв отправлен и появится после проверки.' })
+      toast({ title: 'Спасибо за отзыв!', description: 'Ваш отзыв отправлен и сохранён.' })
       setName('')
       setPhone('')
       setText('')
@@ -103,4 +103,4 @@ export function GuestReviewModal({ isOpen, onClose, onSuccess }: GuestReviewModa
       </DialogContent>
     </Dialog>
   )
-} 
+}
