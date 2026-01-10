@@ -22,7 +22,7 @@ from create_admin import create_admin
 # uvicorn backend.main:app --host 0.0.0.0 --port $PORT
 # (если main.py лежит в папке backend)
 
-app = FastAPI(title="biosphere API")
+app = FastAPI()
 
 # CORS: разрешаем локальную разработку и продакшн
 # Динамическая настройка CORS: учитываем реальный фронтенд-домен из окружения и разрешаем поддомены Render
@@ -40,11 +40,11 @@ allowed_origins = [
 ]
 if frontend_origin:
     allowed_origins.append(frontend_origin)
-
+    
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_origin_regex=r"https://.*\\.onrender\\.com$|https://.*\\.space\\.minimax\\.io$|https://biosphere-kirov\\.ru$|http://biosphere-kirov\\.ru$",
+    # Временно ставим ["*"], чтобы разрешить вообще всем источникам
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
