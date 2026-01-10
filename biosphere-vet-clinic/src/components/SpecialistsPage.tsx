@@ -90,10 +90,11 @@ export default function SpecialistsPage() {
       (s.position || '').toLowerCase().includes(search.toLowerCase())
     const specArr = s.specialization ? s.specialization.split(',').map(x => x.trim()) : []
     const workArr = s.workplace ? s.workplace.split(',').map(x => x.trim()) : []
+    const normalizedWorkArr = workArr.map(w => w === 'Нововятский район' ? 'ул. Молодой Гвардии, 2Д, Нововятский район' : w)
     const matchesSpec =
       selectedSpecs.length === 0 || selectedSpecs.some(spec => specArr.includes(spec))
     const matchesWork =
-      selectedWorkplaces.length === 0 || selectedWorkplaces.some(w => workArr.includes(w))
+      selectedWorkplaces.length === 0 || selectedWorkplaces.some(w => normalizedWorkArr.includes(w))
     const matchesPos = !selectedPosition || s.position === selectedPosition
     return matchesSearch && matchesSpec && matchesWork && matchesPos
   })
@@ -414,7 +415,7 @@ export default function SpecialistsPage() {
       {/* Модальное окно для просмотра фотографий */}
       {selectedImage && (
         <ImageModal
-          isOpen={imageModalOpen}
+         isOpen={imageModalOpen}
           onClose={() => {
             setImageModalOpen(false)
             setSelectedImage(null)
@@ -426,4 +427,4 @@ export default function SpecialistsPage() {
       )}
     </>
   )
-} 
+}
