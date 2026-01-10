@@ -43,8 +43,7 @@ if frontend_origin:
     
 app.add_middleware(
     CORSMiddleware,
-    # Временно ставим ["*"], чтобы разрешить вообще всем источникам
-    allow_origins=["*"], 
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
