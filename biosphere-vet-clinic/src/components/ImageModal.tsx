@@ -17,6 +17,7 @@ export default function ImageModal({ isOpen, onClose, imageSrc, imageAlt, specia
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const imageRef = useRef<HTMLImageElement>(null)
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
 
   useEffect(() => {
     if (isOpen) {
@@ -74,6 +75,9 @@ export default function ImageModal({ isOpen, onClose, imageSrc, imageAlt, specia
     }
   }
 
+  if (isMobile) {
+    return null
+  }
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-[98vw] max-h-[98vh] w-[98vw] h-[98vh] p-0 bg-black/95 border-0">
@@ -151,4 +155,4 @@ export default function ImageModal({ isOpen, onClose, imageSrc, imageAlt, specia
       </DialogContent>
     </Dialog>
   )
-} 
+}

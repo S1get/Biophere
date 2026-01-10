@@ -101,4 +101,42 @@ class SpecialistRead(SpecialistBase):
 
     model_config = {
         "from_attributes": True
-    } 
+    }
+
+# Публичные модели без телефона (для открытых эндпоинтов)
+class PublicUserRead(BaseModel):
+    id: int
+    name: str
+    model_config = {
+        "from_attributes": True
+    }
+
+class PublicReviewRead(BaseModel):
+    id: int
+    rating: int
+    text: str
+    admin_reply: str | None = None
+    guest_name: str | None = None
+    user_id: int | None = None
+    user: PublicUserRead | None = None
+    model_config = {
+        "from_attributes": True
+    }
+
+class PublicQuestionRead(BaseModel):
+    id: int
+    text: str
+    admin_reply: str | None = None
+    guest_name: str | None = None
+    is_read: bool = False
+    user_id: int | None = None
+    user: PublicUserRead | None = None
+    created_at: datetime
+
+    @field_serializer("created_at")
+    def serialize_created_at(self, value):
+        return value.isoformat() if value else None
+
+    model_config = {
+        "from_attributes": True
+    }
