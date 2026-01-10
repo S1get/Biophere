@@ -26,7 +26,7 @@ app = FastAPI(title="biosphere API")
 
 # CORS: разрешаем локальную разработку и продакшн
 # Динамическая настройка CORS: учитываем реальный фронтенд-домен из окружения и разрешаем поддомены Render
-frontend_url = os.getenv("FRONTEND_URL")
+frontend_origin = os.getenv("FRONTEND_ORIGIN")
 allowed_origins = [
     "https://biosphere-frontend.onrender.com",
     "https://biosfera-frontend.onrender.com",
@@ -38,8 +38,8 @@ allowed_origins = [
     "https://biosphere-kirov.ru",
     "http://biosphere-kirov.ru",
 ]
-if frontend_url:
-    allowed_origins.append(frontend_url)
+if frontend_origin:
+    allowed_origins.append(frontend_origin)
 
 app.add_middleware(
     CORSMiddleware,
