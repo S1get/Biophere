@@ -1,6 +1,6 @@
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Download, ZoomIn, ZoomOut } from 'lucide-react'
+import { Download, ZoomIn, ZoomOut, X } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 
 interface ImageModalProps {
@@ -79,53 +79,11 @@ export default function ImageModal({ isOpen, onClose, imageSrc, imageAlt, specia
     return null
   }
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[98vw] max-h-[98vh] w-[98vw] h-[98vh] p-0 bg-black/95 border-0">
-        <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
-          {/* Кнопки управления */}
-          <div className="absolute top-6 right-6 z-50 flex gap-3">
-            <Button
-              size="lg"
-              variant="secondary"
-              onClick={handleZoomOut}
-              disabled={scale <= 0.5}
-              className="bg-white/20 hover:bg-white/30 text-white border-white/30 h-12 w-12 p-0"
-            >
-              <ZoomOut className="h-6 w-6" />
-            </Button>
-            <Button
-              size="lg"
-              variant="secondary"
-              onClick={handleZoomIn}
-              disabled={scale >= 3}
-              className="bg-white/20 hover:bg-white/30 text-white border-white/30 h-12 w-12 p-0"
-            >
-              <ZoomIn className="h-6 w-6" />
-            </Button>
-            <Button
-              size="lg"
-              variant="secondary"
-              onClick={handleDownload}
-              className="bg-white/20 hover:bg-white/30 text-white border-white/30 h-12 w-12 p-0"
-            >
-              <Download className="h-6 w-6" />
-            </Button>
-
-          </div>
-
-          {/* Информация о специалисте */}
-          <div className="absolute top-6 left-6 z-50 bg-black/60 text-white px-4 py-3 rounded-lg">
-            <p className="text-lg font-medium">{specialistName}</p>
-          </div>
-
-          {/* Масштаб */}
-          <div className="absolute bottom-6 left-6 z-50 bg-black/60 text-white px-4 py-3 rounded-lg">
-            <p className="text-lg font-medium">{Math.round(scale * 100)}%</p>
-          </div>
-
-          {/* Изображение */}
+    <Dialog open={isOpen} onOpenChange={onClose} modal={false}>
+      <DialogContent data-overlay="none" className="p-0 bg-transparent border-0 shadow-none max-w-none">
+        <div className="relative w-screen h-screen flex items-center justify-center">
           <div
-            className="w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing"
+            className="relative w-[75vmin] h-[75vmin] max-w-[90vw] max-h-[80vh] rounded-full overflow-hidden shadow-2xl bg-white/5 backdrop-blur-sm"
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
@@ -136,13 +94,35 @@ export default function ImageModal({ isOpen, onClose, imageSrc, imageAlt, specia
               ref={imageRef}
               src={imageSrc}
               alt={imageAlt}
-              className="max-w-full max-h-full object-contain transition-transform duration-200"
+              className="absolute inset-0 m-auto object-cover transition-transform duration-200 select-none"
               style={{
-                transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
+                transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
                 cursor: scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default'
               }}
               draggable={false}
             />
+
+            <div className="absolute -top-12 left-1/2 -translate-x-1/2 flex items-center gap-3">
+              <Button size="icon" variant="secondary" onClick={handleZoomOut} disabled={scale <= 0.5} className="rounded-full bg-white/80 text-black hover:bg-white">
+                <ZoomOut className="h-4 w-4" />
+              </Button>
+              <Button size="icon" variant="secondary" onClick={handleZoomIn} disabled={scale >= 3} className="rounded-full bg-white/80 text-black hover:bg-white">
+                <ZoomIn className="h-4 w-4" />
+              </Button>
+              <Button size="icon" variant="secondary" onClick={handleDownload} className="rounded-full bg-white/80 text-black hover:bg-white">
+                <Download className="h-4 w-4" />
+              </Button>
+              <Button size="icon" variant="secondary" onClick={onClose} className="rounded-full bg-white/80 text-black hover:bg-white">
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <div className="absolute bottom-3 left-3 bg-black/40 text-white px-3 py-1 rounded-full text-sm">
+              {Math.round(scale * 100)}%
+            </div>
+            <div className="absolute top-3 left-3 bg-black/40 text-white px-3 py-1 rounded-full text-sm">
+              {specialistName}
+            </div>
           </div>
         </div>
       </DialogContent>

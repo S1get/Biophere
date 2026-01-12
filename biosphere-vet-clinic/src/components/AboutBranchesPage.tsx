@@ -1,7 +1,8 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Home, Users, Clock, CheckCircle } from 'lucide-react';
+import { MapPin, Home, Users, Clock, CheckCircle, ChevronLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function AboutBranchesPage() {
   return (
@@ -72,6 +73,12 @@ export default function AboutBranchesPage() {
           <p>
             Мы всегда рядом, чтобы заботиться о здоровье вашего питомца — выберите ближайший филиал и приходите в удобное для вас время!
           </p>
+        </div>
+
+        <div className="mt-10 flex justify-start">
+          <Link to="/about-doctors" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+            <ChevronLeft className="h-4 w-4" /> Назад
+          </Link>
         </div>
       </div>
     </section>

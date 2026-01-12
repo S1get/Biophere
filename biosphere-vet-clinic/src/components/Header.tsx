@@ -80,6 +80,13 @@ export function Header({ onNavigateToSection }: HeaderProps) {
               Биосфера
             </button>
             <Button
+              size="sm"
+              onClick={() => setIsBookingOpen(true)}
+              className="hidden md:inline-flex bg-gradient-to-r from-biosphere-primary to-biosphere-secondary text-white px-4 py-2 hover:shadow-lg"
+            >
+              Записаться онлайн
+            </Button>
+            <Button
               variant="ghost"
               size="sm"
               onClick={toggleTheme}

@@ -58,15 +58,14 @@ export default function SpecialistsPage() {
         .filter(Boolean)
     )
   ).sort((a, b) => a.localeCompare(b, 'ru', { sensitivity: 'base' }))
-  const allWorkplaces = Array.from(
-    new Set(
-      specialists
-        .flatMap(s => (s.workplace ? s.workplace.split(',').map(x => x.trim()) : []))
-        .map(w => (w === 'Нововятский район' ? 'ул. Молодой Гвардии, 2Д, Нововятский район' : w))
-        .filter(Boolean)
-        .filter(w => !/^((у\s*)?д\.?\s*\d+\s*[А-Яа-яA-Za-z]?)$/i.test(w) && w.length > 5)
-    )
-  ).sort((a, b) => a.localeCompare(b, 'ru', { sensitivity: 'base' }))
+  const allWorkplaces = [
+    'ул. Солнечная, 19Б',
+    'ул. Московская, 4',
+    'ул. Молодой Гвардии, 2Д, Нововятский район',
+    'пр-т Строителей, 9, корпус 1',
+    'ул. Чернышевского, 7',
+    'ул. Украинская, 18',
+  ]
   const positions = Array.from(new Set(specialists.map(s => s.position))).sort(comparePositions)
 
   // Получаем 6 уникальных должностей и 6 уникальных мест работы (филиалов)
@@ -95,6 +94,7 @@ export default function SpecialistsPage() {
     const specArr = s.specialization ? s.specialization.split(',').map(x => x.trim()) : []
     const workArr = s.workplace ? s.workplace.split(',').map(x => x.trim()) : []
     const normalizedWorkArr = workArr.map(w => w === 'Нововятский район' ? 'ул. Молодой Гвардии, 2Д, Нововятский район' : w)
+      .filter(w => allWorkplaces.some(aw => w.includes(aw) || aw.includes(w)))
     const matchesSpec =
       selectedSpecs.length === 0 || selectedSpecs.some(spec => specArr.includes(spec))
     const matchesWork =
@@ -263,7 +263,7 @@ export default function SpecialistsPage() {
                 </DropdownMenu>
                 <button
                   onClick={resetFilters}
-                  className="flex-1 min-w-[150px] px-4 py-2 rounded-lg border border-red-300 dark:border-red-600 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900 hover:bg-red-100 dark:hover:bg-red-800 transition-colors text-sm font-medium"
+                  className="flex-1 min-w-[150px] px-4 py-2 rounded-lg border border-red-300 dark:border-red-600 text-red-600 dark:text-white bg-red-50 dark:bg-red-900 hover:bg-red-100 dark:hover:bg-red-800 transition-colors text-sm font-medium"
                   style={{ minWidth: 0 }}
                 >
                   Сбросить фильтры

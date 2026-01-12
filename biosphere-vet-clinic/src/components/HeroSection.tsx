@@ -99,14 +99,14 @@ export function HeroSection() {
               {/* Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8">
                 {stats.map((stat, index) => (
-                  <div key={index} className="text-center p-4 rounded-lg bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
+                  <div key={index} className="text-center p-5 rounded-xl bg-white/80 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 shadow-md">
                     <div className="flex items-center justify-center mb-2 text-biosphere-primary">
                       {stat.icon}
                     </div>
-                    <div className="font-bold text-2xl text-gray-900 dark:text-white">
+                    <div className="font-extrabold text-2xl text-gray-900 dark:text-white">
                       {stat.number}
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-300">
+                    <div className="text-sm text-gray-700 dark:text-gray-300">
                       {stat.label}
                     </div>
                   </div>
@@ -141,21 +141,32 @@ export function HeroSection() {
                 </Link>
               ))}
 
+              <div className="flex items-center gap-3">
+                <Link to={features[0].link} className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                  <span>Назад</span>
+                </Link>
+                <Link to={features[features.length-1].link} className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                  <span>Далее</span>
+                </Link>
+              </div>
+
               {/* Emergency Contact Card */}
-              <Card className="bg-gradient-to-r from-red-500/90 to-red-600/90 dark:from-red-500/70 dark:to-red-600/70 text-white border-0 shadow-md">
-                <CardContent className="p-6">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex-shrink-0">
-                      <Phone className="h-8 w-8" />
+              <Link to="/about-24-7" className="block group">
+                <Card className="bg-gradient-to-r from-red-500/90 to-red-600/90 dark:from-red-500/70 dark:to-red-600/70 text-white border-0 shadow-md cursor-pointer">
+                  <CardContent className="p-6">
+                    <div className="flex items-center space-x-4">
+                      <div className="flex-shrink-0">
+                        <Phone className="h-8 w-8" />
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold mb-1">Работаем круглосуточно</div>
+                        <div className="text-lg mb-1">пр-т Строителей, 9, корпус 1</div>
+                        <div className="text-xl font-bold">44-37-97</div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="text-2xl font-bold mb-1">Работаем круглосуточно</div>
-                      <div className="text-lg mb-1">пр-т Строителей, 9, корпус 1</div>
-                      <div className="text-xl font-bold">44-37-97</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </Link>
             </div>
           </div>
         </div>

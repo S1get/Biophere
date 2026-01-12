@@ -18,6 +18,7 @@ export function GuestQuestionModal({ isOpen, onClose, onSuccess }: GuestQuestion
   const [phone, setPhone] = useState('')
   const [text, setText] = useState('')
   const [loading, setLoading] = useState(false)
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,20 +28,27 @@ export function GuestQuestionModal({ isOpen, onClose, onSuccess }: GuestQuestion
     }
     setLoading(true)
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/questions/guest/`, {
+      const res = await fetch(`${API_URL}/questions/guest`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ guest_name: name, guest_phone: phone, text })
       })
-      if (!res.ok) throw new Error('Ошибка отправки')
+      if (!res.ok) {
+        let message = 'Ошибка отправки'
+        try {
+          const data = await res.json()
+          message = (data && data.detail) ? String(data.detail) : message
+        } catch { void 0 }
+        throw new Error(message)
+      }
       toast({ title: 'Спасибо за вопрос!', description: 'Ваш вопрос отправлен и сохранён.' })
       setName('')
       setPhone('')
       setText('')
       onClose()
       onSuccess && onSuccess()
-    } catch {
-      toast({ title: 'Ошибка', description: 'Не удалось отправить вопрос', variant: 'destructive' })
+    } catch (err: any) {
+      toast({ title: 'Ошибка', description: err?.message || 'Не удалось отправить вопрос', variant: 'destructive' })
     } finally {
       setLoading(false)
     }

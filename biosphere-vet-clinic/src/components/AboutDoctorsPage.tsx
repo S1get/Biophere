@@ -1,7 +1,8 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Heart, GraduationCap, Award, Stethoscope, Users, CheckCircle } from 'lucide-react';
+import { Heart, GraduationCap, Award, Stethoscope, Users, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function AboutDoctorsPage() {
   return (
@@ -72,6 +73,15 @@ export default function AboutDoctorsPage() {
           <p>
             Доверьте здоровье вашего питомца нашим специалистам — мы всегда готовы помочь и найти индивидуальный подход к каждому!
           </p>
+        </div>
+
+        <div className="mt-10 flex justify-between">
+          <Link to="/about-equipment" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+            <ChevronLeft className="h-4 w-4" /> Назад
+          </Link>
+          <Link to="/about-branches" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+            Далее <ChevronRight className="h-4 w-4" />
+          </Link>
         </div>
       </div>
     </section>
