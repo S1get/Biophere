@@ -34,19 +34,32 @@ export default function ReviewsPage() {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [guestModalOpen, setGuestModalOpen] = useState(false)
 
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+  const fetchJSONWithRetry = async (url: string, options?: RequestInit, retries = 6, delay = 1500) => {
+    for (let attempt = 0; attempt < retries; attempt++) {
+      try {
+        const res = await fetch(url, options)
+        const contentType = res.headers.get('content-type') || ''
+        if (res.ok && contentType.includes('application/json')) {
+          return await res.json()
+        }
+        const text = await res.text().catch(() => '')
+        if (text.includes('Application loading') || res.status === 503 || res.status === 502) {
+          await sleep(delay)
+          continue
+        }
+        throw new Error('Bad response')
+      } catch (e) {
+        if (attempt === retries - 1) throw e
+        await sleep(delay)
+      }
+    }
+  }
+
   const fetchReviews = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/reviews/`);
-      const contentType = res.headers.get("content-type") || "";
-      if (!res.ok || !contentType.includes("application/json")) {
-        const text = await res.text();
-        console.error("Ошибка ответа сервера (reviews):", text);
-        setError('Ошибка загрузки отзывов');
-        setReviews([]);
-        return;
-      }
-      const data = await res.json();
+      const data = await fetchJSONWithRetry(`${API_URL}/reviews/`)
       setReviews(Array.isArray(data) ? data : []);
       setError(null);
     } catch (e) {

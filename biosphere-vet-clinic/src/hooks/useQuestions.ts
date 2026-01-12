@@ -27,18 +27,27 @@ export function useQuestions() {
     ? { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
     : { 'Content-Type': 'application/json' };
 
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+
   const fetchQuestions = async () => {
     setLoading(true);
     try {
       const url = token ? `${API_URL}/questions/admin` : `${API_URL}/questions/`;
-      const res = await fetch(url, { headers: token ? { Authorization: `Bearer ${token}` } : undefined });
-      const contentType = res.headers.get("content-type") || "";
-      if (!res.ok || !contentType.includes("application/json")) {
-        const text = await res.text();
-        console.error("Ошибка ответа сервера (questions):", text);
+      let data: any = null
+      for (let attempt = 0; attempt < 6; attempt++) {
+        const res = await fetch(url, { headers: token ? { Authorization: `Bearer ${token}` } : undefined });
+        const contentType = res.headers.get("content-type") || "";
+        if (res.ok && contentType.includes("application/json")) {
+          data = await res.json();
+          break
+        }
+        const text = await res.text().catch(() => "");
+        if (text.includes("Application loading") || res.status === 503 || res.status === 502) {
+          await sleep(1500)
+          continue
+        }
         throw new Error("Ошибка загрузки вопросов");
       }
-      const data = await res.json();
       setQuestions(Array.isArray(data) ? data : []);
       setError(null);
     } catch (e: any) {

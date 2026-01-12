@@ -21,6 +21,7 @@ export function GuestReviewModal({ isOpen, onClose, onSuccess }: GuestReviewModa
   const [rating, setRating] = useState(5)
   const [loading, setLoading] = useState(false)
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -30,15 +31,26 @@ export function GuestReviewModal({ isOpen, onClose, onSuccess }: GuestReviewModa
     }
     setLoading(true)
     try {
-      const res = await fetch(`${API_URL}/reviews/guest`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ guest_name: name, guest_phone: phone, text, rating })
-      })
-      if (!res.ok) {
+      let res: Response | null = null
+      for (let attempt = 0; attempt < 6; attempt++) {
+        res = await fetch(`${API_URL}/reviews/guest`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ guest_name: name, guest_phone: phone, text, rating })
+        })
+        const ct = res.headers.get('content-type') || ''
+        if (res.ok && ct.includes('application/json')) break
+        const t = await res.text().catch(() => '')
+        if (t.includes('Application loading') || res.status === 503 || res.status === 502) {
+          await sleep(1500)
+          continue
+        }
+        break
+      }
+      if (!res || !res.ok) {
         let message = 'Ошибка отправки'
         try {
-          const data = await res.json()
+          const data = res ? await res.json() : null
           message = (data && data.detail) ? String(data.detail) : message
         } catch { void 0 }
         throw new Error(message)
@@ -49,7 +61,7 @@ export function GuestReviewModal({ isOpen, onClose, onSuccess }: GuestReviewModa
       setText('')
       setRating(5)
       onClose()
-      onSuccess && onSuccess()
+      if (onSuccess) onSuccess()
     } catch (err: any) {
       toast({ title: 'Ошибка', description: err?.message || 'Не удалось отправить отзыв', variant: 'destructive' })
     } finally {

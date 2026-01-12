@@ -24,18 +24,27 @@ export function useReviews() {
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+
   const fetchReviews = async () => {
     setLoading(true);
     try {
       const url = token ? `${API_URL}/reviews/admin` : `${API_URL}/reviews/`;
-      const res = await fetch(url, { headers: token ? { Authorization: `Bearer ${token}` } : undefined });
-      const contentType = res.headers.get("content-type") || "";
-      if (!res.ok || !contentType.includes("application/json")) {
-        const text = await res.text();
-        console.error("Ошибка ответа сервера (reviews):", text);
+      let data: any = null
+      for (let attempt = 0; attempt < 6; attempt++) {
+        const res = await fetch(url, { headers: token ? { Authorization: `Bearer ${token}` } : undefined });
+        const contentType = res.headers.get("content-type") || "";
+        if (res.ok && contentType.includes("application/json")) {
+          data = await res.json();
+          break
+        }
+        const text = await res.text().catch(() => "");
+        if (text.includes("Application loading") || res.status === 503 || res.status === 502) {
+          await sleep(1500)
+          continue
+        }
         throw new Error("Ошибка загрузки отзывов");
       }
-      const data = await res.json();
       setReviews(Array.isArray(data) ? data : []);
       setError(null);
     } catch (e: any) {

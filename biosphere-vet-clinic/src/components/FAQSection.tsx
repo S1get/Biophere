@@ -31,19 +31,32 @@ export default function FAQSection() {
   const [guestModalOpen, setGuestModalOpen] = useState(false)
   const [timeUpdate, setTimeUpdate] = useState(0); // Для обновления времени каждую секунду
 
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+  const fetchJSONWithRetry = async (url: string, options?: RequestInit, retries = 6, delay = 1500) => {
+    for (let attempt = 0; attempt < retries; attempt++) {
+      try {
+        const res = await fetch(url, options)
+        const contentType = res.headers.get('content-type') || ''
+        if (res.ok && contentType.includes('application/json')) {
+          return await res.json()
+        }
+        const text = await res.text().catch(() => '')
+        if (text.includes('Application loading') || res.status === 503 || res.status === 502) {
+          await sleep(delay)
+          continue
+        }
+        throw new Error('Bad response')
+      } catch (e) {
+        if (attempt === retries - 1) throw e
+        await sleep(delay)
+      }
+    }
+  }
+
   const fetchQuestions = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/questions/`);
-      const contentType = res.headers.get("content-type") || "";
-      if (!res.ok || !contentType.includes("application/json")) {
-        const text = await res.text();
-        console.error("Ошибка ответа сервера (questions):", text);
-        setError('Ошибка загрузки вопросов');
-        setQuestions([]);
-        return;
-      }
-      const data = await res.json();
+      const data = await fetchJSONWithRetry(`${API_URL}/questions/`)
       setQuestions(Array.isArray(data) ? data : []);
       setError(null);
     } catch (e) {
