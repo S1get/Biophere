@@ -24,6 +24,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import ImageModal from './ImageModal'
+import { useIsMobile } from '@/hooks/use-mobile'
+import { comparePositions } from '../constants/positionRank'
 
 export default function SpecialistsPage() {
   const { specialists, loading, error, createSpecialist, updateSpecialist, deleteSpecialist } = useSpecialists()
@@ -33,6 +35,7 @@ export default function SpecialistsPage() {
   const [selectedWorkplaces, setSelectedWorkplaces] = useState<string[]>([])
   const [selectedPosition, setSelectedPosition] = useState<string>('')
   const [showScrollTop, setShowScrollTop] = useState(false)
+  const isMobile = useIsMobile()
   
   // Модальные окна
   const [modalOpen, setModalOpen] = useState(false)
@@ -54,16 +57,17 @@ export default function SpecialistsPage() {
         .flatMap(s => (s.specialization ? s.specialization.split(',').map(x => x.trim()) : []))
         .filter(Boolean)
     )
-  )
+  ).sort((a, b) => a.localeCompare(b, 'ru', { sensitivity: 'base' }))
   const allWorkplaces = Array.from(
     new Set(
       specialists
         .flatMap(s => (s.workplace ? s.workplace.split(',').map(x => x.trim()) : []))
+        .map(w => (w === 'Нововятский район' ? 'ул. Молодой Гвардии, 2Д, Нововятский район' : w))
         .filter(Boolean)
         .filter(w => !/^((у\s*)?д\.?\s*\d+\s*[А-Яа-яA-Za-z]?)$/i.test(w) && w.length > 5)
     )
-  )
-  const positions = Array.from(new Set(specialists.map(s => s.position)))
+  ).sort((a, b) => a.localeCompare(b, 'ru', { sensitivity: 'base' }))
+  const positions = Array.from(new Set(specialists.map(s => s.position))).sort(comparePositions)
 
   // Получаем 6 уникальных должностей и 6 уникальных мест работы (филиалов)
   const uniquePositions = positions.slice(0, 6);
@@ -146,6 +150,7 @@ export default function SpecialistsPage() {
   }
 
   const handleImageClick = (specialist: any) => {
+    if (isMobile) return
     setSelectedImage({
       src: specialist.photo,
       alt: specialist.name,
@@ -326,9 +331,9 @@ export default function SpecialistsPage() {
                   <CardContent className="p-6">
                     <div className="text-center mb-6">
                       <div 
-                        className="w-24 h-24 bg-gradient-to-br from-biosphere-primary to-biosphere-secondary rounded-full mx-auto mb-4 overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-200"
+                        className={`w-24 h-24 bg-gradient-to-br from-biosphere-primary to-biosphere-secondary rounded-full mx-auto mb-4 overflow-hidden ${isMobile ? '' : 'cursor-pointer hover:scale-105 transition-transform duration-200'}`}
                         onClick={() => handleImageClick(specialist)}
-                        title="Нажмите для просмотра в полном размере"
+                        title={isMobile ? undefined : 'Нажмите для просмотра в полном размере'}
                       >
                         <img 
                           src={specialist.photo}

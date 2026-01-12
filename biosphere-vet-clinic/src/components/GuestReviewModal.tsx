@@ -29,7 +29,7 @@ export function GuestReviewModal({ isOpen, onClose, onSuccess }: GuestReviewModa
     }
     setLoading(true)
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/reviews/guest`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/reviews/guest/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ guest_name: name, guest_phone: phone, text, rating })

@@ -8,7 +8,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { RegistrationModal } from './RegistrationModal'
 import { BookingModal } from './BookingModal'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
@@ -29,7 +28,7 @@ const branches = [
 
 export function Header({ onNavigateToSection }: HeaderProps) {
   const { theme, toggleTheme } = useTheme()
-  const [isRegistrationOpen, setIsRegistrationOpen] = useState(false)
+
   const [isBookingOpen, setIsBookingOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const navigate = useNavigate()
@@ -115,13 +114,12 @@ export function Header({ onNavigateToSection }: HeaderProps) {
                 </Button>
               </>
             ) : (
-              <Button
-                variant="ghost"
-                onClick={() => setIsRegistrationOpen(true)}
-                className="text-sm font-medium hover:text-biosphere-primary"
+              <Link
+                to="/admin-login"
+                className="text-sm font-medium hover:text-biosphere-primary transition-colors"
               >
-                Регистрация
-              </Button>
+                Войти (админ)
+              </Link>
             )}
             
             {navigationItems.map((item) => (
@@ -184,21 +182,26 @@ export function Header({ onNavigateToSection }: HeaderProps) {
           <div className="border-t lg:hidden">
             <div className="container py-4 space-y-4">
               <div className="space-y-2">
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start"
-                  onClick={() => {
-                    if (user && user.is_admin) {
+                {user && user.is_admin ? (
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    onClick={() => {
                       handleLogout()
                       setIsMobileMenuOpen(false)
-                    } else {
-                      setIsRegistrationOpen(true)
-                      setIsMobileMenuOpen(false)
-                    }
-                  }}
-                >
-                  {user && user.is_admin ? 'Выйти' : 'Регистрация'}
-                </Button>
+                    }}
+                  >
+                    Выйти
+                  </Button>
+                ) : (
+                  <Link
+                    to="/admin-login"
+                    className="w-full text-left text-sm font-medium hover:text-biosphere-primary transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Войти (админ)
+                  </Link>
+                )
                 
                 {navigationItems.map((item) => (
                   <button
@@ -249,7 +252,6 @@ export function Header({ onNavigateToSection }: HeaderProps) {
         )}
       </header>
 
-      <RegistrationModal isOpen={isRegistrationOpen} onClose={() => setIsRegistrationOpen(false)} />
       <BookingModal isOpen={isBookingOpen} onClose={() => setIsBookingOpen(false)} />
     </>
   )

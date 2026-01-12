@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Body
+from fastapi import APIRouter, Depends, HTTPException, status, Body, Request
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from database import SessionLocal
 from auth import get_current_user, get_db
 import schemas
@@ -21,11 +22,21 @@ def create_review(review: schemas.ReviewCreate, db: Session = Depends(get_db), c
     db.refresh(db_review)
     return db_review
 
-@router.get("/", response_model=list[schemas.ReviewRead])
+@router.get("/", response_model=list[schemas.PublicReviewRead])
 def get_reviews(db: Session = Depends(get_db)):
     reviews = db.query(Review).all()
     for r in reviews:
         if r.user_id:  # подгружаем user только если user_id не None
+            r.user
+    return reviews
+
+@router.get("/admin", response_model=list[schemas.ReviewRead])
+def get_reviews_admin(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Требуются права администратора")
+    reviews = db.query(Review).order_by(Review.created_at.desc()).all()
+    for r in reviews:
+        if r.user_id:
             r.user
     return reviews
 
@@ -68,19 +79,28 @@ def admin_reply_review(review_id: int, reply: str = Body(...), db: Session = Dep
     return db_review
 
 @router.post("/guest", response_model=schemas.ReviewRead)
-def create_guest_review(review: schemas.ReviewCreate, db: Session = Depends(get_db)):
+def create_guest_review(review: schemas.ReviewCreate, db: Session = Depends(get_db), request: Request = None):
     if not review.guest_name or not review.guest_phone:
         raise HTTPException(status_code=400, detail="Имя и телефон обязательны для гостевого отзыва")
+    # Определяем IP клиента
+    client_ip = None
+    if request is not None:
+        xff = request.headers.get("x-forwarded-for")
+        client_ip = xff.split(",")[0].strip() if xff else (request.client.host if request.client else None)
     ten_minutes_ago = datetime.utcnow() - timedelta(minutes=10)
-    last_guest_review = db.query(Review).filter(Review.guest_phone == review.guest_phone).order_by(Review.created_at.desc()).first()
+    last_guest_review = db.query(Review).filter(
+        or_(Review.guest_phone == review.guest_phone, Review.ip_address == client_ip)
+    ).order_by(Review.created_at.desc()).first()
     if last_guest_review and last_guest_review.created_at > ten_minutes_ago:
         raise HTTPException(status_code=429, detail="Можно оставлять гостевой отзыв не чаще, чем раз в 10 минут")
     db_review = Review(
         user_id=None,
         guest_name=review.guest_name,
         guest_phone=review.guest_phone,
+        ip_address=client_ip,
         rating=review.rating,
-        text=review.text
+        text=review.text,
+        published=True
     )
     db.add(db_review)
     db.commit()

@@ -45,12 +45,9 @@ export function useQuestions() {
 
   const markAsRead = async (questionId: number) => {
     try {
-      const res = await fetch(`${API_URL}/questions/${questionId}/read`, {
+      const res = await fetch(`${API_URL}/questions/${questionId}/read/`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
+        headers: authHeaders,
       });
       if (!res.ok) throw new Error("Ошибка отметки как прочитанного");
       await fetchQuestions(); // Обновляем список
@@ -61,12 +58,9 @@ export function useQuestions() {
 
   const markAsUnread = async (questionId: number) => {
     try {
-      const res = await fetch(`${API_URL}/questions/${questionId}/unread`, {
+      const res = await fetch(`${API_URL}/questions/${questionId}/unread/`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
+        headers: authHeaders,
       });
       if (!res.ok) throw new Error("Ошибка отметки как непрочитанного");
       await fetchQuestions(); // Обновляем список

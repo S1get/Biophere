@@ -182,7 +182,7 @@ export default function AdminPanel() {
   
   const handleExportData = async () => {
     try {
-      const response = await fetch(`${API_URL}/admin/export`, {
+      const response = await fetch(`${API_URL}/admin/export/`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -209,7 +209,7 @@ export default function AdminPanel() {
 
   const handleCleanupData = async () => {
     try {
-      const response = await fetch(`${API_URL}/admin/clear_all`, {
+      const response = await fetch(`${API_URL}/admin/clear_all/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -523,6 +523,9 @@ export default function AdminPanel() {
                                 {new Date(review.created_at).toLocaleDateString('ru-RU')}
                               </span>
                             </div>
+                            {review.guest_phone && (
+                              <p className="text-xs text-gray-500">Телефон гостя: {review.guest_phone}</p>
+                            )}
                           </div>
                         </div>
                         <p className="text-gray-700 dark:text-gray-300">{review.text}</p>
@@ -571,7 +574,7 @@ export default function AdminPanel() {
                   <div className="space-y-4">
                     {questions.slice(0, 10).map((question) => (
                       <div key={question.id} className={`p-4 border rounded-lg transition-all duration-200 ${
-                        !question.is_read ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700' : 'bg-white dark:bg-gray-800'
+                        !question.is_read ? 'bg-blue-50 dark:bg-blue-900/200 dark:border-blue-700' : 'bg-white dark:bg-gray-800'
                       }`}>
                         <div className="flex justify-between items-start mb-2">
                           <div className="flex items-center space-x-2">
@@ -582,6 +585,9 @@ export default function AdminPanel() {
                               <span className="text-sm text-gray-500">
                                 {new Date(question.created_at).toLocaleDateString('ru-RU')}
                               </span>
+                              {question.guest_phone && (
+                                <p className="text-xs text-gray-500">Телефон гостя: {question.guest_phone}</p>
+                              )}
                             </div>
                             <div className="flex items-center space-x-2">
                               <Badge variant={question.admin_reply ? "secondary" : "destructive"}>

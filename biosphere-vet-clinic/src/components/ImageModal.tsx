@@ -1,6 +1,6 @@
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Download, X, ZoomIn, ZoomOut } from 'lucide-react'
+import { Download, ZoomIn, ZoomOut } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 
 interface ImageModalProps {
@@ -110,14 +110,7 @@ export default function ImageModal({ isOpen, onClose, imageSrc, imageAlt, specia
             >
               <Download className="h-6 w-6" />
             </Button>
-            <Button
-              size="lg"
-              variant="secondary"
-              onClick={onClose}
-              className="bg-white/20 hover:bg-white/30 text-white border-white/30 h-12 w-12 p-0"
-            >
-              <X className="h-6 w-6" />
-            </Button>
+
           </div>
 
           {/* Информация о специалисте */}

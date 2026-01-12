@@ -67,7 +67,7 @@ export function useSpecialists() {
     const token = localStorage.getItem('token');
     if (!token) throw new Error('Необходима авторизация');
 
-    const res = await fetch(`${API_URL}/specialists/${id}`, {
+    const res = await fetch(`${API_URL}/specialists/${id}/`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -88,7 +88,7 @@ export function useSpecialists() {
     const token = localStorage.getItem('token');
     if (!token) throw new Error('Необходима авторизация');
 
-    const res = await fetch(`${API_URL}/specialists/${id}`, {
+    const res = await fetch(`${API_URL}/specialists/${id}/`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`

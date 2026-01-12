@@ -20,6 +20,12 @@ services:
         generateValue: true
       - key: PYTHON_VERSION
         value: 3.13.4
+      - key: FRONTEND_ORIGIN
+        fromService:
+          name: biosphere-frontend
+          type: static
+          property: host
+        format: https://{{host}}
 
   # Frontend Service
   - type: static

@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import ImageModal from './ImageModal'
+import { useIsMobile } from '@/hooks/use-mobile'
 
 const specialists = [
   {
@@ -77,8 +78,10 @@ export default function SpecialistsPreviewBlock() {
   // Состояние для модального окна просмотра фотографий
   const [imageModalOpen, setImageModalOpen] = useState(false)
   const [selectedImage, setSelectedImage] = useState<{src: string, alt: string, name: string} | null>(null)
+  const isMobile = useIsMobile()
 
   const handleImageClick = (specialist: any) => {
+    if (isMobile) return
     setSelectedImage({
       src: specialist.photo,
       alt: specialist.name,
@@ -162,4 +165,4 @@ export default function SpecialistsPreviewBlock() {
       )}
     </section>
   )
-} 
+}

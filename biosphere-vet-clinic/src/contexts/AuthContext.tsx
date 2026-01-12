@@ -41,7 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const t = overrideToken || token;
     if (!t) return;
     try {
-      const res = await fetch(`${API_URL}/users/me`, {
+      const res = await fetch(`${API_URL}/users/me/`, {
         headers: { Authorization: `Bearer ${t}` },
         credentials: 'include'
       });
@@ -62,10 +62,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string) => {
     setLoading(true);
-    const res = await fetch(`${API_URL}/auth/token`, {
+    const res = await fetch(`${API_URL}/auth/token/`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ username: email, password }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
       credentials: 'include'
     });
     if (!res.ok) {

@@ -43,21 +43,7 @@ def get_user_by_email(db: Session, email: str):
 
 @router.post('/register', response_model=schemas.UserRead)
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    if get_user_by_email(db, user.email):
-        raise HTTPException(status_code=400, detail="Email уже зарегистрирован")
-    
-    # Все пользователи регистрируются как обычные (не админы)
-    db_user = User(
-        name=user.name,
-        email=user.email,
-        phone=user.phone,
-        password_hash=get_password_hash(user.password),
-        is_admin=False  # Всегда False для обычной регистрации
-    )
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+    raise HTTPException(status_code=403, detail="Регистрация отключена. Используйте гостевые формы для вопросов и отзывов.")
 
 @router.post('/admin/register', response_model=schemas.UserRead)
 def register_admin(user: schemas.UserCreate, db: Session = Depends(get_db)):
@@ -82,39 +68,19 @@ def register_admin(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 @router.post('/token')
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db), response: Response = None):
-    user = get_user_by_email(db, form_data.username)
-    if not user or not verify_password(form_data.password, user.password_hash):
-        raise HTTPException(status_code=401, detail="Неверный email или пароль")
-    
-    # Обычный вход не работает для админов
-    if user.is_admin:
-        raise HTTPException(status_code=403, detail="Администраторы должны использовать специальную страницу входа")
-    
-    access_token = create_access_token(data={"sub": str(user.id)})
-    # Устанавливаем куки для cross-site
-    if response is not None:
-        response.set_cookie(
-            key="access_token",
-            value=access_token,
-            httponly=True,
-            secure=True,
-            samesite="none",
-            max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60
-        )
-    return {"access_token": access_token, "token_type": "bearer"}
+    raise HTTPException(status_code=403, detail="Обычный вход отключен. Доступ только для администратора.")
 
 @router.post('/admin/token')
 def admin_login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db), response: Response = None):
     user = get_user_by_email(db, form_data.username)
-    if not user or not verify_password(form_data.password, user.password_hash):
+    admin_email = os.getenv("ADMIN_EMAIL", "admin@biosphere.ru")
+    if not user or user.email != admin_email or not verify_password(form_data.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Неверный email или пароль")
     
-    # Специальный вход только для админов
     if not user.is_admin:
-        raise HTTPException(status_code=403, detail="Доступ только для администраторов")
+        raise HTTPException(status_code=403, detail="Доступ только для администратора")
     
     access_token = create_access_token(data={"sub": str(user.id)})
-    # Устанавливаем куки для cross-site
     if response is not None:
         response.set_cookie(
             key="access_token",

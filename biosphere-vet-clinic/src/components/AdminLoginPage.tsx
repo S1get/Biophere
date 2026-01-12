@@ -15,13 +15,10 @@ const AdminLoginPage: React.FC = () => {
     setError('');
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/auth/admin/token`, {
+      const response = await fetch(`${API_URL}/auth/admin/token/`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          username: email,
-          password: password,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       });
       if (!response.ok) {
         const errorData = await response.json();
@@ -78,4 +75,4 @@ const AdminLoginPage: React.FC = () => {
   );
 };
 
-export default AdminLoginPage; 
+export default AdminLoginPage;

@@ -22,6 +22,7 @@ class ReviewBase(BaseModel):
     admin_reply: str | None = None
     guest_name: str | None = None
     guest_phone: str | None = None
+    published: bool = True
 
 class ReviewCreate(ReviewBase):
     pass
@@ -34,6 +35,7 @@ class ReviewRead(ReviewBase):
     id: int
     user_id: int | None = None
     user: UserRead | None = None
+    created_at: datetime
     model_config = {
         "from_attributes": True
     }
@@ -44,6 +46,7 @@ class QuestionBase(BaseModel):
     guest_name: str | None = None
     guest_phone: str | None = None
     is_read: bool = False
+    published: bool = True
 
 class QuestionCreate(QuestionBase):
     pass
@@ -119,6 +122,12 @@ class PublicReviewRead(BaseModel):
     guest_name: str | None = None
     user_id: int | None = None
     user: PublicUserRead | None = None
+    created_at: datetime
+
+    @field_serializer("created_at")
+    def serialize_created_at(self, value):
+        return value.isoformat() if value else None
+
     model_config = {
         "from_attributes": True
     }

@@ -1,1 +1,17 @@
-export const rank: Record<string, number> = {\n  \"Главный хирург сети клиник\": 1,\n  \"Главный врач\": 2,\n  \"Ведущий терапевт\": 3,\n  \"Ветеринарный врач-хирург\": 4,\n  \"Ветеринарный врач\": 5,\n  \"Администратор\": 6\n};\n\nexport const getPositionRank = (title: string): number => rank[title] ?? 100;\n\nexport const comparePositions = (a: string, b: string): number => {\n  const ra = getPositionRank(a);\n  const rb = getPositionRank(b);\n  if (ra !== rb) return ra - rb;\n  return a.localeCompare(b, \"ru\", { sensitivity: \"base\" });\n};
+export const rank: Record<string, number> = {
+  "Главный хирург сети клиник": 1,
+  "Главный врач": 2,
+  "Ведущий терапевт": 3,
+  "Ветеринарный врач-хирург": 4,
+  "Ветеринарный врач": 5,
+  "Администратор": 6
+};
+
+export const getPositionRank = (title: string): number => rank[title] ?? 100;
+
+export const comparePositions = (a: string, b: string): number => {
+  const ra = getPositionRank(a);
+  const rb = getPositionRank(b);
+  if (ra !== rb) return ra - rb;
+  return a.localeCompare(b, "ru", { sensitivity: "base" });
+};

@@ -21,10 +21,12 @@ class Review(Base):
     user_id = Column(Integer, ForeignKey('users.id'), nullable=True)
     guest_name = Column(String, nullable=True)
     guest_phone = Column(String, nullable=True)
+    ip_address = Column(String, nullable=True)
     rating = Column(Integer, nullable=False)
     text = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     admin_reply = Column(Text, nullable=True)
+    published = Column(Boolean, default=True, nullable=False)
 
     user = relationship('User', foreign_keys=[user_id], primaryjoin='Review.user_id == User.id', back_populates='reviews')
 
@@ -34,10 +36,12 @@ class Question(Base):
     user_id = Column(Integer, ForeignKey('users.id'), nullable=True)
     guest_name = Column(String, nullable=True)
     guest_phone = Column(String, nullable=True)
+    ip_address = Column(String, nullable=True)
     text = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     admin_reply = Column(Text, nullable=True)
     is_read = Column(Boolean, default=False, nullable=False)
+    published = Column(Boolean, default=True, nullable=False)
 
     user = relationship('User', foreign_keys=[user_id], primaryjoin='Question.user_id == User.id', back_populates='questions')
 
@@ -52,4 +56,4 @@ class Specialist(Base):
     extra_qual = Column(Text, nullable=True)
     photo = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False) 
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
