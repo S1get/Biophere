@@ -11,11 +11,6 @@ router = APIRouter(prefix="/reviews", tags=["reviews"])
 
 @router.post("/", response_model=schemas.ReviewRead)
 def create_review(review: schemas.ReviewCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    if not current_user.is_admin:
-        ten_minutes_ago = datetime.utcnow() - timedelta(minutes=10)
-        last_review = db.query(Review).filter(Review.user_id == current_user.id).order_by(Review.created_at.desc()).first()
-        if last_review and last_review.created_at > ten_minutes_ago:
-            raise HTTPException(status_code=429, detail="Можно оставлять отзыв не чаще, чем раз в 10 минут")
     db_review = Review(user_id=current_user.id, rating=review.rating, text=review.text)
     db.add(db_review)
     db.commit()
@@ -87,12 +82,6 @@ def create_guest_review(review: schemas.ReviewCreate, db: Session = Depends(get_
     if request is not None:
         xff = request.headers.get("x-forwarded-for")
         client_ip = xff.split(",")[0].strip() if xff else (request.client.host if request.client else None)
-    ten_minutes_ago = datetime.utcnow() - timedelta(minutes=10)
-    last_guest_review = db.query(Review).filter(
-        or_(Review.guest_phone == review.guest_phone, Review.ip_address == client_ip)
-    ).order_by(Review.created_at.desc()).first()
-    if last_guest_review and last_guest_review.created_at > ten_minutes_ago:
-        raise HTTPException(status_code=429, detail="Можно оставлять гостевой отзыв не чаще, чем раз в 10 минут")
     db_review = Review(
         user_id=None,
         guest_name=review.guest_name,

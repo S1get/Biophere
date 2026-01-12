@@ -11,12 +11,6 @@ router = APIRouter(prefix="/questions", tags=["questions"])
 
 @router.post("/", response_model=schemas.QuestionRead)
 def create_question(question: schemas.QuestionCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    # Троттлинг: не чаще 1 раза в минуту для не-админов
-    if not current_user.is_admin:
-        one_minute_ago = datetime.utcnow() - timedelta(minutes=1)
-        last_question = db.query(Question).filter(Question.user_id == current_user.id).order_by(Question.created_at.desc()).first()
-        if last_question and last_question.created_at > one_minute_ago:
-            raise HTTPException(status_code=429, detail="Можно задавать вопрос не чаще, чем раз в 1 минуту")
     db_question = Question(user_id=current_user.id, text=question.text)
     db.add(db_question)
     db.commit()
@@ -110,13 +104,6 @@ def create_guest_question(question: schemas.QuestionCreate, db: Session = Depend
     if request is not None:
         xff = request.headers.get("x-forwarded-for")
         client_ip = xff.split(",")[0].strip() if xff else (request.client.host if request.client else None)
-    # Троттлинг: не чаще 1 раза в минуту по номеру телефона или IP
-    one_minute_ago = datetime.utcnow() - timedelta(minutes=1)
-    last_guest_question = db.query(Question).filter(
-        or_(Question.guest_phone == question.guest_phone, Question.ip_address == client_ip)
-    ).order_by(Question.created_at.desc()).first()
-    if last_guest_question and last_guest_question.created_at > one_minute_ago:
-        raise HTTPException(status_code=429, detail="Можно отправлять гостевой вопрос не чаще, чем раз в 1 минуту")
     db_question = Question(
         user_id=None,
         guest_name=question.guest_name,
