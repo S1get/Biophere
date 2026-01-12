@@ -22,11 +22,13 @@ export function useReviews() {
   const [error, setError] = useState<string | null>(null);
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
   const fetchReviews = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/reviews/`);
+      const url = token ? `${API_URL}/reviews/admin` : `${API_URL}/reviews/`;
+      const res = await fetch(url, { headers: token ? { Authorization: `Bearer ${token}` } : undefined });
       const contentType = res.headers.get("content-type") || "";
       if (!res.ok || !contentType.includes("application/json")) {
         const text = await res.text();

@@ -22,11 +22,16 @@ export function useQuestions() {
   const [error, setError] = useState<string | null>(null);
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const authHeaders = token
+    ? { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+    : { 'Content-Type': 'application/json' };
 
   const fetchQuestions = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/questions/`);
+      const url = token ? `${API_URL}/questions/admin` : `${API_URL}/questions/`;
+      const res = await fetch(url, { headers: token ? { Authorization: `Bearer ${token}` } : undefined });
       const contentType = res.headers.get("content-type") || "";
       if (!res.ok || !contentType.includes("application/json")) {
         const text = await res.text();
@@ -45,7 +50,7 @@ export function useQuestions() {
 
   const markAsRead = async (questionId: number) => {
     try {
-      const res = await fetch(`${API_URL}/questions/${questionId}/read/`, {
+      const res = await fetch(`${API_URL}/questions/${questionId}/read`, {
         method: 'PATCH',
         headers: authHeaders,
       });
@@ -58,7 +63,7 @@ export function useQuestions() {
 
   const markAsUnread = async (questionId: number) => {
     try {
-      const res = await fetch(`${API_URL}/questions/${questionId}/unread/`, {
+      const res = await fetch(`${API_URL}/questions/${questionId}/unread`, {
         method: 'PATCH',
         headers: authHeaders,
       });

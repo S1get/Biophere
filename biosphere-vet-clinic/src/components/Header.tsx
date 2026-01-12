@@ -115,7 +115,7 @@ export function Header({ onNavigateToSection }: HeaderProps) {
               </>
             ) : (
               <Link
-                to="/admin-login"
+                to="/admin"
                 className="text-sm font-medium hover:text-biosphere-primary transition-colors"
               >
                 Войти (админ)
@@ -195,13 +195,13 @@ export function Header({ onNavigateToSection }: HeaderProps) {
                   </Button>
                 ) : (
                   <Link
-                    to="/admin-login"
+                    to="/admin"
                     className="w-full text-left text-sm font-medium hover:text-biosphere-primary transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Войти (админ)
                   </Link>
-                )
+                )}
                 
                 {navigationItems.map((item) => (
                   <button
