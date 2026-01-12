@@ -95,7 +95,7 @@ export function Header({ onNavigateToSection }: HeaderProps) {
 
           {/* Right side - Navigation */}
           <nav className="hidden lg:flex items-center space-x-6">
-            {user ? (
+            {user && (
               <>
                 {user.is_admin && (
                   <Link
@@ -113,13 +113,6 @@ export function Header({ onNavigateToSection }: HeaderProps) {
                   Выйти
                 </Button>
               </>
-            ) : (
-              <Link
-                to="/admin"
-                className="text-sm font-medium hover:text-biosphere-primary transition-colors"
-              >
-                Войти (админ)
-              </Link>
             )}
             
             {navigationItems.map((item) => (

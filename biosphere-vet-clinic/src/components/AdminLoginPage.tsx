@@ -15,14 +15,23 @@ const AdminLoginPage: React.FC = () => {
     setError('');
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/auth/admin/token/`, {
+      const response = await fetch(`${API_URL}/auth/admin/token`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ username: email, password }).toString(),
       });
       if (!response.ok) {
-        const errorData = await response.json();
-        setError(errorData.detail || 'Неудачный вход');
+        let message = 'Неудачный вход';
+        try {
+          const errorData = await response.json();
+          const detail = (errorData && errorData.detail) || null;
+          if (Array.isArray(detail)) {
+            message = detail.map((d: any) => d.msg || String(d)).join(', ');
+          } else if (typeof detail === 'string') {
+            message = detail;
+          }
+        } catch { void 0 }
+        setError(message);
         setLoading(false);
         return;
       }
