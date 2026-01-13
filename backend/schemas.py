@@ -106,6 +106,27 @@ class SpecialistRead(SpecialistBase):
         "from_attributes": True
     }
 
+class BookingBase(BaseModel):
+    branch: str
+    service: str
+    doctor: str
+    date: str
+    time: str
+    fullName: str
+    phone: str
+    email: EmailStr
+    comments: str | None = None
+
+class BookingCreate(BookingBase):
+    pass
+
+class BookingRead(BookingBase):
+    id: int
+    created_at: datetime
+    model_config = {
+        "from_attributes": True
+    }
+
 # Публичные модели без телефона (для открытых эндпоинтов)
 class PublicUserRead(BaseModel):
     id: int

@@ -49,6 +49,9 @@ export default function AdminPanel() {
   const [selectedSpecialist, setSelectedSpecialist] = useState<any>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [specialistToDelete, setSpecialistToDelete] = useState<any>(null);
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [bookingsLoading, setBookingsLoading] = useState(false);
+  const [bookingsError, setBookingsError] = useState<string | null>(null);
 
   // Реальная статистика из API
   const stats = {
@@ -180,9 +183,11 @@ export default function AdminPanel() {
   // Функции для управления системой
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
   
-  const handleExportData = async () => {
+  const fetchBookings = async () => {
+    setBookingsLoading(true);
+    setBookingsError(null);
     try {
-      const response = await fetch(`${API_URL}/admin/export`, {
+      const response = await fetch(`${API_URL}/bookings/admin`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -190,43 +195,38 @@ export default function AdminPanel() {
         },
         credentials: 'include'
       });
-      
-      if (response.ok) {
-        const data = await response.json();
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `biosphere_export_${new Date().toISOString().split('T')[0]}.json`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-      }
+      if (!response.ok) throw new Error('Ошибка загрузки записей');
+      const data = await response.json();
+      setBookings(data);
     } catch (error) {
-      console.error('Ошибка экспорта:', error);
+      setBookingsError('Не удалось загрузить записи');
+      console.error('Ошибка загрузки записей:', error);
+    } finally {
+      setBookingsLoading(false);
     }
   };
 
-  const handleCleanupData = async () => {
+  useEffect(() => {
+    if (activeTab === 'bookings') {
+      fetchBookings();
+    }
+  }, [activeTab]);
+
+  const handleDeleteBooking = async (id: number) => {
     try {
-      const response = await fetch(`${API_URL}/admin/clear_all`, {
-        method: 'POST',
+      const response = await fetch(`${API_URL}/bookings/${id}`, {
+        method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'
         },
         credentials: 'include'
       });
-      
-      if (response.ok) {
-        alert('Данные успешно очищены');
-      } else {
-        alert('Ошибка при очистке данных');
-      }
+      if (!response.ok) throw new Error('Ошибка удаления записи');
+      setBookings((prev) => prev.filter((b) => b.id !== id));
     } catch (error) {
-      console.error('Ошибка очистки:', error);
-      alert('Ошибка при очистке данных');
+      console.error('Ошибка удаления записи:', error);
+      alert('Не удалось удалить запись');
     }
   };
 
@@ -280,9 +280,9 @@ export default function AdminPanel() {
               <HelpCircle className="h-4 w-4" />
               <span>Вопросы</span>
             </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center space-x-2">
-              <Settings className="h-4 w-4" />
-              <span>Настройки</span>
+            <TabsTrigger value="bookings" className="flex items-center space-x-2">
+              <Calendar className="h-4 w-4" />
+              <span>Записи</span>
             </TabsTrigger>
           </TabsList>
 
@@ -635,32 +635,72 @@ export default function AdminPanel() {
             </Card>
           </TabsContent>
 
-          {/* Настройки */}
-          <TabsContent value="settings" className="space-y-6">
+          {/* Записи */}
+          <TabsContent value="bookings" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <Settings className="h-5 w-5" />
-                  <span>Управление системой</span>
+                  <Calendar className="h-5 w-5" />
+                  <span>Записи ({bookings.length})</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <h4 className="font-medium">Экспорт данных</h4>
-                      <p className="text-sm text-gray-600">Экспорт специалистов, отзывов и вопросов</p>
-                    </div>
-                    <Button variant="outline" size="sm" onClick={handleExportData}>Экспорт</Button>
+                {bookingsLoading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-biosphere-primary mx-auto"></div>
+                    <p className="mt-2 text-gray-600">Загрузка записей...</p>
                   </div>
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <h4 className="font-medium">Очистка данных</h4>
-                      <p className="text-sm text-gray-600">Удаление старых отзывов и вопросов</p>
-                    </div>
-                    <Button variant="outline" size="sm" onClick={handleCleanupData}>Очистить</Button>
+                ) : bookingsError ? (
+                  <p className="text-red-600 text-center py-8">{bookingsError}</p>
+                ) : bookings.length > 0 ? (
+                  <div className="space-y-4">
+                    {bookings.map((b) => (
+                      <div key={b.id} className="p-4 border rounded-lg">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <p className="font-medium">{b.full_name}</p>
+                            <div className="text-sm text-gray-500">
+                              <span className="mr-2">{b.phone}</span>
+                              <span>{b.email}</span>
+                            </div>
+                          </div>
+                          <div className="flex space-x-2">
+                            <Badge variant="secondary">{b.branch}</Badge>
+                            <Badge variant="secondary">{b.doctor}</Badge>
+                            <Badge variant="secondary">{b.service}</Badge>
+                          </div>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <div className="text-sm text-gray-600">
+                            <span className="mr-2">Дата: {b.date}</span>
+                            <span>Время: {b.time}</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-xs text-gray-500">Создано: {new Date(b.created_at).toLocaleString('ru-RU')}</span>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleDeleteBooking(b.id)}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                        {b.comments && (
+                          <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                            <p className="text-sm font-medium text-blue-800 dark:text-blue-200">Комментарий:</p>
+                            <p className="text-sm text-blue-700 dark:text-blue-300">{b.comments}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                </div>
+                ) : (
+                  <p className="text-gray-600 dark:text-gray-400 text-center py-8">
+                    Пока нет записей
+                  </p>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

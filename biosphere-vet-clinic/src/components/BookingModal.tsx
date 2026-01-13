@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/select'
 import { Calendar, Clock, MapPin, User, Phone, Mail, FileText } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import { useNavigate } from 'react-router-dom'
 
 interface BookingModalProps {
   isOpen: boolean
@@ -82,19 +83,31 @@ const timeSlots = [
 
 export function BookingModal({ isOpen, onClose }: BookingModalProps) {
   const { toast } = useToast()
+  const navigate = useNavigate()
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
   
   const form = useForm<BookingFormData>({
     resolver: zodResolver(bookingSchema),
   })
 
-  const handleSubmit = (data: BookingFormData) => {
-    console.log('Booking data:', data)
-    toast({
-      title: 'Запись успешно оформлена!',
-      description: 'В ближайшее время с вами свяжется администратор для подтверждения.',
-    })
-    form.reset()
-    onClose()
+  const handleSubmit = async (data: BookingFormData) => {
+    try {
+      const res = await fetch(`${API_URL}/bookings/guest`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+      if (!res.ok) throw new Error('Ошибка записи')
+      toast({
+        title: 'Запись успешно оформлена!',
+        description: 'Администратор увидит вашу запись в админ-панели.',
+      })
+      form.reset()
+      onClose()
+      navigate('/admin-panel')
+    } catch (e) {
+      toast({ title: 'Ошибка', description: 'Не удалось оформить запись', variant: 'destructive' })
+    }
   }
 
   const getTomorrowDate = () => {

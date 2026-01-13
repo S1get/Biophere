@@ -252,22 +252,7 @@ export default function FAQSection() {
                       </button>
                     </div>
                   )}
-                  {user && user.is_admin && (!question.user_id || user.id !== question.user_id) && (
-                    <div className="flex gap-2">
-                      <button
-                        className="flex items-center gap-1 text-biosphere-primary hover:text-biosphere-secondary"
-                        onClick={() => handleEdit(question)}
-                      >
-                        Редактировать
-                      </button>
-                      <button
-                        className="flex items-center gap-1 text-red-500 hover:text-red-700"
-                        onClick={() => handleDelete(question.id)}
-                      >
-                        Удалить
-                      </button>
-                    </div>
-                  )}
+                  
                 </div>
                 <div className="flex-1">
                   <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-4">

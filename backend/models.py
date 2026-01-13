@@ -57,3 +57,17 @@ class Specialist(Base):
     photo = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+class Booking(Base):
+    __tablename__ = 'bookings'
+    id = Column(Integer, primary_key=True, index=True)
+    branch = Column(String, nullable=False)
+    service = Column(String, nullable=False)
+    doctor = Column(String, nullable=False)
+    date = Column(String, nullable=False)
+    time = Column(String, nullable=False)
+    full_name = Column(String, nullable=False)
+    phone = Column(String, nullable=False)
+    email = Column(String, nullable=False)
+    comments = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
