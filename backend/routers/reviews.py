@@ -26,7 +26,7 @@ def get_reviews(db: Session = Depends(get_db)):
                 r.user
         return reviews
     except Exception:
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        return []
 
 @router.get("/admin", response_model=list[schemas.ReviewRead])
 def get_reviews_admin(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
@@ -41,7 +41,7 @@ def get_reviews_admin(db: Session = Depends(get_db), current_user: User = Depend
     except HTTPException:
         raise
     except Exception:
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        return []
 
 @router.put("/{review_id}", response_model=schemas.ReviewRead)
 def update_review(review_id: int, review: schemas.ReviewUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):

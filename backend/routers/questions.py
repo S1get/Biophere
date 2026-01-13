@@ -26,7 +26,7 @@ def get_questions(db: Session = Depends(get_db)):
                 q.user
         return questions
     except Exception:
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        return []
 
 @router.get("/admin", response_model=list[schemas.QuestionRead])
 def get_questions_admin(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
@@ -41,7 +41,7 @@ def get_questions_admin(db: Session = Depends(get_db), current_user: User = Depe
     except HTTPException:
         raise
     except Exception:
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        return []
 
 @router.put("/{question_id}", response_model=schemas.QuestionRead)
 def update_question(question_id: int, question: schemas.QuestionUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):

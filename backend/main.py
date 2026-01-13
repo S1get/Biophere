@@ -86,6 +86,13 @@ def on_startup():
         except Exception as e:
             print(f"Warning: Could not run migrations automatically: {e}")
             print("Please run manually: cd backend && alembic upgrade head")
+
+        # Дополнительная проверка/создание таблиц на всякий случай
+        try:
+            Base.metadata.create_all(bind=engine)
+            print("Database tables verified/created (fallback)")
+        except Exception as e:
+            print(f"Warning: Fallback table creation failed: {e}")
         
         # Автоматически загружаем специалистов если база пустая
         try:
