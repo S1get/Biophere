@@ -192,8 +192,7 @@ export default function AdminPanel() {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'
-        },
-        credentials: 'include'
+        }
       });
       if (!response.ok) throw new Error('Ошибка загрузки записей');
       const data = await response.json();
@@ -219,8 +218,7 @@ export default function AdminPanel() {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'
-        },
-        credentials: 'include'
+        }
       });
       if (!response.ok) throw new Error('Ошибка удаления записи');
       setBookings((prev) => prev.filter((b) => b.id !== id));

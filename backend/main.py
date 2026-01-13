@@ -45,9 +45,9 @@ if frontend_origin:
     
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_origin_regex=r"^https?://.*\.onrender\.com$|^https?://(?:.+\.)?biosphere-kirov\.ru$",
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_origin_regex=None,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
