@@ -19,21 +19,29 @@ def create_review(review: schemas.ReviewCreate, db: Session = Depends(get_db), c
 
 @router.get("/", response_model=list[schemas.PublicReviewRead])
 def get_reviews(db: Session = Depends(get_db)):
-    reviews = db.query(Review).all()
-    for r in reviews:
-        if r.user_id:  # подгружаем user только если user_id не None
-            r.user
-    return reviews
+    try:
+        reviews = db.query(Review).all()
+        for r in reviews:
+            if r.user_id:
+                r.user
+        return reviews
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @router.get("/admin", response_model=list[schemas.ReviewRead])
 def get_reviews_admin(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    if not current_user.is_admin:
-        raise HTTPException(status_code=403, detail="Требуются права администратора")
-    reviews = db.query(Review).order_by(Review.created_at.desc()).all()
-    for r in reviews:
-        if r.user_id:
-            r.user
-    return reviews
+    try:
+        if not current_user.is_admin:
+            raise HTTPException(status_code=403, detail="Требуются права администратора")
+        reviews = db.query(Review).order_by(Review.created_at.desc()).all()
+        for r in reviews:
+            if r.user_id:
+                r.user
+        return reviews
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @router.put("/{review_id}", response_model=schemas.ReviewRead)
 def update_review(review_id: int, review: schemas.ReviewUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
@@ -75,23 +83,27 @@ def admin_reply_review(review_id: int, reply: str = Body(...), db: Session = Dep
 
 @router.post("/guest", response_model=schemas.ReviewRead)
 def create_guest_review(review: schemas.ReviewCreate, db: Session = Depends(get_db), request: Request = None):
-    if not review.guest_name or not review.guest_phone:
-        raise HTTPException(status_code=400, detail="Имя и телефон обязательны для гостевого отзыва")
-    # Определяем IP клиента
-    client_ip = None
-    if request is not None:
-        xff = request.headers.get("x-forwarded-for")
-        client_ip = xff.split(",")[0].strip() if xff else (request.client.host if request.client else None)
-    db_review = Review(
-        user_id=None,
-        guest_name=review.guest_name,
-        guest_phone=review.guest_phone,
-        ip_address=client_ip,
-        rating=review.rating,
-        text=review.text,
-        published=True
-    )
-    db.add(db_review)
-    db.commit()
-    db.refresh(db_review)
-    return db_review
+    try:
+        if not review.guest_name or not review.guest_phone:
+            raise HTTPException(status_code=400, detail="Имя и телефон обязательны для гостевого отзыва")
+        client_ip = None
+        if request is not None:
+            xff = request.headers.get("x-forwarded-for")
+            client_ip = xff.split(",")[0].strip() if xff else (request.client.host if request.client else None)
+        db_review = Review(
+            user_id=None,
+            guest_name=review.guest_name,
+            guest_phone=review.guest_phone,
+            ip_address=client_ip,
+            rating=review.rating,
+            text=review.text,
+            published=True
+        )
+        db.add(db_review)
+        db.commit()
+        db.refresh(db_review)
+        return db_review
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal Server Error")

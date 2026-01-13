@@ -32,7 +32,7 @@ export function useReviews() {
       const url = token ? `${API_URL}/reviews/admin` : `${API_URL}/reviews/`;
       let data: any = null
       for (let attempt = 0; attempt < 6; attempt++) {
-        const res = await fetch(url, { headers: token ? { Authorization: `Bearer ${token}` } : undefined });
+        const res = await fetch(url, { credentials: 'include', headers: token ? { Authorization: `Bearer ${token}` } : undefined });
         const contentType = res.headers.get("content-type") || "";
         if (res.ok && contentType.includes("application/json")) {
           data = await res.json();

@@ -182,12 +182,13 @@ export default function AdminPanel() {
   
   const handleExportData = async () => {
     try {
-      const response = await fetch(`${API_URL}/admin/export/`, {
+      const response = await fetch(`${API_URL}/admin/export`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'
-        }
+        },
+        credentials: 'include'
       });
       
       if (response.ok) {
@@ -209,12 +210,13 @@ export default function AdminPanel() {
 
   const handleCleanupData = async () => {
     try {
-      const response = await fetch(`${API_URL}/admin/clear_all/`, {
+      const response = await fetch(`${API_URL}/admin/clear_all`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'
-        }
+        },
+        credentials: 'include'
       });
       
       if (response.ok) {

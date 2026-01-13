@@ -44,7 +44,7 @@ if frontend_origin:
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
-    allow_origin_regex=r"https://.*\.onrender\.com$|https://.*biosphere-kirov\.ru$|http://.*biosphere-kirov\.ru$",
+    allow_origin_regex=r"^https?://.*\.onrender\.com$|^https?://(?:.+\.)?biosphere-kirov\.ru$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -59,6 +59,7 @@ app.include_router(specialists_router)
 @app.on_event("startup")
 def on_startup():
     print("=== BIOSPHERE API STARTED ===")
+    print({"allowed_origins": allowed_origins})
     # Создать таблицы только для SQLite (локальная разработка)
     # Для PostgreSQL используйте миграции Alembic
     from database import DATABASE_URL
