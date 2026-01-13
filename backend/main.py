@@ -14,6 +14,7 @@ from routers.reviews import router as reviews_router
 from routers.questions import router as questions_router
 from routers.specialists import router as specialists_router
 from models import User, Review, Question, Specialist, Booking
+import schemas
 from datetime import datetime
 from auth import get_current_user
 from create_admin import create_admin
