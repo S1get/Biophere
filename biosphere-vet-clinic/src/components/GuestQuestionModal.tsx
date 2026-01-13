@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
@@ -71,6 +71,7 @@ export function GuestQuestionModal({ isOpen, onClose, onSuccess }: GuestQuestion
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-center text-biosphere-primary">Задать вопрос</DialogTitle>
+          <DialogDescription className="sr-only">Форма отправки гостевого вопроса</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">

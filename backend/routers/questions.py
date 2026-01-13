@@ -6,6 +6,7 @@ from auth import get_current_user, get_db
 import schemas
 from models import Question, User
 from datetime import datetime, timedelta
+from sqlalchemy import inspect
 
 router = APIRouter(prefix="/questions", tags=["questions"])
 
@@ -94,14 +95,26 @@ def create_guest_question(question: schemas.QuestionCreate, db: Session = Depend
         if request is not None:
             xff = request.headers.get("x-forwarded-for")
             client_ip = xff.split(",")[0].strip() if xff else (request.client.host if request.client else None)
-        db_question = Question(
-            user_id=None,
-            guest_name=question.guest_name,
-            guest_phone=question.guest_phone,
-            ip_address=client_ip,
-            text=question.text,
-            published=True
-        )
+
+        inspector = inspect(db.bind)
+        columns = {col['name'] for col in inspector.get_columns('questions')}
+
+        payload = {
+            'text': question.text,
+            'user_id': None,
+        }
+        if 'guest_name' in columns:
+            payload['guest_name'] = question.guest_name
+        if 'guest_phone' in columns:
+            payload['guest_phone'] = question.guest_phone
+        if 'ip_address' in columns:
+            payload['ip_address'] = client_ip
+        if 'published' in columns:
+            payload['published'] = True
+        if 'is_read' in columns and getattr(question, 'is_read', None) is not None:
+            payload['is_read'] = question.is_read
+
+        db_question = Question(**payload)
         db.add(db_question)
         db.commit()
         db.refresh(db_question)

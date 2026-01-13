@@ -6,6 +6,7 @@ from auth import get_current_user, get_db
 import schemas
 from models import Review, User
 from datetime import datetime, timedelta
+from sqlalchemy import inspect
 
 router = APIRouter(prefix="/reviews", tags=["reviews"])
 
@@ -90,15 +91,25 @@ def create_guest_review(review: schemas.ReviewCreate, db: Session = Depends(get_
         if request is not None:
             xff = request.headers.get("x-forwarded-for")
             client_ip = xff.split(",")[0].strip() if xff else (request.client.host if request.client else None)
-        db_review = Review(
-            user_id=None,
-            guest_name=review.guest_name,
-            guest_phone=review.guest_phone,
-            ip_address=client_ip,
-            rating=review.rating,
-            text=review.text,
-            published=True
-        )
+
+        inspector = inspect(db.bind)
+        columns = {col['name'] for col in inspector.get_columns('reviews')}
+
+        payload = {
+            'text': review.text,
+            'rating': review.rating,
+            'user_id': None,
+        }
+        if 'guest_name' in columns:
+            payload['guest_name'] = review.guest_name
+        if 'guest_phone' in columns:
+            payload['guest_phone'] = review.guest_phone
+        if 'ip_address' in columns:
+            payload['ip_address'] = client_ip
+        if 'published' in columns:
+            payload['published'] = True
+
+        db_review = Review(**payload)
         db.add(db_review)
         db.commit()
         db.refresh(db_review)

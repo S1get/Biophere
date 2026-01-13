@@ -17,6 +17,7 @@ from models import User, Review, Question, Specialist
 from datetime import datetime
 from auth import get_current_user
 from create_admin import create_admin
+from sqlalchemy import inspect, text
 
 # ВАЖНО: Для запуска на Render используйте команду:
 # uvicorn backend.main:app --host 0.0.0.0 --port $PORT
@@ -93,6 +94,37 @@ def on_startup():
             print("Database tables verified/created (fallback)")
         except Exception as e:
             print(f"Warning: Fallback table creation failed: {e}")
+
+        # Гарантируем наличие критичных колонок для гостевых форм
+        try:
+            insp = inspect(engine)
+            with engine.begin() as conn:
+                q_cols = {c['name'] for c in insp.get_columns('questions')}
+                r_cols = {c['name'] for c in insp.get_columns('reviews')}
+
+                def add_col(table: str, col_def: str):
+                    try:
+                        conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {col_def}"))
+                        print(f"Added column {table}.{col_def}")
+                    except Exception as e:
+                        print(f"Skip add column {table}.{col_def}: {e}")
+
+                # questions
+                if 'guest_name' not in q_cols: add_col('questions', 'guest_name TEXT')
+                if 'guest_phone' not in q_cols: add_col('questions', 'guest_phone TEXT')
+                if 'ip_address' not in q_cols: add_col('questions', 'ip_address TEXT')
+                if 'admin_reply' not in q_cols: add_col('questions', 'admin_reply TEXT')
+                if 'is_read' not in q_cols: add_col('questions', 'is_read BOOLEAN DEFAULT FALSE')
+                if 'published' not in q_cols: add_col('questions', 'published BOOLEAN DEFAULT TRUE')
+
+                # reviews
+                if 'guest_name' not in r_cols: add_col('reviews', 'guest_name TEXT')
+                if 'guest_phone' not in r_cols: add_col('reviews', 'guest_phone TEXT')
+                if 'ip_address' not in r_cols: add_col('reviews', 'ip_address TEXT')
+                if 'admin_reply' not in r_cols: add_col('reviews', 'admin_reply TEXT')
+                if 'published' not in r_cols: add_col('reviews', 'published BOOLEAN DEFAULT TRUE')
+        except Exception as e:
+            print(f"Warning: Column ensure failed: {e}")
         
         # Автоматически загружаем специалистов если база пустая
         try:
