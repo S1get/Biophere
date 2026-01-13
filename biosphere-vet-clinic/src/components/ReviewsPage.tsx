@@ -96,6 +96,7 @@ export default function ReviewsPage() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
         body: JSON.stringify(form),
       })
       if (!res.ok) {
@@ -129,6 +130,7 @@ export default function ReviewsPage() {
       const res = await fetch(`${API_URL}/reviews/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
       })
       if (!res.ok) throw new Error('Ошибка удаления')
       fetchReviews()
@@ -146,6 +148,7 @@ export default function ReviewsPage() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
         body: JSON.stringify(replyText),
       })
       if (!res.ok) throw new Error('Ошибка ответа')

@@ -29,7 +29,7 @@ export default function FAQSection() {
   const [replyText, setReplyText] = useState<string>('')
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [guestModalOpen, setGuestModalOpen] = useState(false)
-  const [timeUpdate, setTimeUpdate] = useState(0); // Для обновления времени каждую секунду
+  const [timeUpdate, setTimeUpdate] = useState(0);
 
   const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
   const fetchJSONWithRetry = async (url: string, options?: RequestInit, retries = 6, delay = 1500) => {
@@ -76,58 +76,19 @@ export default function FAQSection() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Обновляем время каждую секунду для отображения оставшегося времени редактирования
   useEffect(() => {
     const interval = setInterval(() => {
       setTimeUpdate(prev => prev + 1);
     }, 1000);
-    
     return () => clearInterval(interval);
   }, []);
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 
-  // Функция для проверки, можно ли редактировать вопрос (5 минут после создания)
-  const canEditQuestion = (question: Question) => {
-    if (!user) return false
-    if (user.is_admin) return true // Админы могут редактировать всегда
-    if (question.user_id !== user.id) return false // Только автор вопроса
-    
-    const questionDate = new Date(question.created_at)
-    const now = new Date()
-    const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000)
-    
-    return questionDate > fiveMinutesAgo
-  }
-
-  // Функция для проверки, можно ли удалить вопрос (5 минут после создания)
-  const canDeleteQuestion = (question: Question) => {
-    if (!user) return false
-    if (user.is_admin) return true // Админы могут удалять всегда
-    if (question.user_id !== user.id) return false // Только автор вопроса
-    
-    const questionDate = new Date(question.created_at)
-    const now = new Date()
-    const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000)
-    
-    return questionDate > fiveMinutesAgo
-  }
-
-  // Функция для отображения оставшегося времени редактирования
-  const getEditTimeRemaining = (question: Question) => {
-    if (!user || user.is_admin || question.user_id !== user.id) return null
-    
-    const questionDate = new Date(question.created_at)
-    const now = new Date()
-    const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000)
-    
-    if (questionDate <= fiveMinutesAgo) return null
-    
-    const timeRemaining = new Date(questionDate.getTime() + 5 * 60 * 1000).getTime() - now.getTime()
-    const minutes = Math.floor(timeRemaining / (1000 * 60))
-    const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000)
-    
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`
+  const canEditOrDelete = (question: Question) => {
+    if (!user) return false;
+    if (user.is_admin) return true;
+    return question.user_id === user.id;
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -145,6 +106,7 @@ export default function FAQSection() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
         body: JSON.stringify(form),
       })
       if (!res.ok) {
@@ -178,6 +140,7 @@ export default function FAQSection() {
       const res = await fetch(`${API_URL}/questions/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include',
       })
       if (!res.ok) {
         if (res.status === 403) {
@@ -201,6 +164,7 @@ export default function FAQSection() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
+        credentials: 'include',
         body: JSON.stringify(replyText),
       })
       if (!res.ok) throw new Error('Ошибка ответа')
@@ -272,7 +236,7 @@ export default function FAQSection() {
                       {new Date(question.created_at).toLocaleString('ru-RU', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                     </div>
                   </div>
-                  {user && question.user_id && user.id === question.user_id && canEditQuestion(question) && (
+                  {user && canEditOrDelete(question) && (
                     <div className="flex gap-2">
                       <button
                         className="flex items-center gap-1 text-biosphere-primary hover:text-biosphere-secondary"
@@ -286,31 +250,6 @@ export default function FAQSection() {
                       >
                         Удалить
                       </button>
-                      {getEditTimeRemaining(question) && (
-                        <span className="text-xs text-orange-600 dark:text-orange-400">
-                          Осталось: {getEditTimeRemaining(question)}
-                        </span>
-                      )}
-                    </div>
-                  )}
-                  {user && question.user_id && user.id === question.user_id && !canEditQuestion(question) && canDeleteQuestion(question) && (
-                    <div className="flex gap-2">
-                      <button
-                        className="flex items-center gap-1 text-red-500 hover:text-red-700"
-                        onClick={() => handleDelete(question.id)}
-                      >
-                        Удалить
-                      </button>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        Редактирование недоступно
-                      </span>
-                    </div>
-                  )}
-                  {user && question.user_id && user.id === question.user_id && !canEditQuestion(question) && !canDeleteQuestion(question) && (
-                    <div className="flex gap-2">
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        Редактирование и удаление недоступны
-                      </span>
                     </div>
                   )}
                   {user && user.is_admin && (!question.user_id || user.id !== question.user_id) && (

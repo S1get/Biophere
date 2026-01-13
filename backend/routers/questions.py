@@ -53,15 +53,6 @@ def update_question(question_id: int, question: schemas.QuestionUpdate, db: Sess
     if db_question.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Нет доступа к изменению этого вопроса")
     
-    # Проверяем время для обычных пользователей (не админов)
-    if not current_user.is_admin:
-        five_minutes_ago = datetime.utcnow() - timedelta(minutes=5)
-        if db_question.created_at < five_minutes_ago:
-            raise HTTPException(
-                status_code=403, 
-                detail="Время редактирования истекло. Вопрос можно редактировать только в течение 5 минут после создания."
-            )
-    
     if question.text is not None:
         db_question.text = question.text
     db.commit()
@@ -77,15 +68,6 @@ def delete_question(question_id: int, db: Session = Depends(get_db), current_use
     # Проверяем права доступа
     if db_question.user_id != current_user.id and not current_user.is_admin:
         raise HTTPException(status_code=403, detail="Нет доступа к удалению этого вопроса")
-    
-    # Проверяем время для обычных пользователей (не админов)
-    if not current_user.is_admin and db_question.user_id == current_user.id:
-        five_minutes_ago = datetime.utcnow() - timedelta(minutes=5)
-        if db_question.created_at < five_minutes_ago:
-            raise HTTPException(
-                status_code=403, 
-                detail="Время удаления истекло. Вопрос можно удалить только в течение 5 минут после создания."
-            )
     
     db.delete(db_question)
     db.commit()
