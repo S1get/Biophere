@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -52,14 +52,14 @@ const branches = [
   'ул. Украинская, 18',
 ]
 
-const serviceNames = Array.from(new Set(servicesData.map((s: any) => s.name)))
+const serviceNames = Array.from(new Set(servicesData.map((s: any) => s.name))).sort((a: string, b: string) => a.localeCompare(b, 'ru'))
 
 const doctors = [
-  'Смирнова Анна Петровна - Терапевт',
-  'Козлов Михаил Андреевич - Хирург',
   'Волкова Елена Сергеевна - Дерматолог',
-  'Петров Алексей Николаевич - Кардиолог',
   'Иванова Мария Викторовна - Офтальмолог',
+  'Козлов Михаил Андреевич - Хирург',
+  'Петров Алексей Николаевич - Кардиолог',
+  'Смирнова Анна Петровна - Терапевт',
   'Соколов Дмитрий Павлович - Ортопед',
 ]
 
@@ -78,6 +78,10 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
     resolver: zodResolver(bookingSchema),
   })
 
+  useEffect(() => {
+    const tomorrow = getTomorrowDate()
+    form.setValue('date', tomorrow, { shouldValidate: true })
+  }, [])
   const handleSubmit = async (data: BookingFormData) => {
     try {
       const res = await fetch(`${API_URL}/bookings/guest`, {
@@ -92,7 +96,6 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
       })
       form.reset()
       onClose()
-      navigate('/admin-panel')
     } catch (e) {
       toast({ title: 'Ошибка', description: 'Не удалось оформить запись', variant: 'destructive' })
     }
@@ -195,6 +198,7 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
                 type="date"
                 min={getTomorrowDate()}
                 {...form.register('date')}
+                inputMode="numeric"
               />
               {form.formState.errors.date && (
                 <p className="text-sm text-destructive">{form.formState.errors.date.message}</p>
@@ -250,6 +254,7 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
                 id="phone"
                 type="tel"
                 placeholder="+7 (900) 123-45-67"
+                inputMode="tel"
                 {...form.register('phone')}
               />
               {form.formState.errors.phone && (

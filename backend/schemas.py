@@ -1,5 +1,6 @@
-from pydantic import BaseModel, EmailStr, field_serializer
+from pydantic import BaseModel, EmailStr, field_serializer, field_validator
 from datetime import datetime
+import re
 
 class UserBase(BaseModel):
     name: str
@@ -117,6 +118,42 @@ class BookingBase(BaseModel):
     email: EmailStr
     comments: str | None = None
 
+    @field_validator("branch", "service", "doctor", "fullName")
+    def strip_and_minlen(cls, v: str):
+        v = v.strip()
+        if len(v) < 2:
+            raise ValueError("Недостаточная длина")
+        if len(v) > 200:
+            raise ValueError("Слишком длинное значение")
+        return v
+
+    @field_validator("date")
+    def validate_date(cls, v: str):
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", v.strip()):
+            raise ValueError("Некорректная дата (YYYY-MM-DD)")
+        return v
+
+    @field_validator("time")
+    def validate_time(cls, v: str):
+        if not re.fullmatch(r"\d{2}:\d{2}", v.strip()):
+            raise ValueError("Некорректное время (HH:MM)")
+        return v
+
+    @field_validator("phone")
+    def validate_phone(cls, v: str):
+        digits = re.sub(r"\D", "", v)
+        if len(digits) < 10 or len(digits) > 15:
+            raise ValueError("Некорректный телефон")
+        return v.strip()
+
+    @field_validator("comments")
+    def validate_comments(cls, v: str | None):
+        if v is None:
+            return v
+        v = v.strip()
+        if len(v) > 1000:
+            raise ValueError("Слишком длинный комментарий")
+        return v
 class BookingCreate(BookingBase):
     pass
 

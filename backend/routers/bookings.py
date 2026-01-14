@@ -3,11 +3,19 @@ from sqlalchemy.orm import Session
 from auth import get_db, get_current_user
 import schemas
 from models import Booking, User
+from datetime import datetime, timedelta
 
 router = APIRouter(prefix="/bookings", tags=["bookings"])
 
 @router.post("/guest", response_model=schemas.BookingRead)
 def create_booking(booking: schemas.BookingCreate, db: Session = Depends(get_db)):
+    recent_limit_window = datetime.utcnow() - timedelta(minutes=5)
+    recent_count = db.query(Booking).filter(
+        Booking.email == str(booking.email),
+        Booking.created_at >= recent_limit_window
+    ).count()
+    if recent_count > 0:
+        raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="Слишком частые записи. Попробуйте позже.")
     db_booking = Booking(
         branch=booking.branch,
         service=booking.service,
