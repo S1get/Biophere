@@ -13,6 +13,7 @@ from routers.users import router as users_router
 from routers.reviews import router as reviews_router
 from routers.questions import router as questions_router
 from routers.specialists import router as specialists_router
+from routers.bookings import router as bookings_router
 from models import User, Review, Question, Specialist, Booking
 import schemas
 from datetime import datetime
@@ -57,6 +58,7 @@ app.include_router(users_router)
 app.include_router(reviews_router)
 app.include_router(questions_router)
 app.include_router(specialists_router)
+app.include_router(bookings_router)
 
 @app.on_event("startup")
 def on_startup():
@@ -171,54 +173,6 @@ def ping():
     """Ping endpoint to prevent Render from spinning down"""
     return {"status": "ok", "timestamp": datetime.utcnow().isoformat()}
 
-# Bookings endpoints
-@app.post("/bookings/guest", response_model=schemas.BookingRead)
-def create_booking(booking: schemas.BookingCreate):
-    db = SessionLocal()
-    try:
-        db_booking = Booking(
-            branch=booking.branch,
-            service=booking.service,
-            doctor=booking.doctor,
-            date=booking.date,
-            time=booking.time,
-            full_name=booking.fullName,
-            phone=booking.phone,
-            email=str(booking.email),
-            comments=booking.comments,
-        )
-        db.add(db_booking)
-        db.commit()
-        db.refresh(db_booking)
-        return db_booking
-    finally:
-        db.close()
-
-@app.get("/bookings/admin", response_model=list[schemas.BookingRead])
-def list_bookings_admin(current_user: User = Depends(get_current_user)):
-    if not current_user.is_admin:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Недостаточно прав")
-    db = SessionLocal()
-    try:
-        items = db.query(Booking).order_by(Booking.created_at.desc()).all()
-        return items
-    finally:
-        db.close()
-
-@app.delete("/bookings/{booking_id}")
-def delete_booking(booking_id: int, current_user: User = Depends(get_current_user)):
-    if not current_user.is_admin:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Недостаточно прав")
-    db = SessionLocal()
-    try:
-        b = db.query(Booking).filter(Booking.id == booking_id).first()
-        if not b:
-            raise HTTPException(status_code=404, detail="Запись не найдена")
-        db.delete(b)
-        db.commit()
-        return {"status": "ok"}
-    finally:
-        db.close()
 
 @app.post("/admin/clear_all")
 def clear_all(current_user: User = Depends(get_current_user)):

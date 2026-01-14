@@ -22,6 +22,7 @@ import {
 import { Calendar, Clock, MapPin, User, Phone, Mail, FileText } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { useNavigate } from 'react-router-dom'
+import servicesData from './services-data.js'
 
 interface BookingModalProps {
   isOpen: boolean
@@ -51,20 +52,7 @@ const branches = [
   'ул. Украинская, 18',
 ]
 
-const services = [
-  'Первичный осмотр',
-  'Вакцинация',
-  'Терапия',
-  'Хирургия',
-  'Стоматология',
-  'Дерматология',
-  'Кардиология',
-  'Офтальмология',
-  'Ортопедия',
-  'УЗИ диагностика',
-  'Рентген',
-  'Анализы',
-]
+const serviceNames = Array.from(new Set(servicesData.map((s: any) => s.name)))
 
 const doctors = [
   'Смирнова Анна Петровна - Терапевт',
@@ -160,7 +148,7 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
                 <SelectValue placeholder="Выберите услугу" />
               </SelectTrigger>
               <SelectContent>
-                {services.map((service) => (
+                {serviceNames.map((service) => (
                   <SelectItem key={service} value={service}>
                     {service}
                   </SelectItem>
