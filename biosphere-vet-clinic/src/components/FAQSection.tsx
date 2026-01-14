@@ -106,7 +106,6 @@ export default function FAQSection() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        credentials: 'include',
         body: JSON.stringify(form),
       })
       if (!res.ok) {
@@ -140,7 +139,6 @@ export default function FAQSection() {
       const res = await fetch(`${API_URL}/questions/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
-        credentials: 'include',
       })
       if (!res.ok) {
         if (res.status === 403) {
@@ -164,7 +162,6 @@ export default function FAQSection() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        credentials: 'include',
         body: JSON.stringify(replyText),
       })
       if (!res.ok) throw new Error('Ошибка ответа')

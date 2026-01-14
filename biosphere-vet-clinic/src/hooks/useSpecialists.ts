@@ -73,7 +73,6 @@ export function useSpecialists() {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      credentials: 'include',
       body: JSON.stringify(specialist)
     });
 
@@ -93,8 +92,7 @@ export function useSpecialists() {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`
-      },
-      credentials: 'include'
+      }
     });
 
     if (!res.ok) {

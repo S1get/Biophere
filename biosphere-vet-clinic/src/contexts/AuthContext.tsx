@@ -41,9 +41,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const t = overrideToken || token;
     if (!t) return;
     try {
-      const res = await fetch(`${API_URL}/users/me/`, {
+      const res = await fetch(`${API_URL}/users/me`, {
         headers: { Authorization: `Bearer ${t}` },
-        credentials: 'include'
       });
       if (res.ok) {
         const data = await res.json();
@@ -62,17 +61,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string) => {
     setLoading(true);
-    const res = await fetch(`${API_URL}/auth/token/`, {
+    const res = await fetch(`${API_URL}/auth/admin/token`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-      credentials: 'include'
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ username: email, password }).toString(),
     });
     if (!res.ok) {
-      if (res.status === 403) {
-        const errorData = await res.json();
-        throw new Error(errorData.detail || 'Администраторы должны использовать специальную страницу входа');
-      }
+      const errorData = await res.json().catch(() => ({} as any));
+      const detail = (errorData && (errorData.detail as any)) || null;
+      if (Array.isArray(detail)) throw new Error(detail.map((d: any) => d.msg || String(d)).join(', '));
+      if (typeof detail === 'string') throw new Error(detail);
       throw new Error('Неверный email или пароль');
     }
     const data = await res.json();

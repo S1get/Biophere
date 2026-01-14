@@ -37,9 +37,7 @@ const AdminLoginPage: React.FC = () => {
       }
       const data = await response.json();
       localStorage.setItem('token', data.access_token);
-      // Сначала редирект на главную, затем обновление страницы
-      navigate('/');
-      setTimeout(() => window.location.reload(), 100);
+      navigate('/admin-panel');
     } catch (err) {
       setError('Неудачный вход');
     } finally {

@@ -35,7 +35,7 @@ export function useQuestions() {
       const url = token ? `${API_URL}/questions/admin` : `${API_URL}/questions/`;
       let data: any = null
       for (let attempt = 0; attempt < 6; attempt++) {
-        const res = await fetch(url, { credentials: 'include', headers: token ? { Authorization: `Bearer ${token}` } : undefined });
+        const res = await fetch(url, { headers: token ? { Authorization: `Bearer ${token}` } : undefined });
         const contentType = res.headers.get("content-type") || "";
         if (res.ok && contentType.includes("application/json")) {
           data = await res.json();
@@ -61,7 +61,6 @@ export function useQuestions() {
     try {
       const res = await fetch(`${API_URL}/questions/${questionId}/read`, {
         method: 'PATCH',
-        credentials: 'include',
         headers: authHeaders,
       });
       if (!res.ok) throw new Error("Ошибка отметки как прочитанного");
@@ -75,7 +74,6 @@ export function useQuestions() {
     try {
       const res = await fetch(`${API_URL}/questions/${questionId}/unread`, {
         method: 'PATCH',
-        credentials: 'include',
         headers: authHeaders,
       });
       if (!res.ok) throw new Error("Ошибка отметки как непрочитанного");
