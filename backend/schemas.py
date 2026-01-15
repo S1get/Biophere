@@ -113,12 +113,17 @@ class BookingBase(BaseModel):
     doctor: str
     date: str
     time: str
-    fullName: str
+    full_name: str
     phone: str
     email: EmailStr
     comments: str | None = None
+    
+    model_config = {
+        "alias_generator": lambda field_name: ''.join(word.title() if i > 0 else word for i, word in enumerate(field_name.split('_'))),
+        "populate_by_name": True
+    }
 
-    @field_validator("branch", "service", "doctor", "fullName")
+    @field_validator("branch", "service", "doctor", "full_name")
     def strip_and_minlen(cls, v: str):
         v = v.strip()
         if len(v) < 2:
@@ -160,8 +165,10 @@ class BookingCreate(BookingBase):
 class BookingRead(BookingBase):
     id: int
     created_at: datetime
+    
     model_config = {
-        "from_attributes": True
+        "from_attributes": True,
+        "populate_by_name": True
     }
 
 # Публичные модели без телефона (для открытых эндпоинтов)

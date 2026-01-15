@@ -95,7 +95,7 @@ def admin_login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
 from fastapi import Request
 from fastapi.security.utils import get_authorization_scheme_param
 
-def get_current_user(request: Request, db: Session = Depends(get_db)):
+def get_current_user(request: Request = None, db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
