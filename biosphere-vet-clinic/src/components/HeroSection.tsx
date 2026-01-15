@@ -141,15 +141,6 @@ export function HeroSection() {
                 </Link>
               ))}
 
-              <div className="flex items-center gap-3">
-                <Link to={features[0].link} className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
-                  <span>Назад</span>
-                </Link>
-                <Link to={features[features.length-1].link} className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
-                  <span>Далее</span>
-                </Link>
-              </div>
-
               {/* Emergency Contact Card */}
               <Link to="/about-24-7" className="block group">
                 <Card className="bg-gradient-to-r from-red-500/90 to-red-600/90 dark:from-red-500/70 dark:to-red-600/70 text-white border-0 shadow-md cursor-pointer">
