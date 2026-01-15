@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Home, Users, Clock, CheckCircle, ChevronLeft } from 'lucide-react';
+import { MapPin, Home, Users, Clock, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function AboutBranchesPage() {
@@ -75,11 +75,13 @@ export default function AboutBranchesPage() {
           </p>
         </div>
 
-        <div className="mt-10 flex justify-start">
-          <Link to="/about-doctors" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
-            <ChevronLeft className="h-4 w-4" /> Назад
-          </Link>
-        </div>
+        <Link
+          to="/"
+          className="fixed z-50 right-6 bottom-24 md:bottom-32 w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-colors bg-white dark:bg-gray-800 text-biosphere-primary dark:text-biosphere-secondary border border-gray-200 dark:border-gray-700 hover:bg-biosphere-primary hover:text-white dark:hover:bg-biosphere-secondary dark:hover:text-white"
+          title="На главную"
+        >
+          <Home className="w-6 h-6" />
+        </Link>
       </div>
     </section>
   );
