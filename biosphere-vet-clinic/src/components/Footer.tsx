@@ -38,7 +38,7 @@ export function Footer() {
               <Heart className="h-6 w-6 text-biosphere-secondary" />
               <h3 className="text-2xl font-bold text-black dark:text-white">Биосфера</h3>
             </div>
-            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+            <p className="text-gray-700 dark:text-gray-300 leading-relaxed hidden md:block">
               Современная ветеринарная клиника, обеспечивающая качественную медицинскую помощь домашним животным с 2004 года.
             </p>
             <div className="flex space-x-4">

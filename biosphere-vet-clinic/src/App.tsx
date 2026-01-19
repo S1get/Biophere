@@ -598,7 +598,7 @@ function App() {
   }
 
   // Секции для навигации
-  const sectionIds = ['hero', 'faq', 'prices', 'specialists', 'testimonials']
+  const sectionIds = ['home', 'main-prices', 'faq', 'main-specialists', 'main-reviews']
   const [currentSection, setCurrentSection] = useState(0)
 
   useEffect(() => {
@@ -635,7 +635,7 @@ function App() {
     }
   }
 
-  const mainSectionIds = ['hero', 'faq', 'specialists', 'reviews', 'prices'];
+  const mainSectionIds = ['home', 'main-prices', 'faq', 'main-specialists', 'main-reviews'];
   const [currentMainSection, setCurrentMainSection] = useState(0);
 
   useEffect(() => {
@@ -665,17 +665,17 @@ function App() {
                 <Route path="/" element={
                   <>
                     <HeroSection />
+                    <PricePreviewBlock />
                     <FAQPreviewBlock />
                     <SpecialistsPreviewBlock />
-                    <PricePreviewBlock />
                     <ReviewsPreviewBlock />
                     {/* Стрелки для перемещения между секциями */}
                     {(() => {
                       const sectionIds = [
                         'home',
+                        'main-prices',
                         'faq',
                         'main-specialists',
-                        'main-prices',
                         'main-reviews',
                       ];
                       const [currentSection, setCurrentSection] = React.useState(0);

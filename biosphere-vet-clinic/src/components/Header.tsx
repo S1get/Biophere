@@ -179,76 +179,75 @@ export function Header({ onNavigateToSection }: HeaderProps) {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className="border-t lg:hidden">
-            <div className="container py-4 space-y-4">
-              <div className="space-y-2">
-                {user && user.is_admin ? (
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start"
-                    onClick={() => {
-                      handleLogout()
-                      setIsMobileMenuOpen(false)
-                    }}
-                  >
-                    Выйти
-                  </Button>
-                ) : (
-                  <Link
-                    to="/admin"
-                    className="w-full text-left text-sm font-medium hover:text-biosphere-primary transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Войти (админ)
-                  </Link>
-                )}
-                
-                {navigationItems.map((item) => (
-                  <button
-                    key={item.label}
-                    onClick={() => {
-                      item.action()
-                      setIsMobileMenuOpen(false)
-                    }}
-                    className="block w-full text-left px-4 py-2 text-sm hover:bg-accent hover:text-accent-foreground rounded-md"
-                  >
-                    {item.label}
-                  </button>
-                ))}
-                <Link
-                  to="/specialists-page"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="block w-full text-left px-4 py-2 text-sm hover:bg-accent hover:text-accent-foreground rounded-md"
-                >
-                  Специалисты
-                </Link>
-                <Link
-                  to="/reviews-page"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="block w-full text-left px-4 py-2 text-sm hover:bg-accent hover:text-accent-foreground rounded-md"
-                >
-                  Отзывы
-                </Link>
-
-                <div className="pt-2 border-t">
-                  <div className="text-sm font-medium text-muted-foreground mb-2">Филиалы:</div>
-                  {branches.map((branch, index) => (
-                    <button
-                      key={index}
+          <>
+            {/* Backdrop for closing menu */}
+            <div 
+              className="fixed inset-0 z-40 bg-black/20 lg:hidden" 
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+            <div className="border-t lg:hidden relative z-50 bg-background">
+              <div className="container py-4 space-y-4">
+                <div className="space-y-2">
+                  {user && user.is_admin && (
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start"
                       onClick={() => {
-                        handleBranchClick(branch)
+                        handleLogout()
+                        setIsMobileMenuOpen(false)
+                      }}
+                    >
+                      Выйти
+                    </Button>
+                  )}
+                  
+                  {navigationItems.map((item) => (
+                    <button
+                      key={item.label}
+                      onClick={() => {
+                        item.action()
                         setIsMobileMenuOpen(false)
                       }}
                       className="block w-full text-left px-4 py-2 text-sm hover:bg-accent hover:text-accent-foreground rounded-md"
                     >
-                      <MapPin className="h-4 w-4 mr-2 inline text-biosphere-primary" />
-                      {branch}
+                      {item.label}
                     </button>
                   ))}
+                  <Link
+                    to="/specialists-page"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block w-full text-left px-4 py-2 text-sm hover:bg-accent hover:text-accent-foreground rounded-md"
+                  >
+                    Специалисты
+                  </Link>
+                  <Link
+                    to="/reviews-page"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block w-full text-left px-4 py-2 text-sm hover:bg-accent hover:text-accent-foreground rounded-md"
+                  >
+                    Отзывы
+                  </Link>
+
+                  <div className="pt-2 border-t">
+                    <div className="text-sm font-medium text-muted-foreground mb-2">Филиалы:</div>
+                    {branches.map((branch, index) => (
+                      <button
+                        key={index}
+                        onClick={() => {
+                          handleBranchClick(branch)
+                          setIsMobileMenuOpen(false)
+                        }}
+                        className="block w-full text-left px-4 py-2 text-sm hover:bg-accent hover:text-accent-foreground rounded-md"
+                      >
+                        <MapPin className="h-4 w-4 mr-2 inline text-biosphere-primary" />
+                        {branch}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </>
         )}
       </header>
 
