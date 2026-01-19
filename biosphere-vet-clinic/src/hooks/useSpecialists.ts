@@ -20,8 +20,15 @@ export function useSpecialists() {
 
   const fetchSpecialists = async () => {
     setLoading(true);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 секунд таймаут
+
     try {
-      const res = await fetch(`${API_URL}/specialists/`);
+      const res = await fetch(`${API_URL}/specialists/`, {
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      
       const contentType = res.headers.get("content-type") || "";
       if (!res.ok || !contentType.includes("application/json")) {
         const text = await res.text();
@@ -32,7 +39,12 @@ export function useSpecialists() {
       setSpecialists(data);
       setError(null);
     } catch (e: any) {
-      setError(e.message);
+      clearTimeout(timeoutId);
+      if (e.name === 'AbortError') {
+        setError("Превышено время ожидания ответа от сервера. Возможно, сервер просыпается или есть проблемы с сетью.");
+      } else {
+        setError(e.message);
+      }
     } finally {
       setLoading(false);
     }

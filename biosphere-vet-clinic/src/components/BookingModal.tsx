@@ -5,6 +5,7 @@ import * as z from 'zod'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
@@ -30,12 +31,12 @@ interface BookingModalProps {
 }
 
 const bookingSchema = z.object({
-  branch: z.string().min(1, 'Выберите филиал'),
-  service: z.string().min(1, 'Выберите услугу'),
-  doctor: z.string().min(1, 'Выберите врача'),
+  branch: z.string().min(2, 'Выберите филиал'),
+  service: z.string().min(2, 'Выберите услугу'),
+  doctor: z.string().min(2, 'Выберите врача'),
   date: z.string().min(1, 'Выберите дату'),
   time: z.string().min(1, 'Выберите время'),
-  fullName: z.string().min(2, 'Введите ваше ФИО'),
+  full_name: z.string().min(2, 'Введите ваше ФИО'),
   phone: z.string().min(10, 'Введите корректный номер телефона'),
   email: z.string().email('Введите корректный email'),
   comments: z.string().optional(),
@@ -89,15 +90,24 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       })
-      if (!res.ok) throw new Error('Ошибка записи')
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ detail: 'Ошибка сервера' }));
+        throw new Error(errorData.detail || 'Не удалось оформить запись');
+      }
+
       toast({
         title: 'Запись успешно оформлена!',
         description: 'Администратор увидит вашу запись в админ-панели.',
       })
       form.reset()
       onClose()
-    } catch (e) {
-      toast({ title: 'Ошибка', description: 'Не удалось оформить запись', variant: 'destructive' })
+    } catch (e: any) {
+      toast({ 
+        title: 'Ошибка', 
+        description: e.message || 'Не удалось оформить запись', 
+        variant: 'destructive' 
+      })
     }
   }
 
@@ -109,15 +119,19 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-center text-biosphere-primary">
+      <DialogContent className="sm:max-w-[500px] p-0 flex flex-col max-h-[95vh] sm:max-h-[90vh]">
+        <DialogHeader className="p-6 pb-2 shrink-0 relative">
+          <DialogTitle className="text-center text-biosphere-primary pr-8">
             Записаться на консультацию
           </DialogTitle>
+          <DialogDescription className="text-center pr-8">
+            Заполните форму ниже, и наш администратор свяжется с вами для подтверждения записи.
+          </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-          {/* Branch Selection */}
+        <div className="flex-1 overflow-y-auto p-6 pt-2">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6 pb-4">
+            {/* Branch Selection */}
           <div className="space-y-2">
             <Label htmlFor="branch">
               <MapPin className="h-4 w-4 inline mr-1" />
@@ -231,17 +245,17 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
           {/* Contact Information */}
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="fullName">
+              <Label htmlFor="full_name">
                 <User className="h-4 w-4 inline mr-1" />
                 ФИО
               </Label>
               <Input
-                id="fullName"
+                id="full_name"
                 placeholder="Иванов Иван Иванович"
-                {...form.register('fullName')}
+                {...form.register('full_name')}
               />
-              {form.formState.errors.fullName && (
-                <p className="text-sm text-destructive">{form.formState.errors.fullName.message}</p>
+              {form.formState.errors.full_name && (
+                <p className="text-sm text-destructive">{form.formState.errors.full_name.message}</p>
               )}
             </div>
 
@@ -306,7 +320,8 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
             </Button>
           </div>
         </form>
-      </DialogContent>
+      </div>
+    </DialogContent>
     </Dialog>
   )
 }

@@ -176,90 +176,93 @@ export function Header({ onNavigateToSection }: HeaderProps) {
             {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </Button>
         </div>
+      </header>
 
-        {/* Mobile Navigation */}
-        {isMobileMenuOpen && (
-          <div className="fixed inset-0 z-50 lg:hidden">
-            {/* Backdrop for closing menu */}
-            <div 
-              className="absolute inset-0 bg-black/40 backdrop-blur-sm" 
-              onClick={() => setIsMobileMenuOpen(false)}
-            />
-            <div className="absolute right-0 top-0 h-full w-[280px] bg-background shadow-xl border-l flex flex-col animate-in slide-in-from-right duration-300">
-              <div className="flex items-center justify-between p-4 border-b">
-                <span className="font-bold text-biosphere-primary text-lg">Меню</span>
-                <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)}>
-                  <X className="h-6 w-6" />
-                </Button>
+      {/* Mobile Navigation - Moved outside header for better stacking and isolation */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-[100] lg:hidden">
+          {/* Backdrop for closing menu */}
+          <div 
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" 
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+          <div 
+            className="absolute right-0 top-0 h-full w-[280px] bg-background shadow-2xl border-l flex flex-col animate-in slide-in-from-right duration-300 ease-in-out"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-4 border-b bg-background sticky top-0 z-10">
+              <span className="font-bold text-biosphere-primary text-lg">Меню</span>
+              <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)}>
+                <X className="h-6 w-6" />
+              </Button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4 space-y-6">
+              <div className="space-y-1">
+                {navigationItems.map((item) => (
+                  <button
+                    key={item.label}
+                    onClick={() => {
+                      item.action()
+                      setIsMobileMenuOpen(false)
+                    }}
+                    className="flex items-center w-full px-4 py-3 text-base font-medium hover:bg-accent hover:text-accent-foreground rounded-lg transition-colors"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+                <Link
+                  to="/specialists-page"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center w-full px-4 py-3 text-base font-medium hover:bg-accent hover:text-accent-foreground rounded-lg transition-colors"
+                >
+                  Специалисты
+                </Link>
+                <Link
+                  to="/reviews-page"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center w-full px-4 py-3 text-base font-medium hover:bg-accent hover:text-accent-foreground rounded-lg transition-colors"
+                >
+                  Отзывы
+                </Link>
               </div>
-              <div className="flex-1 overflow-y-auto p-4 space-y-6">
+
+              <div className="pt-4 border-t">
+                <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider px-4 mb-2">Филиалы</div>
                 <div className="space-y-1">
-                  {navigationItems.map((item) => (
+                  {branches.map((branch, index) => (
                     <button
-                      key={item.label}
+                      key={index}
                       onClick={() => {
-                        item.action()
+                        handleBranchClick(branch)
                         setIsMobileMenuOpen(false)
                       }}
-                      className="flex items-center w-full px-4 py-3 text-base font-medium hover:bg-accent hover:text-accent-foreground rounded-lg transition-colors"
+                      className="flex items-start w-full px-4 py-3 text-sm hover:bg-accent hover:text-accent-foreground rounded-lg transition-colors text-left"
                     >
-                      {item.label}
+                      <MapPin className="h-4 w-4 mr-3 mt-0.5 flex-shrink-0 text-biosphere-primary" />
+                      <span>{branch}</span>
                     </button>
                   ))}
-                  <Link
-                    to="/specialists-page"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center w-full px-4 py-3 text-base font-medium hover:bg-accent hover:text-accent-foreground rounded-lg transition-colors"
-                  >
-                    Специалисты
-                  </Link>
-                  <Link
-                    to="/reviews-page"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center w-full px-4 py-3 text-base font-medium hover:bg-accent hover:text-accent-foreground rounded-lg transition-colors"
-                  >
-                    Отзывы
-                  </Link>
                 </div>
-
-                <div className="pt-4 border-t">
-                  <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider px-4 mb-2">Филиалы</div>
-                  <div className="space-y-1">
-                    {branches.map((branch, index) => (
-                      <button
-                        key={index}
-                        onClick={() => {
-                          handleBranchClick(branch)
-                          setIsMobileMenuOpen(false)
-                        }}
-                        className="flex items-start w-full px-4 py-3 text-sm hover:bg-accent hover:text-accent-foreground rounded-lg transition-colors text-left"
-                      >
-                        <MapPin className="h-4 w-4 mr-3 mt-0.5 flex-shrink-0 text-biosphere-primary" />
-                        <span>{branch}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {user && user.is_admin && (
-                  <div className="pt-4 border-t">
-                    <Button
-                      variant="destructive"
-                      className="w-full justify-start gap-2"
-                      onClick={() => {
-                        handleLogout()
-                        setIsMobileMenuOpen(false)
-                      }}
-                    >
-                      Выйти из системы
-                    </Button>
-                  </div>
-                )}
               </div>
+
+              {user && user.is_admin && (
+                <div className="pt-4 border-t">
+                  <Button
+                    variant="destructive"
+                    className="w-full justify-start gap-2"
+                    onClick={() => {
+                      handleLogout()
+                      setIsMobileMenuOpen(false)
+                    }}
+                  >
+                    Выйти из системы
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
-        )}
-      </header>
+        </div>
+      )}
 
       <BookingModal isOpen={isBookingOpen} onClose={() => setIsBookingOpen(false)} />
     </>

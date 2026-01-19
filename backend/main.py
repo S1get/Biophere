@@ -1,14 +1,21 @@
 import sys
 import os
+import re
+from datetime import datetime
+from pathlib import Path
+import shutil
+
 # Добавляем текущую директорию в PYTHONPATH для корректной работы импортов
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from fastapi import Depends, HTTPException, status
+from fastapi.staticfiles import StaticFiles
+from fastapi.exceptions import RequestValidationError
+
 from database import Base, engine, SessionLocal
-from auth import router as auth_router
+from auth import router as auth_router, get_current_user
 from routers.users import router as users_router
 from routers.reviews import router as reviews_router
 from routers.questions import router as questions_router
@@ -16,30 +23,57 @@ from routers.specialists import router as specialists_router
 from routers.bookings import router as bookings_router
 from models import User, Review, Question, Specialist, Booking
 import schemas
-from datetime import datetime
-from auth import get_current_user
 from create_admin import create_admin
 from sqlalchemy import inspect, text
 
-# ВАЖНО: Для запуска на Render используйте команду:
-# uvicorn backend.main:app --host 0.0.0.0 --port $PORT
-# (если main.py лежит в папке backend)
-
 app = FastAPI()
 
+# Добавляем обработчики ошибок для гарантии CORS заголовков
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    response = JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
+    )
+    origin = request.headers.get("origin")
+    if origin:
+        if origin in allowed_origins or re.match(r"^https?://.*\.onrender\.com$", origin):
+             response.headers["Access-Control-Allow-Origin"] = origin
+             response.headers["Access-Control-Allow-Credentials"] = "true"
+    return response
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    response = JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={"detail": exc.errors()},
+    )
+    origin = request.headers.get("origin")
+    if origin:
+        if origin in allowed_origins or re.match(r"^https?://.*\.onrender\.com$", origin):
+             response.headers["Access-Control-Allow-Origin"] = origin
+             response.headers["Access-Control-Allow-Credentials"] = "true"
+    return response
+
+# Создаем папку для загрузок если ее нет
+UPLOAD_DIR = Path("uploads")
+UPLOAD_DIR.mkdir(exist_ok=True)
+
+# Монтируем статику для доступа к загруженным файлам
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
 # CORS: разрешаем локальную разработку и продакшн
-# Динамическая настройка CORS: учитываем реальный фронтенд-домен из окружения и разрешаем поддомены Render
 frontend_origin = os.getenv("FRONTEND_ORIGIN")
 allowed_origins = [
     "https://biosphere-frontend.onrender.com",
     "https://biosfera-frontend.onrender.com",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    # Минимакс превью домен (для тестов/предпросмотра)
     "https://1y0ld6yrx4.space.minimax.io",
-    # Продакшн домен сайта
     "https://biosphere-kirov.ru",
     "http://biosphere-kirov.ru",
+    "https://biosfera-kirov.ru",
+    "http://biosfera-kirov.ru",
 ]
 if frontend_origin:
     allowed_origins.append(frontend_origin)
@@ -47,10 +81,10 @@ if frontend_origin:
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
-    allow_origin_regex=r"^https?://.*\.onrender\.com$|^https?://(?:.+\.)?biosphere-kirov\.ru$",
-    allow_credentials=False,
+    allow_origin_regex=r"^https?://.*\.onrender\.com$|^https?://(?:.+\.)?biosfer[ea]-kirov\.ru$",
+    allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["Authorization", "Content-Type"],
+    allow_headers=["*"],
 )
 
 app.include_router(auth_router)
@@ -60,12 +94,25 @@ app.include_router(questions_router)
 app.include_router(specialists_router)
 app.include_router(bookings_router)
 
+@app.post("/upload")
+async def upload_file(file: UploadFile = File(...), current_user: User = Depends(get_current_user)):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Недостаточно прав")
+    
+    file_extension = Path(file.filename).suffix
+    file_name = f"{datetime.now().timestamp()}{file_extension}"
+    file_path = UPLOAD_DIR / file_name
+    
+    with file_path.open("wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    
+    return {"url": f"/uploads/{file_name}"}
+
 @app.on_event("startup")
 def on_startup():
     print("=== BIOSPHERE API STARTED ===")
     print({"allowed_origins": allowed_origins})
-    # Создать таблицы только для SQLite (локальная разработка)
-    # Для PostgreSQL используйте миграции Alembic
+    
     from database import DATABASE_URL
     if DATABASE_URL.startswith('sqlite'):
         try:
@@ -74,83 +121,71 @@ def on_startup():
         except Exception as e:
             print(f"Warning: Could not create tables: {e}")
     else:
-        # Для PostgreSQL пытаемся запустить миграции автоматически
         try:
-            import os
             from alembic.config import Config
             from alembic import command
-            # Определяем путь к alembic.ini
             alembic_ini_path = os.path.join(os.path.dirname(__file__), "alembic.ini")
             if os.path.exists(alembic_ini_path):
                 alembic_cfg = Config(alembic_ini_path)
                 command.upgrade(alembic_cfg, "head")
                 print("Database migrations completed")
-            else:
-                print("Warning: alembic.ini not found, skipping auto-migration")
         except Exception as e:
             print(f"Warning: Could not run migrations automatically: {e}")
-            print("Please run manually: cd backend && alembic upgrade head")
 
-        # Дополнительная проверка/создание таблиц на всякий случай
         try:
             Base.metadata.create_all(bind=engine)
             print("Database tables verified/created (fallback)")
         except Exception as e:
             print(f"Warning: Fallback table creation failed: {e}")
 
-        # Гарантируем наличие критичных колонок для гостевых форм
+    try:
+        insp = inspect(engine)
+        with engine.begin() as conn:
+            q_cols = {c['name'] for c in insp.get_columns('questions')}
+            r_cols = {c['name'] for c in insp.get_columns('reviews')}
+
+            def add_col(table: str, col_def: str):
+                try:
+                    conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {col_def}"))
+                except Exception:
+                    pass
+
+            if 'guest_name' not in q_cols: add_col('questions', 'guest_name TEXT')
+            if 'guest_phone' not in q_cols: add_col('questions', 'guest_phone TEXT')
+            if 'ip_address' not in q_cols: add_col('questions', 'ip_address TEXT')
+            if 'admin_reply' not in q_cols: add_col('questions', 'admin_reply TEXT')
+            if 'is_read' not in q_cols: add_col('questions', 'is_read BOOLEAN DEFAULT FALSE')
+            if 'published' not in q_cols: add_col('questions', 'published BOOLEAN DEFAULT TRUE')
+
+            if 'guest_name' not in r_cols: add_col('reviews', 'guest_name TEXT')
+            if 'guest_phone' not in r_cols: add_col('reviews', 'guest_phone TEXT')
+            if 'ip_address' not in r_cols: add_col('reviews', 'ip_address TEXT')
+            if 'admin_reply' not in r_cols: add_col('reviews', 'admin_reply TEXT')
+            if 'published' not in r_cols: add_col('reviews', 'published BOOLEAN DEFAULT TRUE')
+
+            # Убеждаемся в существовании таблицы bookings
+            if not insp.has_table('bookings'):
+                Booking.__table__.create(engine)
+                print("Table 'bookings' created")
+    except Exception as e:
+        print(f"Warning: Column ensure failed: {e}")
+    
+    try:
+        db = SessionLocal()
         try:
-            insp = inspect(engine)
-            with engine.begin() as conn:
-                q_cols = {c['name'] for c in insp.get_columns('questions')}
-                r_cols = {c['name'] for c in insp.get_columns('reviews')}
+            specialist_count = db.query(Specialist).count()
+            if specialist_count == 0:
+                from seed_specialists import seed_specialists
+                seed_specialists()
+        finally:
+            db.close()
+    except Exception as e:
+        print(f"Warning: Could not seed specialists: {e}")
 
-                def add_col(table: str, col_def: str):
-                    try:
-                        conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {col_def}"))
-                        print(f"Added column {table}.{col_def}")
-                    except Exception as e:
-                        print(f"Skip add column {table}.{col_def}: {e}")
-
-                # questions
-                if 'guest_name' not in q_cols: add_col('questions', 'guest_name TEXT')
-                if 'guest_phone' not in q_cols: add_col('questions', 'guest_phone TEXT')
-                if 'ip_address' not in q_cols: add_col('questions', 'ip_address TEXT')
-                if 'admin_reply' not in q_cols: add_col('questions', 'admin_reply TEXT')
-                if 'is_read' not in q_cols: add_col('questions', 'is_read BOOLEAN DEFAULT FALSE')
-                if 'published' not in q_cols: add_col('questions', 'published BOOLEAN DEFAULT TRUE')
-
-                # reviews
-                if 'guest_name' not in r_cols: add_col('reviews', 'guest_name TEXT')
-                if 'guest_phone' not in r_cols: add_col('reviews', 'guest_phone TEXT')
-                if 'ip_address' not in r_cols: add_col('reviews', 'ip_address TEXT')
-                if 'admin_reply' not in r_cols: add_col('reviews', 'admin_reply TEXT')
-                if 'published' not in r_cols: add_col('reviews', 'published BOOLEAN DEFAULT TRUE')
-        except Exception as e:
-            print(f"Warning: Column ensure failed: {e}")
-        
-        # Автоматически загружаем специалистов если база пустая
-        try:
-            from models import Specialist
-            from seed_specialists import seed_specialists
-            db = SessionLocal()
-            try:
-                specialist_count = db.query(Specialist).count()
-                if specialist_count == 0:
-                    print("База специалистов пуста, загружаем данные...")
-                    seed_specialists()
-                else:
-                    print(f"В базе уже есть {specialist_count} специалистов")
-            finally:
-                db.close()
-        except Exception as e:
-            print(f"Warning: Could not seed specialists: {e}")
-    # Обеспечиваем наличие администратора (admin@biosphere.ru / ADMINBIO)
     try:
         create_admin()
-        print("Admin user ensured")
-    except Exception as e:
-        print(f"Warning: Could not ensure admin user: {e}")
+    except Exception:
+        pass
 
 @app.get("/")
 def root():
@@ -158,9 +193,7 @@ def root():
 
 @app.get("/health")
 def health_check():
-    """Health check endpoint for Render"""
     try:
-        from sqlalchemy import text
         db = SessionLocal()
         db.execute(text("SELECT 1"))
         db.close()
@@ -170,17 +203,12 @@ def health_check():
 
 @app.get("/ping")
 def ping():
-    """Ping endpoint to prevent Render from spinning down"""
     return {"status": "ok", "timestamp": datetime.utcnow().isoformat()}
-
 
 @app.post("/admin/clear_all")
 def clear_all(current_user: User = Depends(get_current_user)):
     if not current_user.is_admin:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Недостаточно прав для доступа к этой функции"
-        )
+        raise HTTPException(status_code=403, detail="Недостаточно прав")
     db = SessionLocal()
     db.query(Review).delete()
     db.query(Question).delete()
@@ -189,273 +217,3 @@ def clear_all(current_user: User = Depends(get_current_user)):
     db.commit()
     db.close()
     return {"status": "ok"}
-
-@app.get("/admin/export")
-def export_data(current_user: User = Depends(get_current_user)):
-    """Экспорт всех данных в формате JSON"""
-    if not current_user.is_admin:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Недостаточно прав для доступа к этой функции"
-        )
-    
-    db = SessionLocal()
-    
-    # Получаем все данные
-    specialists = db.query(Specialist).all()
-    reviews = db.query(Review).all()
-    questions = db.query(Question).all()
-    users = db.query(User).all()
-    
-    # Преобразуем в словари
-    specialists_data = [
-        {
-            "id": s.id,
-            "name": s.name,
-            "position": s.position,
-            "specialization": s.specialization,
-            "workplace": s.workplace,
-            "education": s.education,
-            "extra_qual": s.extra_qual,
-            "photo": s.photo
-        } for s in specialists
-    ]
-    
-    reviews_data = [
-        {
-            "id": r.id,
-            "text": r.text,
-            "rating": r.rating,
-            "created_at": r.created_at.isoformat() if r.created_at else None,
-            "user_name": r.user.name if r.user else None,
-            "guest_name": r.guest_name,
-            "admin_reply": r.admin_reply
-        } for r in reviews
-    ]
-    
-    questions_data = [
-        {
-            "id": q.id,
-            "text": q.text,
-            "created_at": q.created_at.isoformat() if q.created_at else None,
-            "user_name": q.user.name if q.user else None,
-            "guest_name": q.guest_name,
-            "admin_reply": q.admin_reply,
-            "is_read": q.is_read
-        } for q in questions
-    ]
-    
-    users_data = [
-        {
-            "id": u.id,
-            "name": u.name,
-            "email": u.email,
-            "is_admin": u.is_admin,
-            "created_at": u.created_at.isoformat() if u.created_at else None
-        } for u in users
-    ]
-    
-    export_data = {
-        "export_date": datetime.now().isoformat(),
-        "statistics": {
-            "total_specialists": len(specialists),
-            "total_reviews": len(reviews),
-            "total_questions": len(questions),
-            "total_users": len(users),
-            "average_rating": sum(r.rating for r in reviews) / len(reviews) if reviews else 0,
-            "response_rate": len([q for q in questions if q.admin_reply]) / len(questions) * 100 if questions else 0
-        },
-        "specialists": specialists_data,
-        "reviews": reviews_data,
-        "questions": questions_data,
-        "users": users_data
-    }
-    
-    db.close()
-    
-    return JSONResponse(content=export_data)
-
-@app.post("/admin/cleanup")
-def cleanup_old_data(current_user: User = Depends(get_current_user)):
-    """Очистка старых данных (старше 1 года)"""
-    if not current_user.is_admin:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Недостаточно прав для доступа к этой функции"
-        )
-    
-    db = SessionLocal()
-    from datetime import timedelta
-    
-    # Дата год назад
-    one_year_ago = datetime.now() - timedelta(days=365)
-    
-    # Удаляем старые отзывы без ответов администратора
-    old_reviews = db.query(Review).filter(
-        Review.created_at < one_year_ago,
-        Review.admin_reply.is_(None)
-    ).all()
-    
-    for review in old_reviews:
-        db.delete(review)
-    
-    # Удаляем старые вопросы без ответов администратора
-    old_questions = db.query(Question).filter(
-        Question.created_at < one_year_ago,
-        Question.admin_reply.is_(None)
-    ).all()
-    
-    for question in old_questions:
-        db.delete(question)
-    
-    db.commit()
-    db.close()
-    
-    return {
-        "status": "success",
-        "deleted_reviews": len(old_reviews),
-        "deleted_questions": len(old_questions),
-        "message": f"Удалено {len(old_reviews)} старых отзывов и {len(old_questions)} старых вопросов"
-    }
-
-@app.get("/admin/statistics")
-def get_detailed_statistics(current_user: User = Depends(get_current_user)):
-    """Получение подробной статистики системы"""
-    if not current_user.is_admin:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Недостаточно прав для доступа к этой функции"
-        )
-    
-    db = SessionLocal()
-    from datetime import timedelta
-    
-    # Базовые данные
-    total_specialists = db.query(Specialist).count()
-    total_reviews = db.query(Review).count()
-    total_questions = db.query(Question).count()
-    total_users = db.query(User).count()
-    
-    # Статистика по рейтингам
-    reviews_with_rating = db.query(Review).filter(Review.rating.isnot(None)).all()
-    average_rating = sum(r.rating for r in reviews_with_rating) / len(reviews_with_rating) if reviews_with_rating else 0
-    
-    rating_distribution = {}
-    for i in range(1, 6):
-        rating_distribution[i] = len([r for r in reviews_with_rating if r.rating == i])
-    
-    # Статистика по ответам
-    answered_questions = db.query(Question).filter(Question.admin_reply.isnot(None)).count()
-    response_rate = (answered_questions / total_questions * 100) if total_questions > 0 else 0
-    
-    # Статистика по времени
-    now = datetime.now()
-    week_ago = now - timedelta(days=7)
-    month_ago = now - timedelta(days=30)
-    
-    recent_reviews = db.query(Review).filter(Review.created_at >= week_ago).count()
-    recent_questions = db.query(Question).filter(Question.created_at >= week_ago).count()
-    
-    monthly_reviews = db.query(Review).filter(Review.created_at >= month_ago).count()
-    monthly_questions = db.query(Question).filter(Question.created_at >= month_ago).count()
-    
-    # Статистика по специалистам
-    specialists_by_position = {}
-    for specialist in db.query(Specialist).all():
-        position = specialist.position or "Не указана"
-        specialists_by_position[position] = specialists_by_position.get(position, 0) + 1
-    
-    # Статистика по местам работы
-    specialists_by_workplace = {}
-    for specialist in db.query(Specialist).all():
-        workplace = specialist.workplace or "Не указано"
-        specialists_by_workplace[workplace] = specialists_by_workplace.get(workplace, 0) + 1
-    
-    db.close()
-    
-    return {
-        "overview": {
-            "total_specialists": total_specialists,
-            "total_reviews": total_reviews,
-            "total_questions": total_questions,
-            "total_users": total_users,
-            "average_rating": round(average_rating, 1),
-            "response_rate": round(response_rate, 1)
-        },
-        "recent_activity": {
-            "reviews_last_week": recent_reviews,
-            "questions_last_week": recent_questions,
-            "reviews_last_month": monthly_reviews,
-            "questions_last_month": monthly_questions
-        },
-        "rating_distribution": rating_distribution,
-        "specialists_by_position": specialists_by_position,
-        "specialists_by_workplace": specialists_by_workplace,
-        "generated_at": now.isoformat()
-    }
-
-@app.get("/admin/logs")
-def get_system_logs(current_user: User = Depends(get_current_user)):
-    """Получение логов системы"""
-    if not current_user.is_admin:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Недостаточно прав для доступа к этой функции"
-        )
-    
-    db = SessionLocal()
-    
-    # Получаем последние действия
-    recent_reviews = db.query(Review).order_by(Review.created_at.desc()).limit(10).all()
-    recent_questions = db.query(Question).order_by(Question.created_at.desc()).limit(10).all()
-    
-    logs = []
-    
-    # Логи отзывов
-    for review in recent_reviews:
-        logs.append({
-            "timestamp": review.created_at.isoformat() if review.created_at else None,
-            "type": "review",
-            "action": "created",
-            "user": review.user.name if review.user else review.guest_name or "Гость",
-            "details": f"Отзыв с рейтингом {review.rating} звезд",
-            "id": review.id
-        })
-    
-    # Логи вопросов
-    for question in recent_questions:
-        logs.append({
-            "timestamp": question.created_at.isoformat() if question.created_at else None,
-            "type": "question",
-            "action": "created",
-            "user": question.user.name if question.user else question.guest_name or "Гость",
-            "details": f"Вопрос {'(отвечен)' if question.admin_reply else '(ожидает ответа)'}",
-            "id": question.id
-        })
-    
-    # Сортируем по времени
-    logs.sort(key=lambda x: x["timestamp"] or "", reverse=True)
-    
-    # Статистика ошибок (симуляция)
-    error_stats = {
-        "total_errors": 0,
-        "errors_last_24h": 0,
-        "most_common_error": "Нет ошибок",
-        "system_health": "Отлично"
-    }
-    
-    db.close()
-    
-    return {
-        "recent_logs": logs[:20],  # Последние 20 логов
-        "error_statistics": error_stats,
-        "system_info": {
-            "database_connections": "Активно",
-            "api_status": "Работает",
-            "last_backup": datetime.now().isoformat(),
-            "uptime": "100%"
-        }
-    }
-
-# TODO: Подключить роутеры для specialists, testimonials, faq, если они появятся в будущем
-

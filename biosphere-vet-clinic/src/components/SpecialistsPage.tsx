@@ -150,7 +150,6 @@ export default function SpecialistsPage() {
   }
 
   const handleImageClick = (specialist: any) => {
-    if (isMobile) return
     setSelectedImage({
       src: specialist.photo,
       alt: specialist.name,

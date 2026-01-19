@@ -1,4 +1,4 @@
-import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Download, ZoomIn, ZoomOut, X } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
@@ -98,6 +98,10 @@ export default function ImageModal({ isOpen, onClose, imageSrc, imageAlt, specia
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="p-0 bg-black/90 border-0 shadow-none max-w-none w-screen h-screen flex flex-col items-center justify-center sm:rounded-none">
+        <DialogHeader className="sr-only">
+          <DialogTitle>Просмотр фото специалиста: {specialistName}</DialogTitle>
+          <DialogDescription>Увеличенное изображение специалиста с возможностью масштабирования и скачивания</DialogDescription>
+        </DialogHeader>
         <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
           <Button size="icon" variant="secondary" onClick={handleDownload} className="rounded-full bg-white/10 text-white hover:bg-white/20 backdrop-blur-md">
             <Download className="h-5 w-5" />

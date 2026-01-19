@@ -5,6 +5,7 @@ import * as z from 'zod'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
@@ -95,6 +96,9 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
           <DialogTitle className="text-center text-biosphere-primary">
             Личный кабинет
           </DialogTitle>
+          <DialogDescription className="text-center">
+            Войдите в свой аккаунт или зарегистрируйтесь для доступа к услугам клиники.
+          </DialogDescription>
         </DialogHeader>
 
         <Tabs defaultValue="login" className="w-full">
