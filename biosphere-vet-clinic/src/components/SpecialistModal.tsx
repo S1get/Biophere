@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Specialist } from '../hooks/useSpecialists';
+import { X, Plus, Upload } from 'lucide-react';
 
 interface SpecialistModalProps {
   isOpen: boolean;
@@ -38,6 +39,7 @@ export default function SpecialistModal({
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (specialist && mode === 'edit') {
@@ -103,6 +105,43 @@ export default function SpecialistModal({
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Проверка типа файла
+    if (!file.type.startsWith('image/')) {
+      setErrors(prev => ({ ...prev, photo: 'Пожалуйста, выберите изображение' }));
+      return;
+    }
+
+    setUploading(true);
+    const formDataUpload = new FormData();
+    formDataUpload.append('file', file);
+
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${API_URL}/upload`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: formDataUpload,
+      });
+
+      if (!response.ok) throw new Error('Ошибка загрузки');
+      
+      const data = await response.json();
+      // Предполагаем, что API возвращает { url: "..." }
+      handleChange('photo', data.url);
+    } catch (error) {
+      console.error('Ошибка загрузки фото:', error);
+      setErrors(prev => ({ ...prev, photo: 'Не удалось загрузить фото' }));
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -196,14 +235,58 @@ export default function SpecialistModal({
             />
           </div>
 
-          <div>
-            <Label htmlFor="photo">Фото (путь к файлу)</Label>
-            <Input
-              id="photo"
-              value={formData.photo}
-              onChange={(e) => handleChange('photo', e.target.value)}
-              placeholder="/doctors/doctor.jpg"
-            />
+          <div className="space-y-2">
+            <Label htmlFor="photo">Фото специалиста</Label>
+            <div className="flex flex-col gap-4">
+              {formData.photo && (
+                <div className="relative w-32 h-32 rounded-lg overflow-hidden border">
+                  <img 
+                    src={formData.photo} 
+                    alt="Предпросмотр" 
+                    className="w-full h-full object-cover"
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-1 right-1 h-6 w-6 rounded-full"
+                    onClick={() => handleChange('photo', '')}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <Input
+                    id="photo_upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full gap-2"
+                    onClick={() => document.getElementById('photo_upload')?.click()}
+                    disabled={uploading}
+                  >
+                    <Plus className="h-4 w-4" />
+                    {uploading ? 'Загрузка...' : 'Загрузить фото'}
+                  </Button>
+                </div>
+                <div className="flex-1">
+                  <Input
+                    id="photo_url"
+                    value={formData.photo}
+                    onChange={(e) => handleChange('photo', e.target.value)}
+                    placeholder="Или вставьте ссылку на фото"
+                  />
+                </div>
+              </div>
+            </div>
+            {errors.photo && <p className="text-red-500 text-sm mt-1">{errors.photo}</p>}
           </div>
 
           {errors.submit && (

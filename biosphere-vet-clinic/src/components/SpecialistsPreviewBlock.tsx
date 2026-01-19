@@ -81,7 +81,6 @@ export default function SpecialistsPreviewBlock() {
   const isMobile = useIsMobile()
 
   const handleImageClick = (specialist: any) => {
-    if (isMobile) return
     setSelectedImage({
       src: specialist.photo,
       alt: specialist.name,

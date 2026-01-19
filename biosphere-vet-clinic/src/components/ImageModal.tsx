@@ -75,55 +75,77 @@ export default function ImageModal({ isOpen, onClose, imageSrc, imageAlt, specia
     }
   }
 
-  if (isMobile) {
-    return null
+  // Touch handling for mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1 && scale > 1) {
+      setIsDragging(true)
+      setDragStart({
+        x: e.touches[0].clientX - position.x,
+        y: e.touches[0].clientY - position.y
+      })
+    }
   }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (isDragging && e.touches.length === 1 && scale > 1) {
+      setPosition({
+        x: e.touches[0].clientX - dragStart.x,
+        y: e.touches[0].clientY - dragStart.y
+      })
+    }
+  }
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose} modal={false}>
-      <DialogContent data-overlay="none" className="p-0 bg-transparent border-0 shadow-none max-w-none">
-        <div className="relative w-screen h-screen flex items-center justify-center">
-          <div
-            className="relative w-[75vmin] h-[75vmin] max-w-[90vw] max-h-[80vh] rounded-full overflow-hidden shadow-2xl bg-white/5 backdrop-blur-sm"
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
-            onWheel={handleWheel}
-          >
-            <img
-              ref={imageRef}
-              src={imageSrc}
-              alt={imageAlt}
-              className="absolute inset-0 m-auto object-cover transition-transform duration-200 select-none"
-              style={{
-                transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
-                cursor: scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default'
-              }}
-              draggable={false}
-            />
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="p-0 bg-black/90 border-0 shadow-none max-w-none w-screen h-screen flex flex-col items-center justify-center sm:rounded-none">
+        <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
+          <Button size="icon" variant="secondary" onClick={handleDownload} className="rounded-full bg-white/10 text-white hover:bg-white/20 backdrop-blur-md">
+            <Download className="h-5 w-5" />
+          </Button>
+          <Button size="icon" variant="secondary" onClick={onClose} className="rounded-full bg-white/10 text-white hover:bg-white/20 backdrop-blur-md">
+            <X className="h-5 w-5" />
+          </Button>
+        </div>
 
-            <div className="absolute -top-12 left-1/2 -translate-x-1/2 flex items-center gap-3">
-              <Button size="icon" variant="secondary" onClick={handleZoomOut} disabled={scale <= 0.5} className="rounded-full bg-white/80 text-black hover:bg-white">
-                <ZoomOut className="h-4 w-4" />
-              </Button>
-              <Button size="icon" variant="secondary" onClick={handleZoomIn} disabled={scale >= 3} className="rounded-full bg-white/80 text-black hover:bg-white">
-                <ZoomIn className="h-4 w-4" />
-              </Button>
-              <Button size="icon" variant="secondary" onClick={handleDownload} className="rounded-full bg-white/80 text-black hover:bg-white">
-                <Download className="h-4 w-4" />
-              </Button>
-              <Button size="icon" variant="secondary" onClick={onClose} className="rounded-full bg-white/80 text-black hover:bg-white">
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
+        <div 
+          className="relative w-full h-full flex items-center justify-center overflow-hidden touch-none"
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleMouseUp}
+          onWheel={handleWheel}
+        >
+          <img
+            ref={imageRef}
+            src={imageSrc}
+            alt={imageAlt}
+            className="max-w-[95vw] max-h-[85vh] object-contain transition-transform duration-200 select-none"
+            style={{
+              transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
+              cursor: scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'zoom-in'
+            }}
+            onClick={() => scale === 1 ? handleZoomIn() : setScale(1)}
+            draggable={false}
+          />
+        </div>
 
-            <div className="absolute bottom-3 left-3 bg-black/40 text-white px-3 py-1 rounded-full text-sm">
-              {Math.round(scale * 100)}%
-            </div>
-            <div className="absolute top-3 left-3 bg-black/40 text-white px-3 py-1 rounded-full text-sm">
-              {specialistName}
-            </div>
-          </div>
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4 px-6 py-3 bg-black/50 backdrop-blur-xl rounded-full border border-white/10">
+          <Button size="icon" variant="ghost" onClick={handleZoomOut} disabled={scale <= 0.5} className="text-white hover:bg-white/20">
+            <ZoomOut className="h-5 w-5" />
+          </Button>
+          <span className="text-white font-medium min-w-[3rem] text-center">
+            {Math.round(scale * 100)}%
+          </span>
+          <Button size="icon" variant="ghost" onClick={handleZoomIn} disabled={scale >= 5} className="text-white hover:bg-white/20">
+            <ZoomIn className="h-5 w-5" />
+          </Button>
+        </div>
+
+        <div className="absolute top-6 left-6 text-white/80 font-medium hidden sm:block">
+          {specialistName}
         </div>
       </DialogContent>
     </Dialog>
