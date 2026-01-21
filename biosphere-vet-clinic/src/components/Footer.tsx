@@ -102,15 +102,6 @@ export function Footer() {
                         {branch.phone}
                       </a>
                     </p>
-                    <a 
-                      href={branch.mapUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs text-biosphere-secondary hover:underline font-semibold mt-1"
-                    >
-                      Карта проезда
-                      <MessageCircle className="h-3 w-3" />
-                    </a>
                   </div>
                 </div>
               ))}

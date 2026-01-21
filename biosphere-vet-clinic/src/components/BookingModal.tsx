@@ -177,33 +177,39 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
               onValueChange={(value) => form.setValue('service', value)}
               onOpenChange={setIsServiceSelectOpen}
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Выберите услугу" />
               </SelectTrigger>
-              <SelectContent className="max-h-[300px]">
-                <div className="p-2 sticky top-0 bg-white dark:bg-gray-800 z-10 border-b">
-                  <div className="relative">
+              <SelectContent 
+                className="max-h-[300px] w-[var(--radix-select-trigger-width)] overflow-x-hidden p-0"
+                position="popper"
+                sideOffset={4}
+              >
+                <div className="px-2 py-2 sticky top-0 bg-white dark:bg-gray-800 z-10 border-b w-full box-border">
+                  <div className="relative w-full">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
                       placeholder="Поиск услуги..."
-                      className="pl-8 h-9"
+                      className="pl-8 h-9 w-full bg-gray-50 dark:bg-gray-900/50"
                       value={serviceSearch}
                       onChange={(e) => setServiceSearch(e.target.value)}
-                      onKeyDown={(e) => e.stopPropagation()} // Prevent select from closing
+                      onKeyDown={(e) => e.stopPropagation()} 
                     />
                   </div>
                 </div>
-                {filteredServices.length === 0 ? (
-                  <div className="p-4 text-sm text-center text-muted-foreground">
-                    Услуги не найдены
-                  </div>
-                ) : (
-                  filteredServices.map((service) => (
-                    <SelectItem key={service} value={service}>
-                      {service}
-                    </SelectItem>
-                  ))
-                )}
+                <div className="p-1">
+                  {filteredServices.length === 0 ? (
+                    <div className="p-4 text-sm text-center text-muted-foreground">
+                      Услуги не найдены
+                    </div>
+                  ) : (
+                    filteredServices.map((service) => (
+                      <SelectItem key={service} value={service}>
+                        {service}
+                      </SelectItem>
+                    ))
+                  )}
+                </div>
               </SelectContent>
             </Select>
             {form.formState.errors.service && (
