@@ -60,6 +60,19 @@
   }
 }
 
+@keyframes heart-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+.animate-heart {
+  animation: heart-float 2s ease-in-out infinite;
+}
+
 @keyframes dash {
   0% {
     stroke-dasharray: 1, 150;

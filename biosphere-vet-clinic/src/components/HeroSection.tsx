@@ -77,28 +77,29 @@ export function HeroSection() {
                 
                 <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight relative inline-block py-6">
                   {/* Декоративная дуга "Забота" */}
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-[120%] h-full pointer-events-none select-none overflow-visible -z-10">
+                  <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-[140%] h-[120px] pointer-events-none select-none overflow-visible -z-10">
                     <svg
-                      viewBox="0 0 200 100"
+                      viewBox="0 0 200 120"
                       className="w-full h-full"
                       preserveAspectRatio="none"
                     >
                       {/* Верхняя дуга (полумесяц) */}
                       <path
-                        d="M 20,50 Q 100,-10 180,50"
+                        d="M 10,100 Q 100,0 190,100"
                         fill="none"
                         stroke="url(#care-gradient)"
-                        strokeWidth="3"
+                        strokeWidth="2.5"
                         strokeLinecap="round"
                         className="opacity-40 dark:opacity-60"
                       />
                       {/* Иконка сердца в центре дуги */}
-                      <path
-                        d="M 100,12 C 98,12 96,14 96,16 C 96,20 100,24 100,24 C 100,24 104,20 104,16 C 104,14 102,12 100,12 Z"
-                        fill="#4caf50"
-                        className="animate-bounce"
-                        style={{ transformOrigin: 'center', transform: 'scale(1.5)' }}
-                      />
+                      <g className="animate-heart">
+                        <path
+                          d="M 100,35 C 97,35 94,38 94,41 C 94,47 100,53 100,53 C 100,53 106,47 106,41 C 106,38 103,35 100,35 Z"
+                          fill="#4caf50"
+                          transform="scale(1.5) translate(-33.3, -15)"
+                        />
+                      </g>
                       <defs>
                         <linearGradient id="care-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
                           <stop offset="0%" stopColor="#0285a2" />
