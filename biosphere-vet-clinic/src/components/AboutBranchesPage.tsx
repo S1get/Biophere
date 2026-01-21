@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Users, Clock, CheckCircle } from 'lucide-react';
+import { MapPin, Users, Clock, CheckCircle, Home } from 'lucide-react';
 import { ArticleNavigation } from './ArticleNavigation';
 
 export default function AboutBranchesPage() {
