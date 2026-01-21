@@ -77,27 +77,27 @@ export function HeroSection() {
                 
                 <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight relative inline-block py-6">
                   {/* Декоративная дуга "Забота" */}
-                  <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-[140%] h-[120px] pointer-events-none select-none overflow-visible -z-10">
+                  <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-[140%] h-[140px] pointer-events-none select-none overflow-visible -z-10">
                     <svg
-                      viewBox="0 0 200 120"
+                      viewBox="0 0 200 140"
                       className="w-full h-full"
                       preserveAspectRatio="none"
                     >
                       {/* Верхняя дуга (полумесяц) */}
                       <path
-                        d="M 10,100 Q 100,0 190,100"
+                        d="M 10,120 Q 100,-10 190,120"
                         fill="none"
                         stroke="url(#care-gradient)"
-                        strokeWidth="2.5"
+                        strokeWidth="2"
                         strokeLinecap="round"
                         className="opacity-40 dark:opacity-60"
                       />
-                      {/* Иконка сердца в центре дуги */}
-                      <g className="animate-heart">
+                      {/* Иконка лапки в центре дуги */}
+                      <g className="animate-paw" style={{ transformOrigin: '100px 30px' }}>
                         <path
-                          d="M 100,35 C 97,35 94,38 94,41 C 94,47 100,53 100,53 C 100,53 106,47 106,41 C 106,38 103,35 100,35 Z"
+                          d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM7 11a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm11 0a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM14 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm-1 10a5 5 0 1 1-10 0 5 5 0 0 1 10 0Z"
                           fill="#4caf50"
-                          transform="scale(1.5) translate(-33.3, -15)"
+                          transform="translate(88, 10) scale(1.2)"
                         />
                       </g>
                       <defs>

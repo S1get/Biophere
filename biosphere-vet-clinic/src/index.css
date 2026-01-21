@@ -60,17 +60,17 @@
   }
 }
 
-@keyframes heart-float {
+@keyframes paw-float {
   0%, 100% {
-    transform: translateY(0);
+    transform: translateY(0) rotate(-5deg);
   }
   50% {
-    transform: translateY(-15px);
+    transform: translateY(-12px) rotate(5deg);
   }
 }
 
-.animate-heart {
-  animation: heart-float 2s ease-in-out infinite;
+.animate-paw {
+  animation: paw-float 3s ease-in-out infinite;
 }
 
 @keyframes dash {
