@@ -119,7 +119,7 @@ class BookingBase(BaseModel):
     comments: str | None = None
     
     model_config = {
-        "alias_generator": lambda field_name: ''.join(word.title() if i > 0 else word for i, word in enumerate(field_name.split('_'))),
+        "from_attributes": True,
         "populate_by_name": True
     }
 
