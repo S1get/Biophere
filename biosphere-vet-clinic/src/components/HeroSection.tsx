@@ -75,13 +75,33 @@ export function HeroSection() {
                   Ветеринарная клиника №1 в Кирове
                 </Badge> */}
                 
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-                  <span className="text-transparent bg-clip-text" style={{ background: 'linear-gradient(to right, rgb(2, 133, 162), rgb(76, 175, 80))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight relative inline-block py-4">
+                  <div className="absolute inset-0 pointer-events-none select-none overflow-visible -z-10 flex items-center justify-center">
+                    <svg
+                      viewBox="0 0 200 100"
+                      className="w-[150%] h-[200%] opacity-25 dark:opacity-35"
+                      preserveAspectRatio="none"
+                    >
+                      <path
+                        d="M 170,10 A 85,40 0 1,0 170,90 A 70,30 0 1,1 170,10"
+                        fill="url(#moon-gradient)"
+                        className="animate-pulse"
+                        transform="rotate(-5, 100, 50)"
+                      />
+                      <defs>
+                        <linearGradient id="moon-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor="#0285a2" stopOpacity="0.8" />
+                          <stop offset="100%" stopColor="#4caf50" stopOpacity="0.8" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                  </div>
+                  <span className="text-transparent bg-clip-text relative z-10" style={{ background: 'linear-gradient(to right, rgb(2, 133, 162), rgb(76, 175, 80))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                     Биосфера
                   </span>
                 </h1>
                 <div className="text-2xl md:text-3xl font-semibold text-gray-800 dark:text-gray-200">
-                  Ветеринарная клиника, которой доверяют
+                  Клиника, где окружают заботой
                 </div>
               </div>
 
