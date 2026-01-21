@@ -1,12 +1,13 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Heart, GraduationCap, Award, Stethoscope, Users, CheckCircle, ChevronRight, Home } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Heart, GraduationCap, Award, Stethoscope, Users, CheckCircle } from 'lucide-react';
+import { ArticleNavigation } from './ArticleNavigation';
 
 export default function AboutDoctorsPage() {
   return (
     <section className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-16">
+      <ArticleNavigation />
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="mb-12 text-center">
           <Badge variant="secondary" className="mb-4 text-lg px-4 py-2">Опытные врачи</Badge>
@@ -74,14 +75,6 @@ export default function AboutDoctorsPage() {
             Доверьте здоровье вашего питомца нашим специалистам — мы всегда готовы помочь и найти индивидуальный подход к каждому!
           </p>
         </div>
-
-        <Link
-          to="/"
-          className="fixed z-50 right-6 bottom-24 md:bottom-32 w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-colors bg-white dark:bg-gray-800 text-biosphere-primary dark:text-biosphere-secondary border border-gray-200 dark:border-gray-700 hover:bg-biosphere-primary hover:text-white dark:hover:bg-biosphere-secondary dark:hover:text-white"
-          title="На главную"
-        >
-          <Home className="w-6 h-6" />
-        </Link>
       </div>
     </section>
   );

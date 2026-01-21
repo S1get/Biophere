@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Calendar, Clock, MapPin, User, Phone, Mail, FileText } from 'lucide-react'
+import { Calendar, Clock, MapPin, User, Phone, Mail, FileText, Search } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { useNavigate } from 'react-router-dom'
 import servicesData from './services-data.js'
@@ -75,7 +75,20 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
   const navigate = useNavigate()
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
   
-  const form = useForm<BookingFormData>({
+  const [serviceSearch, setServiceSearch] = useState('')
+   const [isServiceSelectOpen, setIsServiceSelectOpen] = useState(false)
+   
+   const filteredServices = useMemo(() => {
+     return serviceNames.filter(s => s.toLowerCase().includes(serviceSearch.toLowerCase()))
+   }, [serviceSearch])
+
+   useEffect(() => {
+      if (!isServiceSelectOpen) {
+        setServiceSearch('')
+      }
+    }, [isServiceSelectOpen])
+
+   const form = useForm<BookingFormData>({
     resolver: zodResolver(bookingSchema),
   })
 
@@ -160,16 +173,37 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
               <FileText className="h-4 w-4 inline mr-1" />
               Услуга
             </Label>
-            <Select onValueChange={(value) => form.setValue('service', value)}>
+            <Select 
+              onValueChange={(value) => form.setValue('service', value)}
+              onOpenChange={setIsServiceSelectOpen}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Выберите услугу" />
               </SelectTrigger>
-              <SelectContent>
-                {serviceNames.map((service) => (
-                  <SelectItem key={service} value={service}>
-                    {service}
-                  </SelectItem>
-                ))}
+              <SelectContent className="max-h-[300px]">
+                <div className="p-2 sticky top-0 bg-white dark:bg-gray-800 z-10 border-b">
+                  <div className="relative">
+                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Поиск услуги..."
+                      className="pl-8 h-9"
+                      value={serviceSearch}
+                      onChange={(e) => setServiceSearch(e.target.value)}
+                      onKeyDown={(e) => e.stopPropagation()} // Prevent select from closing
+                    />
+                  </div>
+                </div>
+                {filteredServices.length === 0 ? (
+                  <div className="p-4 text-sm text-center text-muted-foreground">
+                    Услуги не найдены
+                  </div>
+                ) : (
+                  filteredServices.map((service) => (
+                    <SelectItem key={service} value={service}>
+                      {service}
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
             {form.formState.errors.service && (
