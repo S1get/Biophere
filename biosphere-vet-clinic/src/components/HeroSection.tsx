@@ -75,27 +75,40 @@ export function HeroSection() {
                   Ветеринарная клиника №1 в Кирове
                 </Badge> */}
                 
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight relative inline-block py-4">
-                  <div className="absolute inset-0 pointer-events-none select-none overflow-visible -z-10 flex items-center justify-center">
+                <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight relative inline-block py-6">
+                  {/* Декоративная дуга "Забота" */}
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-[120%] h-full pointer-events-none select-none overflow-visible -z-10">
                     <svg
                       viewBox="0 0 200 100"
-                      className="w-[150%] h-[200%] opacity-25 dark:opacity-35"
+                      className="w-full h-full"
                       preserveAspectRatio="none"
                     >
+                      {/* Верхняя дуга (полумесяц) */}
                       <path
-                        d="M 170,10 A 85,40 0 1,0 170,90 A 70,30 0 1,1 170,10"
-                        fill="url(#moon-gradient)"
-                        className="animate-pulse"
-                        transform="rotate(-5, 100, 50)"
+                        d="M 20,50 Q 100,-10 180,50"
+                        fill="none"
+                        stroke="url(#care-gradient)"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        className="opacity-40 dark:opacity-60"
+                      />
+                      {/* Иконка сердца в центре дуги */}
+                      <path
+                        d="M 100,12 C 98,12 96,14 96,16 C 96,20 100,24 100,24 C 100,24 104,20 104,16 C 104,14 102,12 100,12 Z"
+                        fill="#4caf50"
+                        className="animate-bounce"
+                        style={{ transformOrigin: 'center', transform: 'scale(1.5)' }}
                       />
                       <defs>
-                        <linearGradient id="moon-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#0285a2" stopOpacity="0.8" />
-                          <stop offset="100%" stopColor="#4caf50" stopOpacity="0.8" />
+                        <linearGradient id="care-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor="#0285a2" />
+                          <stop offset="50%" stopColor="#4caf50" />
+                          <stop offset="100%" stopColor="#0285a2" />
                         </linearGradient>
                       </defs>
                     </svg>
                   </div>
+                  
                   <span className="text-transparent bg-clip-text relative z-10" style={{ background: 'linear-gradient(to right, rgb(2, 133, 162), rgb(76, 175, 80))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                     Биосфера
                   </span>
