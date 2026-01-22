@@ -77,15 +77,15 @@ export function HeroSection() {
                 
                 <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight relative inline-block py-6">
                   {/* Декоративная дуга "Забота" */}
-                  <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-[140%] h-[140px] pointer-events-none select-none overflow-visible -z-10">
+                  <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[140%] h-[160px] pointer-events-none select-none overflow-visible -z-10">
                     <svg
-                      viewBox="0 0 200 140"
+                      viewBox="0 0 200 160"
                       className="w-full h-full"
                       preserveAspectRatio="none"
                     >
                       {/* Верхняя дуга (полумесяц) */}
                       <path
-                        d="M 10,120 Q 100,-10 190,120"
+                        d="M 10,140 Q 100,10 190,140"
                         fill="none"
                         stroke="url(#care-gradient)"
                         strokeWidth="2"
@@ -93,12 +93,17 @@ export function HeroSection() {
                         className="opacity-40 dark:opacity-60"
                       />
                       {/* Иконка лапки в центре дуги */}
-                      <g className="animate-paw" style={{ transformOrigin: '100px 30px' }}>
+                      <g className="animate-paw" style={{ transformOrigin: '100px 45px' }}>
+                        {/* Большая подушечка (кисть) */}
                         <path
-                          d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM7 11a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm11 0a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM14 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm-1 10a5 5 0 1 1-10 0 5 5 0 0 1 10 0Z"
+                          d="M 100,58 C 92,58 86,52 86,46 C 86,39 92,36 100,36 C 108,36 114,39 114,46 C 114,52 108,58 100,58 Z"
                           fill="#4caf50"
-                          transform="translate(88, 10) scale(1.2)"
                         />
+                        {/* Четыре пальчика (равномерно распределены по дуге) */}
+                        <circle cx="83" cy="32" r="4" fill="#4caf50" />
+                        <circle cx="93" cy="22" r="4" fill="#4caf50" />
+                        <circle cx="107" cy="22" r="4" fill="#4caf50" />
+                        <circle cx="117" cy="32" r="4" fill="#4caf50" />
                       </g>
                       <defs>
                         <linearGradient id="care-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
