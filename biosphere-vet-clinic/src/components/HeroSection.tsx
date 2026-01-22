@@ -102,20 +102,20 @@ export function HeroSection() {
                     </svg>
 
                     {/* SVG для лапки (сохраняет пропорции) */}
-                    <div className="absolute inset-0 flex justify-center items-start pt-2">
+                    <div className="absolute inset-0 flex justify-center items-start pt-1">
                       <svg
                         viewBox="0 0 40 40"
-                        className="w-10 h-10 animate-paw overflow-visible"
+                        className="w-14 h-14 animate-paw overflow-visible"
                       >
                         <g transform="translate(20, 20)">
                           {/* Большая подушечка (идеально круглая) */}
-                          <circle cx="0" cy="2" r="9" fill="#4caf50" />
+                          <circle cx="0" cy="2" r="10" fill="#4caf50" />
                           
                           {/* Пальчики (симметрично вокруг) */}
-                          <circle cx="-10" cy="-6" r="3.5" fill="#4caf50" />
-                          <circle cx="-4" cy="-13" r="3.5" fill="#4caf50" />
-                          <circle cx="4" cy="-13" r="3.5" fill="#4caf50" />
-                          <circle cx="10" cy="-6" r="3.5" fill="#4caf50" />
+                          <circle cx="-11" cy="-7" r="4" fill="#4caf50" />
+                          <circle cx="-4" cy="-14" r="4" fill="#4caf50" />
+                          <circle cx="4" cy="-14" r="4" fill="#4caf50" />
+                          <circle cx="11" cy="-7" r="4" fill="#4caf50" />
                         </g>
                       </svg>
                     </div>
