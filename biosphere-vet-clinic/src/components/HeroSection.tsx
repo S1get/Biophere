@@ -108,17 +108,14 @@ export function HeroSection() {
                         className="w-10 h-10 animate-paw overflow-visible"
                       >
                         <g transform="translate(20, 20)">
-                          {/* Большая подушечка */}
-                          <path
-                            d="M -8,4 C -12,4 -14,-2 -14,-6 C -14,-12 -8,-14 0,-14 C 8,-14 14,-12 14,-6 C 14,-2 12,4 8,4 Z"
-                            fill="#4caf50"
-                            transform="rotate(180)"
-                          />
-                          {/* Пальчики */}
-                          <circle cx="-11" cy="-8" r="3.5" fill="#4caf50" />
-                          <circle cx="-4" cy="-15" r="3.5" fill="#4caf50" />
-                          <circle cx="4" cy="-15" r="3.5" fill="#4caf50" />
-                          <circle cx="11" cy="-8" r="3.5" fill="#4caf50" />
+                          {/* Большая подушечка (идеально круглая) */}
+                          <circle cx="0" cy="2" r="9" fill="#4caf50" />
+                          
+                          {/* Пальчики (симметрично вокруг) */}
+                          <circle cx="-10" cy="-6" r="3.5" fill="#4caf50" />
+                          <circle cx="-4" cy="-13" r="3.5" fill="#4caf50" />
+                          <circle cx="4" cy="-13" r="3.5" fill="#4caf50" />
+                          <circle cx="10" cy="-6" r="3.5" fill="#4caf50" />
                         </g>
                       </svg>
                     </div>
