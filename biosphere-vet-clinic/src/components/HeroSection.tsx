@@ -78,12 +78,12 @@ export function HeroSection() {
                 <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight relative inline-block py-6">
                   {/* Декоративная дуга "Забота" */}
                   <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[140%] h-[160px] pointer-events-none select-none overflow-visible -z-10">
+                    {/* SVG для дуги (растягивается по ширине) */}
                     <svg
                       viewBox="0 0 200 160"
-                      className="w-full h-full"
+                      className="absolute inset-0 w-full h-full"
                       preserveAspectRatio="none"
                     >
-                      {/* Верхняя дуга (полумесяц) */}
                       <path
                         d="M 10,140 Q 100,10 190,140"
                         fill="none"
@@ -92,19 +92,6 @@ export function HeroSection() {
                         strokeLinecap="round"
                         className="opacity-40 dark:opacity-60"
                       />
-                      {/* Иконка лапки в центре дуги */}
-                      <g className="animate-paw" style={{ transformOrigin: '100px 45px' }}>
-                        {/* Большая подушечка (кисть) */}
-                        <path
-                          d="M 100,58 C 92,58 86,52 86,46 C 86,39 92,36 100,36 C 108,36 114,39 114,46 C 114,52 108,58 100,58 Z"
-                          fill="#4caf50"
-                        />
-                        {/* Четыре пальчика (равномерно распределены по дуге) */}
-                        <circle cx="83" cy="32" r="4" fill="#4caf50" />
-                        <circle cx="93" cy="22" r="4" fill="#4caf50" />
-                        <circle cx="107" cy="22" r="4" fill="#4caf50" />
-                        <circle cx="117" cy="32" r="4" fill="#4caf50" />
-                      </g>
                       <defs>
                         <linearGradient id="care-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
                           <stop offset="0%" stopColor="#0285a2" />
@@ -113,6 +100,28 @@ export function HeroSection() {
                         </linearGradient>
                       </defs>
                     </svg>
+
+                    {/* SVG для лапки (сохраняет пропорции) */}
+                    <div className="absolute inset-0 flex justify-center items-start pt-2">
+                      <svg
+                        viewBox="0 0 40 40"
+                        className="w-10 h-10 animate-paw overflow-visible"
+                      >
+                        <g transform="translate(20, 20)">
+                          {/* Большая подушечка */}
+                          <path
+                            d="M -8,4 C -12,4 -14,-2 -14,-6 C -14,-12 -8,-14 0,-14 C 8,-14 14,-12 14,-6 C 14,-2 12,4 8,4 Z"
+                            fill="#4caf50"
+                            transform="rotate(180)"
+                          />
+                          {/* Пальчики */}
+                          <circle cx="-11" cy="-8" r="3.5" fill="#4caf50" />
+                          <circle cx="-4" cy="-15" r="3.5" fill="#4caf50" />
+                          <circle cx="4" cy="-15" r="3.5" fill="#4caf50" />
+                          <circle cx="11" cy="-8" r="3.5" fill="#4caf50" />
+                        </g>
+                      </svg>
+                    </div>
                   </div>
                   
                   <span className="text-transparent bg-clip-text relative z-10" style={{ background: 'linear-gradient(to right, rgb(2, 133, 162), rgb(76, 175, 80))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
