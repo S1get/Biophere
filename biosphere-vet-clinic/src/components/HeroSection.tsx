@@ -68,8 +68,8 @@ export function HeroSection() {
         <div className="container mx-auto px-4 py-20 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left column - Text content */}
-            <div className="space-y-8">
-              <div className="space-y-6">
+            <div className="space-y-8 text-center lg:text-left">
+              <div className="space-y-6 flex flex-col items-center lg:items-start">
                 {/* <Badge variant="secondary">
                   <Heart className="h-3 w-3 mr-1" />
                   Ветеринарная клиника №1 в Кирове
@@ -115,11 +115,11 @@ export function HeroSection() {
                   </span>
                 </h1>
                 <div className="text-2xl md:text-3xl font-semibold text-gray-800 dark:text-gray-200">
-                  Клиника, где окружают заботой
+                  Окружаем заботой
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Button
                   size="lg"
                   onClick={() => setIsBookingOpen(true)}
