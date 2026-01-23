@@ -76,49 +76,29 @@ export function HeroSection() {
                 </Badge> */}
                 
                 <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight relative inline-block py-6">
-                  {/* Декоративная дуга "Забота" */}
-                  <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[140%] h-[160px] pointer-events-none select-none overflow-visible -z-10">
-                    {/* SVG для дуги (растягивается по ширине) */}
+                  {/* Декоративная полусфера (дуга) слева */}
+                  <div className="absolute inset-0 -z-10 pointer-events-none select-none overflow-visible">
                     <svg
-                      viewBox="0 0 200 160"
-                      className="absolute inset-0 w-full h-full"
+                      viewBox="0 0 200 100"
+                      className="w-full h-full"
                       preserveAspectRatio="none"
                     >
                       <path
-                        d="M 10,140 Q 100,10 190,140"
+                        d="M 2,85 Q -15,50 75,5"
                         fill="none"
-                        stroke="url(#care-gradient)"
+                        stroke="url(#sphere-gradient)"
                         strokeWidth="2"
                         strokeLinecap="round"
                         className="opacity-40 dark:opacity-60"
                       />
                       <defs>
-                        <linearGradient id="care-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <linearGradient id="sphere-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
                           <stop offset="0%" stopColor="#0285a2" />
                           <stop offset="50%" stopColor="#4caf50" />
                           <stop offset="100%" stopColor="#0285a2" />
                         </linearGradient>
                       </defs>
                     </svg>
-
-                    {/* SVG для лапки (сохраняет пропорции) */}
-                    <div className="absolute inset-0 flex justify-center items-start pt-1">
-                      <svg
-                        viewBox="0 0 40 40"
-                        className="w-14 h-14 animate-paw overflow-visible"
-                      >
-                        <g transform="translate(20, 20)">
-                          {/* Большая подушечка (идеально круглая) */}
-                          <circle cx="0" cy="2" r="10" fill="#4caf50" />
-                          
-                          {/* Пальчики (симметрично вокруг) */}
-                          <circle cx="-11" cy="-7" r="4" fill="#4caf50" />
-                          <circle cx="-4" cy="-14" r="4" fill="#4caf50" />
-                          <circle cx="4" cy="-14" r="4" fill="#4caf50" />
-                          <circle cx="11" cy="-7" r="4" fill="#4caf50" />
-                        </g>
-                      </svg>
-                    </div>
                   </div>
                   
                   <span className="text-transparent bg-clip-text relative z-10" style={{ background: 'linear-gradient(to right, rgb(2, 133, 162), rgb(76, 175, 80))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
