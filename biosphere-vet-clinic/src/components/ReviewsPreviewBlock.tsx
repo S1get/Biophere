@@ -75,8 +75,8 @@ export default function ReviewsPreviewBlock() {
       <div className="container mx-auto px-4">
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-8 text-center">Отзывы о клинике</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {reviews.map((review) => (
-            <Card key={review.id} className="h-full hover:shadow-lg transition-shadow duration-300 border-0 shadow-md">
+          {reviews.map((review, idx) => (
+            <Card key={review.id} className={`h-full hover:shadow-lg transition-shadow duration-300 border-0 shadow-md ${idx >= 3 ? 'hidden md:block' : ''}`}>
               <CardContent className="p-6 h-full flex flex-col">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-3">

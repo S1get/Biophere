@@ -20,32 +20,23 @@ export function ArticleNavigation() {
 
   return (
     <>
-      {/* PC/Tablet: Home Top-Left (below header) */}
+      {/* Home Button - Top Left for all devices */}
       <Link
         to="/"
-        className="hidden md:flex fixed z-50 left-6 top-24 w-12 h-12 rounded-full items-center justify-center shadow-lg transition-all bg-white dark:bg-gray-800 text-biosphere-primary border border-gray-200 dark:border-gray-700 hover:bg-biosphere-primary hover:text-white group"
+        className="fixed z-50 left-6 top-24 w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all bg-white dark:bg-gray-800 text-biosphere-primary border-2 border-biosphere-primary/20 dark:border-gray-700 hover:bg-biosphere-primary hover:text-white group active:scale-90"
         title="На главную"
       >
-        <Home className="w-6 h-6 group-hover:scale-110 transition-transform" />
+        <Home className="w-7 h-7 group-hover:scale-110 transition-transform" />
       </Link>
 
-      {/* Mobile: Home Bottom-Left */}
-      <Link
-        to="/"
-        className="md:hidden fixed z-50 left-6 bottom-6 w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all bg-white dark:bg-gray-800 text-biosphere-primary border border-gray-200 dark:border-gray-700 active:scale-95"
-        title="На главную"
-      >
-        <Home className="w-6 h-6" />
-      </Link>
-
-      {/* PC/Tablet: Prev Bottom-Left */}
+      {/* Prev Bottom-Left */}
       {prev && (
         <Link
           to={prev.path}
-          className="hidden md:flex fixed z-50 left-6 bottom-6 w-12 h-12 rounded-full items-center justify-center shadow-lg transition-all bg-white dark:bg-gray-800 text-biosphere-primary border border-gray-200 dark:border-gray-700 hover:bg-biosphere-primary hover:text-white group"
+          className="fixed z-50 left-6 bottom-6 w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all bg-white dark:bg-gray-800 text-biosphere-primary border-2 border-biosphere-primary/20 dark:border-gray-700 hover:bg-biosphere-primary hover:text-white group active:scale-90"
           title={`Назад: ${prev.title}`}
         >
-          <ArrowLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
+          <ArrowLeft className="w-7 h-7 group-hover:-translate-x-1 transition-transform" />
         </Link>
       )}
 
@@ -53,10 +44,10 @@ export function ArticleNavigation() {
       {next && (
         <Link
           to={next.path}
-          className="fixed z-50 right-6 bottom-6 w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all bg-white dark:bg-gray-800 text-biosphere-primary border border-gray-200 dark:border-gray-700 hover:bg-biosphere-primary hover:text-white group active:scale-95"
+          className="fixed z-50 right-6 bottom-6 w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all bg-white dark:bg-gray-800 text-biosphere-primary border-2 border-biosphere-primary/20 dark:border-gray-700 hover:bg-biosphere-primary hover:text-white group active:scale-90"
           title={`Далее: ${next.title}`}
         >
-          <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+          <ArrowRight className="w-7 h-7 group-hover:translate-x-1 transition-transform" />
         </Link>
       )}
     </>

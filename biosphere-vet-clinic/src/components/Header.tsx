@@ -75,9 +75,16 @@ export function Header({ onNavigateToSection }: HeaderProps) {
           <div className="flex items-center space-x-4">
             <button
               onClick={() => handleNavScroll('/')}
-              className="text-2xl font-bold text-biosphere-primary hover:text-biosphere-accent transition-colors"
+              className="flex items-center space-x-3 group"
             >
-              Биосфера
+              <img 
+                src="/logo.jpg" 
+                alt="Биосфера" 
+                className="h-10 w-auto rounded-lg shadow-sm group-hover:shadow-md transition-all duration-300 dark:brightness-110 dark:contrast-110" 
+              />
+              <span className="text-2xl font-bold text-biosphere-primary hover:text-biosphere-accent transition-colors">
+                Биосфера
+              </span>
             </button>
             <Button
               size="sm"

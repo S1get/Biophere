@@ -89,15 +89,15 @@ export function Footer() {
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {branches.map((branch, index) => (
-                <div key={index} className="space-y-3 p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                  <h5 className="font-bold text-biosphere-secondary">{branch.address}</h5>
-                  <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                <div key={index} className="space-y-2 md:space-y-3 p-3 md:p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                  <h5 className="font-bold text-biosphere-secondary text-sm md:text-base">{branch.address}</h5>
+                  <div className="space-y-1 md:space-y-2 text-xs md:text-sm text-gray-700 dark:text-gray-300">
                     <p className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-biosphere-secondary" />
+                      <Clock className="h-3 w-3 md:h-4 md:w-4 text-biosphere-secondary" />
                       {branch.hours}
                     </p>
                     <p className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-biosphere-secondary" />
+                      <Phone className="h-3 w-3 md:h-4 md:w-4 text-biosphere-secondary" />
                       <a href={`tel:${branch.phone.replace(/-/g, '')}`} className="hover:text-biosphere-secondary transition-colors font-medium">
                         {branch.phone}
                       </a>

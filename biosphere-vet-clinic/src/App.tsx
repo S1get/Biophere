@@ -101,18 +101,13 @@ const specialists = [
 
 function MainSpecialistsPage() {
   const [search, setSearch] = useState('')
-  const [selectedBranch, setSelectedBranch] = useState('')
-  const [selectedSpecialization, setSelectedSpecialization] = useState('')
+  const [position, setPosition] = useState('')
+  const [specialization, setSpecialization] = useState('')
+  const [branch, setBranch] = useState('')
   
   // Состояние для модального окна просмотра фотографий
   const [imageModalOpen, setImageModalOpen] = useState(false)
   const [selectedImage, setSelectedImage] = useState<{src: string, alt: string, name: string} | null>(null)
-
-  const branches = [...new Set(specialists.map(s => s.branch))]
-  const specializations = [...new Set(specialists.map(s => s.specialization))]
-
-  const [position, setPosition] = useState('')
-  const [branch, setBranch] = useState('')
 
   const uniquePositions = Array.from(new Set(specialists.map(s => s.position)))
   const uniqueSpecializations = Array.from(new Set(specialists.map(s => s.specialization)))
@@ -127,8 +122,9 @@ function MainSpecialistsPage() {
 
   const resetFilters = () => {
     setSearch('')
-    setSelectedBranch('')
-    setSelectedSpecialization('')
+    setPosition('')
+    setSpecialization('')
+    setBranch('')
   }
 
   const handleImageClick = (specialist: any) => {
@@ -597,61 +593,32 @@ function App() {
     }
   }
 
-  // Секции для навигации
-  const sectionIds = ['home', 'main-prices', 'faq', 'main-specialists', 'main-reviews']
-  const [currentSection, setCurrentSection] = useState(0)
-
-  useEffect(() => {
-    // Обновление текущей секции при скролле
-    const handleScroll = () => {
-      const offsets = sectionIds.map(id => {
-        const el = document.getElementById(id)
-        return el ? el.getBoundingClientRect().top : Infinity
-      })
-      const index = offsets.findIndex(offset => offset > 80)
-      setCurrentSection(index === -1 ? sectionIds.length - 1 : Math.max(0, index - 1))
-    }
-    window.addEventListener('scroll', handleScroll)
-    handleScroll()
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  const scrollToSection = (index: number) => {
-    const el = document.getElementById(sectionIds[index])
-    if (el) {
-      const headerHeight = 80
-      const top = el.offsetTop - headerHeight
-      window.scrollTo({ top, behavior: 'smooth' })
-    }
-  }
-
-  // Добавляю обработчики прокрутки
-  const scrollTo = (id) => {
-    const el = document.getElementById(id)
-    if (el) {
-      const headerHeight = 80
-      const top = el.offsetTop - headerHeight
-      window.scrollTo({ top, behavior: 'smooth' })
-    }
-  }
-
   const mainSectionIds = ['home', 'main-prices', 'faq', 'main-specialists', 'main-reviews'];
   const [currentMainSection, setCurrentMainSection] = useState(0);
 
   useEffect(() => {
-    // Обновление текущей секции при скролле только на главной
     const handleScroll = () => {
       const offsets = mainSectionIds.map(id => {
         const el = document.getElementById(id)
         return el ? el.getBoundingClientRect().top : Infinity
       })
-      const index = offsets.findIndex(offset => offset > 80)
+      // Find the index of the first section that is below the header
+      const index = offsets.findIndex(offset => offset > 120)
       setCurrentMainSection(index === -1 ? mainSectionIds.length - 1 : Math.max(0, index - 1))
     }
     window.addEventListener('scroll', handleScroll)
     handleScroll()
     return () => window.removeEventListener('scroll', handleScroll)
   }, []);
+
+  const scrollToMainSection = (index: number) => {
+    const el = document.getElementById(mainSectionIds[index]);
+    if (el) {
+      const headerHeight = 80;
+      const top = el.offsetTop - headerHeight;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
+  };
 
   return (
     <Router>
@@ -669,58 +636,28 @@ function App() {
                     <FAQPreviewBlock />
                     <SpecialistsPreviewBlock />
                     <ReviewsPreviewBlock />
-                    {/* Стрелки для перемещения между секциями */}
-                    {(() => {
-                      const sectionIds = [
-                        'home',
-                        'main-prices',
-                        'faq',
-                        'main-specialists',
-                        'main-reviews',
-                      ];
-                      const [currentSection, setCurrentSection] = React.useState(0);
-                      React.useEffect(() => {
-                        const handleScroll = () => {
-                          const offsets = sectionIds.map(id => {
-                            const el = document.getElementById(id);
-                            return el ? el.getBoundingClientRect().top : Infinity;
-                          });
-                          const index = offsets.findIndex(offset => offset > 80);
-                          setCurrentSection(index === -1 ? sectionIds.length - 1 : Math.max(0, index - 1));
-                        };
-                        window.addEventListener('scroll', handleScroll);
-                        handleScroll();
-                        return () => window.removeEventListener('scroll', handleScroll);
-                      }, []);
-                      const scrollToSection = (index) => {
-                        const el = document.getElementById(sectionIds[index]);
-                        if (el) {
-                          const headerHeight = 80;
-                          const top = el.offsetTop - headerHeight;
-                          window.scrollTo({ top, behavior: 'smooth' });
-                        }
-                      };
-                      return <>
-                        {currentSection < sectionIds.length - 1 && (
-                          <button
-                            onClick={() => scrollToSection(currentSection + 1)}
-                            className="fixed z-50 right-6 bottom-24 md:bottom-32 w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-colors bg-white dark:bg-gray-800 text-biosphere-primary dark:text-biosphere-secondary border border-gray-200 dark:border-gray-700 hover:bg-biosphere-primary hover:text-white dark:hover:bg-biosphere-secondary dark:hover:text-white"
-                            title="Вниз к следующему разделу"
-                          >
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
-                          </button>
-                        )}
-                        {currentSection > 0 && (
-                          <button
-                            onClick={() => scrollToSection(currentSection - 1)}
-                            className="fixed z-50 right-6 bottom-40 md:bottom-48 w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-colors bg-white dark:bg-gray-800 text-biosphere-primary dark:text-biosphere-secondary border border-gray-200 dark:border-gray-700 hover:bg-biosphere-primary hover:text-white dark:hover:bg-biosphere-secondary dark:hover:text-white"
-                            title="Вверх к предыдущему разделу"
-                          >
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" /></svg>
-                          </button>
-                        )}
-                      </>;
-                    })()}
+                    
+                    {/* Navigation Arrows for Main Page */}
+                    <div className="fixed z-50 right-6 bottom-24 md:bottom-32 flex flex-col gap-6">
+                      {currentMainSection > 0 && (
+                        <button
+                          onClick={() => scrollToMainSection(currentMainSection - 1)}
+                          className="w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all bg-white dark:bg-gray-800 text-biosphere-primary dark:text-biosphere-secondary border-2 border-biosphere-primary/20 dark:border-gray-700 hover:bg-biosphere-primary hover:text-white dark:hover:bg-biosphere-secondary dark:hover:text-white active:scale-90 group"
+                          title="Вверх к предыдущему разделу"
+                        >
+                          <svg className="w-7 h-7 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" /></svg>
+                        </button>
+                      )}
+                      {currentMainSection < mainSectionIds.length - 1 && (
+                        <button
+                          onClick={() => scrollToMainSection(currentMainSection + 1)}
+                          className="w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all bg-white dark:bg-gray-800 text-biosphere-primary dark:text-biosphere-secondary border-2 border-biosphere-primary/20 dark:border-gray-700 hover:bg-biosphere-primary hover:text-white dark:hover:bg-biosphere-secondary dark:hover:text-white active:scale-90 group"
+                          title="Вниз к следующему разделу"
+                        >
+                          <svg className="w-7 h-7 group-hover:translate-y-1 transition-transform" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                        </button>
+                      )}
+                    </div>
                   </>
                 } />
                 <Route path="/pricelist" element={<PricelistPage />} />
