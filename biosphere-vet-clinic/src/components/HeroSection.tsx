@@ -61,7 +61,7 @@ export function HeroSection() {
 
   return (
     <>
-      <section id="home" className="relative min-h-screen flex items-center bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 overflow-hidden pt-24 pb-32 lg:pt-32 lg:pb-40">
+      <section id="home" className="relative min-h-[80vh] flex items-center bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 overflow-hidden pt-12 pb-20 lg:pt-16 lg:pb-24">
         {/* Background animation blobs */}
         <div className="absolute inset-0 opacity-5 pointer-events-none">
           <div className="absolute top-10 left-10 w-72 h-72 bg-biosphere-primary rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
