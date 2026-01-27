@@ -20,6 +20,8 @@ import SpecialistsPage from './components/SpecialistsPage'
 import SpecialistsPreviewBlock from './components/SpecialistsPreviewBlock'
 import ReviewsPreviewBlock from './components/ReviewsPreviewBlock'
 import PricePreviewBlock from './components/PricePreviewBlock'
+import PharmacyPreviewBlock from './components/PharmacyPreviewBlock'
+import NewsPreviewBlock from './components/NewsPreviewBlock'
 import PricelistPage from './components/PricelistPage'
 import AdminLoginPage from './components/AdminLoginPage'
 import AdminPanel from './components/AdminPanel'
@@ -593,7 +595,7 @@ function App() {
     }
   }
 
-  const mainSectionIds = ['home', 'main-prices', 'faq', 'main-specialists', 'main-reviews'];
+  const mainSectionIds = ['home', 'main-prices', 'faq', 'main-specialists', 'main-reviews', 'main-pharmacy', 'main-news'];
   const [currentMainSection, setCurrentMainSection] = useState(0);
 
   useEffect(() => {
@@ -636,6 +638,8 @@ function App() {
                     <FAQPreviewBlock />
                     <SpecialistsPreviewBlock />
                     <ReviewsPreviewBlock />
+                    <PharmacyPreviewBlock />
+                    <NewsPreviewBlock />
                     
                     {/* Navigation Arrows for Main Page */}
                     <div className="fixed z-50 right-6 bottom-24 md:bottom-32 flex flex-col gap-6">
