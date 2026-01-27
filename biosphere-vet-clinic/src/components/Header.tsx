@@ -77,11 +77,15 @@ export function Header({ onNavigateToSection }: HeaderProps) {
               onClick={() => handleNavScroll('/')}
               className="flex items-center space-x-3 group"
             >
-              <img 
-                src="/logo.jpg" 
-                alt="Биосфера" 
-                className="h-10 w-auto rounded-lg shadow-sm group-hover:shadow-md transition-all duration-300 dark:brightness-110 dark:contrast-110" 
-              />
+              <div 
+                    className="h-10 w-10 rounded-lg overflow-hidden relative group-hover:shadow-md transition-all duration-300 bg-white dark:bg-transparent"
+                  >
+                    <img 
+                      src="/logo.jpg" 
+                      alt="Биосфера" 
+                      className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal dark:invert dark:hue-rotate-180 contrast-[1.1] dark:brightness-125"
+                    />
+                  </div>
               <span className="text-2xl font-bold text-biosphere-primary hover:text-biosphere-accent transition-colors">
                 Биосфера
               </span>
