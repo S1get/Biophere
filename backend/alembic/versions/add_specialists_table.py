@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = 'add_specialists_table'
-down_revision = 'a1b2c3d4e5f6'
+down_revision = 'add_is_read_to_questions'
 branch_labels = None
 depends_on = None
 

@@ -20,7 +20,7 @@ specialists_data = [
         "workplace": "пр-т. Строителей, д. 9, к. 1",
         "education": "Московская Ветеринарная Академия",
         "extra_qual": "Кардиология, УЗИ-диагностика",
-        "photo": "./doctors/ancheremisinova.jpg"
+        "photo": "/doctors/ancheremisinova.jpg"
     },
     {
         "name": "Малышева Ольга Юрьевна",
@@ -29,7 +29,7 @@ specialists_data = [
         "workplace": "ул. Чернышевского, д. 7, ул. Солнечная",
         "education": "Московская Ветеринарная Академия",
         "extra_qual": "Кардиология, УЗИ-диагностика",
-        "photo": "./doctors/olmalisheva.jpg"
+        "photo": "/doctors/olmalisheva.jpg"
     },
     {
         "name": "Онегов Иван Александрович",
@@ -38,7 +38,7 @@ specialists_data = [
         "workplace": "ул. Солнечная, ул. Чернышевского, д. 7",
         "education": "Московская Ветеринарная Академия",
         "extra_qual": "Кардиология, УЗИ-диагностика",
-        "photo": "./doctors/ivonegov.jpg"
+        "photo": "/doctors/ivonegov.jpg"
     },
     {
         "name": "Жаворонков Олег Николаевич",
@@ -47,7 +47,7 @@ specialists_data = [
         "workplace": "ул. Московская, д. 4",
         "education": "Московская Ветеринарная Академия",
         "extra_qual": "Кардиология, УЗИ-диагностика",
-        "photo": "./doctors/olzhavoronkov.jpg"
+        "photo": "/doctors/olzhavoronkov.jpg"
     },
     {
         "name": "Вавилова Ульяна Юрьевна",
@@ -56,7 +56,7 @@ specialists_data = [
         "workplace": "ул. Московская, д. 4, ул. Молодой Гвардии",
         "education": "Московская Ветеринарная Академия",
         "extra_qual": "Кардиология, УЗИ-диагностика",
-        "photo": "./doctors/ulvavilova.jpg"
+        "photo": "/doctors/ulvavilova.jpg"
     },
     {
         "name": "Казанцева Елена Валерьевна",
@@ -65,7 +65,7 @@ specialists_data = [
         "workplace": "ул. Московская, д. 4, пр-т. Строителей, д. 9, к. 1",
         "education": "Московская Ветеринарная Академия",
         "extra_qual": "Кардиология, УЗИ-диагностика",
-        "photo": "./doctors/elborovicheva.jpg"
+        "photo": "/doctors/elborovicheva.jpg"
     },
     {
         "name": "Панина Станислава Ивановна",
@@ -74,7 +74,7 @@ specialists_data = [
         "workplace": "ул. Солнечная",
         "education": "Московская Ветеринарная Академия",
         "extra_qual": "Кардиология, УЗИ-диагностика",
-        "photo": "./doctors/slobanova.jpg"
+        "photo": "/doctors/slobanova.jpg"
     },
     {
         "name": "Безденежных Анна Николаевна",
@@ -83,7 +83,7 @@ specialists_data = [
         "workplace": "ул. Молодой Гвардии",
         "education": "Московская Ветеринарная Академия",
         "extra_qual": "Кардиология, УЗИ-диагностика",
-        "photo": "./doctors/anbezdenezhnih.jpg"
+        "photo": "/doctors/anbezdenezhnih.jpg"
     },
     {
         "name": "Гурьева Ольга Вадимовна",
@@ -92,7 +92,7 @@ specialists_data = [
         "workplace": "пр-т. Строителей, д. 9, к. 1",
         "education": "Московская Ветеринарная Академия",
         "extra_qual": "Кардиология, УЗИ-диагностика",
-        "photo": "./doctors/olguryeva.jpg"
+        "photo": "/doctors/olguryeva.jpg"
     },
     {
         "name": "Кудрявцева Юлия Юрьевна",
