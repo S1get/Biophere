@@ -53,7 +53,19 @@ const branches = [
   'ул. Украинская, 18',
 ]
 
-const serviceNames = Array.from(new Set(servicesData.map((s: any) => s.name))).sort((a: string, b: string) => a.localeCompare(b, 'ru'))
+const serviceNames = Array.from(new Set(
+  servicesData
+    .map((s: any) => s.name)
+    .filter((name: string) => {
+      const lowerName = name.toLowerCase();
+      // Убираем технические строки и категории веса, которые попали в названия
+      return !lowerName.includes('кг') && 
+             !lowerName.includes('более') && 
+             !lowerName.includes('до 5') &&
+             !lowerName.includes('вкл. медикаменты') &&
+             name.length > 3; // Игнорируем слишком короткие технические строки
+    })
+)).sort((a: string, b: string) => a.localeCompare(b, 'ru'))
 
 const doctors = [
   'Волкова Елена Сергеевна - Дерматолог',

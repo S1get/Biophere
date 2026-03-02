@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+import { useAuth } from '@/contexts/AuthContext';
 
 const AdminLoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -9,37 +8,17 @@ const AdminLoginPage: React.FC = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/auth/admin/token`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ username: email, password }).toString(),
-      });
-      if (!response.ok) {
-        let message = 'Неудачный вход';
-        try {
-          const errorData = await response.json();
-          const detail = (errorData && errorData.detail) || null;
-          if (Array.isArray(detail)) {
-            message = detail.map((d: any) => d.msg || String(d)).join(', ');
-          } else if (typeof detail === 'string') {
-            message = detail;
-          }
-        } catch { void 0 }
-        setError(message);
-        setLoading(false);
-        return;
-      }
-      const data = await response.json();
-      localStorage.setItem('token', data.access_token);
+      await login(email, password);
       navigate('/admin-panel');
-    } catch (err) {
-      setError('Неудачный вход');
+    } catch (err: any) {
+      setError(err.message || 'Неудачный вход');
     } finally {
       setLoading(false);
     }

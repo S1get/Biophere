@@ -36,7 +36,7 @@ export function HeroSection() {
               <div className="relative flex flex-col items-center lg:items-start">
                 <div className="relative">
                   {/* The Globus Image - Positioned to encompass the letter 'Б' */}
-                  <div className="absolute left-1/2 -translate-x-1/2 lg:left-[-2rem] lg:translate-x-0 top-1/2 -translate-y-1/2 w-20 h-20 md:w-32 md:h-32 lg:w-44 lg:h-44 pointer-events-none select-none z-0 overflow-hidden">
+                  <div className="absolute left-1/2 -translate-x-1/2 lg:left-[1rem] lg:translate-x-0 top-1/2 -translate-y-1/2 w-24 h-24 md:w-40 md:h-40 lg:w-56 lg:h-56 pointer-events-none select-none z-0 overflow-hidden">
                      <div 
                         className="w-full h-full bg-cover bg-center mix-blend-multiply dark:mix-blend-screen"
                         style={{ 
@@ -65,7 +65,7 @@ export function HeroSection() {
                 </div>
                 
                 {/* Subtitle - Aligned with the start of the title/globus */}
-                <div className="mt-4 lg:pl-8 relative group inline-block">
+                <div className="mt-10 lg:pl-8 relative group inline-block">
                   <div className="text-2xl md:text-3xl font-semibold text-gray-800 dark:text-gray-200 animate-in fade-in slide-in-from-left-12 duration-1000 delay-200">
                     Окружаем заботой
                   </div>

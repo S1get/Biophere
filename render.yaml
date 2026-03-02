@@ -23,12 +23,12 @@ services:
       - key: FRONTEND_ORIGIN
         fromService:
           name: biosphere-frontend
-          type: static
+          type: static_site
           property: host
         format: https://{{host}}
 
   # Frontend Service
-  - type: static
+  - type: static_site
     name: biosphere-frontend
     region: frankfurt
     plan: free

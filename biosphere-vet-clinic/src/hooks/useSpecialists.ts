@@ -19,9 +19,25 @@ export function useSpecialists() {
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
   const fetchSpecialists = async () => {
+    // Попробуем сначала взять из localStorage
+    const cachedData = localStorage.getItem('specialists_cache');
+    if (cachedData) {
+      try {
+        const { data, timestamp } = JSON.parse(cachedData);
+        // Если кэшу меньше 1 часа, используем его
+        if (Date.now() - timestamp < 3600000) {
+          setSpecialists(data);
+          setLoading(false);
+          // Но все равно обновим в фоне
+        }
+      } catch (e) {
+        console.error("Ошибка парсинга кэша специалистов:", e);
+      }
+    }
+
     setLoading(true);
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 секунд таймаут
+    const timeoutId = setTimeout(() => controller.abort(), 45000); // Увеличиваем до 45 секунд для "просыпания" сервера
 
     try {
       const res = await fetch(`${API_URL}/specialists/`, {
@@ -36,12 +52,19 @@ export function useSpecialists() {
         throw new Error("Ошибка загрузки специалистов");
       }
       const data = await res.json();
+      
+      // Сохраняем в кэш
+      localStorage.setItem('specialists_cache', JSON.stringify({
+        data,
+        timestamp: Date.now()
+      }));
+
       setSpecialists(data);
       setError(null);
     } catch (e: any) {
       clearTimeout(timeoutId);
       if (e.name === 'AbortError') {
-        setError("Превышено время ожидания ответа от сервера. Возможно, сервер просыпается или есть проблемы с сетью.");
+        setError("Превышено время ожидания ответа от сервера. Возможно, сервер просыпается или есть проблемы с сетью. Попробуйте обновить страницу через минуту.");
       } else {
         setError(e.message);
       }

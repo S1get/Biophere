@@ -56,27 +56,45 @@ export default function PharmacyPreviewBlock() {
             </div>
           </div>
 
-          <div className="flex-1 w-full">
-            <div className="grid grid-cols-1 gap-6">
-              {pharmacyFeatures.map((feature, idx) => (
-                <Card key={idx} className="group border-0 shadow-lg bg-white/90 dark:bg-gray-800/90 backdrop-blur-md overflow-hidden transform hover:-translate-x-2 transition-all duration-300">
-                  <CardContent className="p-6 flex items-start gap-6">
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 flex-shrink-0">
-                      {feature.icon}
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2 group-hover:text-emerald-600 transition-colors">
-                        {feature.title}
-                      </h3>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed font-medium">
-                        {feature.desc}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+          <div className="flex-1 w-full relative group/image">
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl transform rotate-1 group-hover:rotate-0 transition-all duration-700">
+              <img 
+                src="https://images.unsplash.com/photo-1583947581924-860bda6a26df?q=80&w=2067" 
+                alt="Ветаптека Биосфера" 
+                className="w-full h-[500px] object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/60 via-transparent to-transparent"></div>
+              <div className="absolute bottom-8 left-8 right-8">
+                <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md p-6 rounded-2xl shadow-xl">
+                  <p className="text-emerald-700 dark:text-emerald-400 font-bold mb-1">Всегда в наличии</p>
+                  <p className="text-gray-900 dark:text-white text-sm font-medium">Более 2000 наименований товаров для здоровья ваших питомцев</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Floating elements for extra style */}
+            <div className="absolute -top-6 -right-6 w-24 h-24 bg-white dark:bg-gray-800 rounded-2xl shadow-xl flex items-center justify-center animate-bounce duration-[3000ms]">
+              <Pill className="w-10 h-10 text-emerald-500" />
             </div>
           </div>
+        </div>
+
+        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+          {pharmacyFeatures.map((feature, idx) => (
+            <Card key={idx} className="group border-0 shadow-lg bg-white/90 dark:bg-gray-800/90 backdrop-blur-md overflow-hidden transform hover:-translate-y-2 transition-all duration-300">
+              <CardContent className="p-8 flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 mb-6">
+                  {feature.icon}
+                </div>
+                <h3 className="text-xl font-black text-gray-900 dark:text-white mb-4 group-hover:text-emerald-600 transition-colors">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed font-medium">
+                  {feature.desc}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
     </section>
