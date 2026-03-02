@@ -23,18 +23,19 @@ services:
       - key: FRONTEND_ORIGIN
         fromService:
           name: biosphere-frontend
-          type: static_site
+          type: web
           property: host
         format: https://{{host}}
 
   # Frontend Service
-  - type: static_site
+  - type: web
     name: biosphere-frontend
+    env: node
     region: frankfurt
     plan: free
     rootDir: biosphere-vet-clinic
     buildCommand: npm install && npm run build
-    publishDir: dist
+    startCommand: npx vite preview --port $PORT --host
     autoDeploy: true
     envVars:
       - key: VITE_API_URL
@@ -45,6 +46,8 @@ services:
         format: https://{{host}}
       - key: NODE_VERSION
         value: 20.x
+      - key: PORT
+        value: 10000
 
 databases:
   - name: biosphere-db
