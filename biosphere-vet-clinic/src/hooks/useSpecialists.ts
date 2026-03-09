@@ -16,7 +16,7 @@ export function useSpecialists() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '');
 
   const fetchSpecialists = async () => {
     // Попробуем сначала взять из localStorage
