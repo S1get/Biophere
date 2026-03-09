@@ -123,25 +123,37 @@ export default function SpecialistModal({
     formDataUpload.append('file', file);
 
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      // Получаем базовый URL без лишних слешей
+      const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+      const token = localStorage.getItem('token');
+      
       const response = await fetch(`${API_URL}/upload`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: formDataUpload,
       });
 
-      if (!response.ok) throw new Error('Ошибка загрузки');
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Ошибка загрузки: ${errorText}`);
+      }
       
       const data = await response.json();
-      // Предполагаем, что API возвращает { url: "..." }
-      handleChange('photo', data.url);
-    } catch (error) {
+      // data.url уже содержит начальный слеш (/uploads/filename.ext)
+      const fullUrl = `${API_URL}${data.url}`;
+      
+      setFormData(prev => ({ ...prev, photo: fullUrl }));
+      setErrors(prev => ({ ...prev, photo: '' }));
+    } catch (error: any) {
       console.error('Ошибка загрузки фото:', error);
-      setErrors(prev => ({ ...prev, photo: 'Не удалось загрузить фото' }));
+      setErrors(prev => ({ ...prev, photo: `Не удалось загрузить фото: ${error.message}` }));
     } finally {
       setUploading(false);
+      if (e.target) {
+        e.target.value = '';
+      }
     }
   };
 
