@@ -59,7 +59,7 @@ export default function PharmacyPreviewBlock() {
           <div className="flex-1 w-full relative group/image">
             <div className="relative rounded-3xl overflow-hidden shadow-2xl transform rotate-1 group-hover:rotate-0 transition-all duration-700">
               <img 
-                src="https://images.unsplash.com/photo-1583947581924-860bda6a26df?q=80&w=2067" 
+                src="https://images.unsplash.com/photo-1576602976047-174e57a47881?q=80&w=2069" 
                 alt="Ветаптека Биосфера" 
                 className="w-full h-[500px] object-cover"
               />

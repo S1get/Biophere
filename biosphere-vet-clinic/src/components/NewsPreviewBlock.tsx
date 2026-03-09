@@ -8,7 +8,7 @@ const news = [
     date: '25.01.2026',
     category: 'Новости',
     desc: 'Рады сообщить об открытии нашего нового филиала! Современное оборудование и лучшие специалисты теперь еще ближе к вам в районе Украинской.',
-    image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1974',
+    image: 'https://images.unsplash.com/photo-1599443015574-be5fe8a05783?auto=format&fit=crop&q=80&w=2070',
     type: 'news'
   },
   {
@@ -16,7 +16,7 @@ const news = [
     date: 'Актуально',
     category: 'Советы',
     desc: 'Напоминаем о необходимости ежегодной вакцинации. Защитите своего любимца от опасных инфекций заранее. Запись открыта во всех филиалах.',
-    image: 'https://images.unsplash.com/photo-1628033033904-944f23b99912?q=80&w=2070',
+    image: 'https://images.unsplash.com/photo-1628033033904-944f23b99912?auto=format&fit=crop&q=80&w=2070',
     type: 'news'
   },
   {
@@ -24,7 +24,7 @@ const news = [
     date: '10.01.2026',
     category: 'Новости',
     desc: 'Мы обновили диагностическую базу для лечения глазных заболеваний. Теперь обследование стало еще точнее и быстрее.',
-    image: 'https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?q=80&w=2070',
+    image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80&w=2080',
     type: 'news'
   }
 ]
