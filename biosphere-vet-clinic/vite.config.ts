@@ -10,7 +10,11 @@ export default defineConfig({
     },
   },
   preview: {
-    allowedHosts: ["biophere.onrender.com"]
+    allowedHosts: [
+      "biosphere-frontend.onrender.com",
+      "biosfera-frontend.onrender.com",
+      "biophere.onrender.com"
+    ]
   }
 })
 
