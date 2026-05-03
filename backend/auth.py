@@ -10,7 +10,22 @@ from models import User
 import schemas
 import os
 
-SECRET_KEY = os.getenv('SECRET_KEY', 'supersecret')
+def _get_secret_key() -> str:
+    key = os.getenv("SECRET_KEY")
+    if key and len(key) >= 32:
+        return key
+
+    # Разрешаем слабый/пустой ключ только в явном dev-режиме
+    env = os.getenv("ENVIRONMENT", "development").lower()
+    allow_insecure = os.getenv("ALLOW_INSECURE_SECRET_KEY", "").lower() in {"1", "true", "yes"}
+    if env in {"development", "dev", "local"} or allow_insecure:
+        return key or "dev-insecure-secret-key-change-me"
+
+    raise RuntimeError(
+        "SECRET_KEY is not set (or too short). Set SECRET_KEY env var (>=32 chars) for production."
+    )
+
+SECRET_KEY = _get_secret_key()
 ALGORITHM = 'HS256'
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 дней
 
@@ -47,24 +62,8 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 @router.post('/admin/register', response_model=schemas.UserRead)
 def register_admin(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    if get_user_by_email(db, user.email):
-        raise HTTPException(status_code=400, detail="Email уже зарегистрирован")
-    
-    # Проверяем специальный email для создания админа
-    if user.email != 'admin@biosphere.ru':
-        raise HTTPException(status_code=403, detail="Доступ запрещен")
-    
-    db_user = User(
-        name=user.name,
-        email=user.email,
-        phone=user.phone,
-        password_hash=get_password_hash(user.password),
-        is_admin=True  # Только для специального эндпоинта
-    )
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+    # Удалённый эндпоинт “самосоздания админа” — слишком рискованно оставлять в проде.
+    raise HTTPException(status_code=410, detail="Эндпоинт отключен. Создайте администратора через переменные окружения и create_admin.py")
 
 @router.post('/token')
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db), response: Response = None):

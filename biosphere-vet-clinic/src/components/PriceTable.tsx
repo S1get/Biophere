@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
-import services from './services-data.js';
-
-const sections = ['Все разделы', ...Array.from(new Set(services.map(s => s.section)))];
+import React, { useMemo, useState } from 'react';
+import { usePricelist } from '@/hooks/usePricelist';
 
 export default function PriceTable() {
+  const { items: services, loading, error } = usePricelist();
   const [search, setSearch] = useState('');
   const [section, setSection] = useState('Все разделы');
+
+  const sections = useMemo(() => {
+    return ['Все разделы', ...Array.from(new Set(services.map(s => s.section).filter(Boolean)))];
+  }, [services]);
 
   const filtered = services.filter(s =>
     (section === 'Все разделы' || s.section === section) &&
@@ -39,6 +42,19 @@ export default function PriceTable() {
           ))}
         </select>
       </div>
+
+      {loading && (
+        <div className="py-10 text-center text-gray-500 dark:text-gray-400">
+          Загрузка прейскуранта...
+        </div>
+      )}
+
+      {!loading && error && (
+        <div className="py-10 text-center text-red-600">
+          Не удалось загрузить прейскурант. {error}
+        </div>
+      )}
+
       <table className="w-full border-collapse text-sm md:text-base">
         <thead>
           <tr>

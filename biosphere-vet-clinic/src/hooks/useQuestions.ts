@@ -9,6 +9,7 @@ export interface Question {
   created_at: string;
   admin_reply?: string;
   is_read: boolean;
+  published?: boolean;
   user?: {
     id: number;
     name: string;

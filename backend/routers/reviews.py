@@ -7,6 +7,7 @@ import schemas
 from models import Review, User
 from datetime import datetime, timedelta
 from sqlalchemy import inspect
+from sqlalchemy import desc
 
 router = APIRouter(prefix="/reviews", tags=["reviews"])
 
@@ -21,7 +22,12 @@ def create_review(review: schemas.ReviewCreate, db: Session = Depends(get_db), c
 @router.get("/", response_model=list[schemas.PublicReviewRead])
 def get_reviews(db: Session = Depends(get_db)):
     try:
-        reviews = db.query(Review).all()
+        reviews = (
+            db.query(Review)
+            .filter(Review.published == True)  # noqa: E712
+            .order_by(desc(Review.created_at))
+            .all()
+        )
         for r in reviews:
             if r.user_id:
                 r.user
@@ -82,11 +88,31 @@ def admin_reply_review(review_id: int, reply: str = Body(...), db: Session = Dep
     db.refresh(db_review)
     return db_review
 
+@router.patch("/{review_id}/publish", response_model=schemas.ReviewRead)
+def set_review_published(review_id: int, published: bool = Body(...), db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Требуются права администратора")
+    db_review = db.query(Review).filter(Review.id == review_id).first()
+    if not db_review:
+        raise HTTPException(status_code=404, detail="Отзыв не найден")
+    db_review.published = bool(published)
+    db.commit()
+    db.refresh(db_review)
+    return db_review
+
 @router.post("/guest", response_model=schemas.ReviewRead)
 def create_guest_review(review: schemas.ReviewCreate, db: Session = Depends(get_db), request: Request = None):
     try:
         if not review.guest_name or not review.guest_phone:
             raise HTTPException(status_code=400, detail="Имя и телефон обязательны для гостевого отзыва")
+        # Мини-anti-spam: ограничиваем частоту по телефону (1 отзыв / 2 минуты)
+        recent_limit_window = datetime.utcnow() - timedelta(minutes=2)
+        recent_count = db.query(Review).filter(
+            Review.guest_phone == str(review.guest_phone),
+            Review.created_at >= recent_limit_window
+        ).count()
+        if recent_count > 0:
+            raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="Слишком часто. Попробуйте позже.")
         client_ip = None
         if request is not None:
             xff = request.headers.get("x-forwarded-for")

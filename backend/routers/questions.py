@@ -7,6 +7,7 @@ import schemas
 from models import Question, User
 from datetime import datetime, timedelta
 from sqlalchemy import inspect
+from sqlalchemy import desc
 
 router = APIRouter(prefix="/questions", tags=["questions"])
 
@@ -21,7 +22,12 @@ def create_question(question: schemas.QuestionCreate, db: Session = Depends(get_
 @router.get("/", response_model=list[schemas.PublicQuestionRead])
 def get_questions(db: Session = Depends(get_db)):
     try:
-        questions = db.query(Question).order_by(Question.created_at.desc()).all()
+        questions = (
+            db.query(Question)
+            .filter(Question.published == True)  # noqa: E712
+            .order_by(desc(Question.created_at))
+            .all()
+        )
         for q in questions:
             if q.user_id:
                 q.user
@@ -86,11 +92,31 @@ def admin_reply_question(question_id: int, reply: str = Body(...), db: Session =
     db.refresh(db_question)
     return db_question
 
+@router.patch("/{question_id}/publish", response_model=schemas.QuestionRead)
+def set_question_published(question_id: int, published: bool = Body(...), db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Требуются права администратора")
+    db_question = db.query(Question).filter(Question.id == question_id).first()
+    if not db_question:
+        raise HTTPException(status_code=404, detail="Вопрос не найден")
+    db_question.published = bool(published)
+    db.commit()
+    db.refresh(db_question)
+    return db_question
+
 @router.post("/guest", response_model=schemas.QuestionRead)
 def create_guest_question(question: schemas.QuestionCreate, db: Session = Depends(get_db), request: Request = None):
     try:
         if not question.guest_name or not question.guest_phone:
             raise HTTPException(status_code=400, detail="Имя и телефон обязательны для гостевого вопроса")
+        # Мини-anti-spam: ограничиваем частоту по телефону (1 вопрос / 2 минуты)
+        recent_limit_window = datetime.utcnow() - timedelta(minutes=2)
+        recent_count = db.query(Question).filter(
+            Question.guest_phone == str(question.guest_phone),
+            Question.created_at >= recent_limit_window
+        ).count()
+        if recent_count > 0:
+            raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="Слишком часто. Попробуйте позже.")
         client_ip = None
         if request is not None:
             xff = request.headers.get("x-forwarded-for")

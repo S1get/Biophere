@@ -4,6 +4,7 @@ import re
 from datetime import datetime
 from pathlib import Path
 import shutil
+import uuid
 
 # Добавляем текущую директорию в PYTHONPATH для корректной работы импортов
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -21,6 +22,7 @@ from routers.reviews import router as reviews_router
 from routers.questions import router as questions_router
 from routers.specialists import router as specialists_router
 from routers.bookings import router as bookings_router
+from routers.pricelist import router as pricelist_router
 from models import User, Review, Question, Specialist, Booking
 import schemas
 from create_admin import create_admin
@@ -93,19 +95,38 @@ app.include_router(reviews_router)
 app.include_router(questions_router)
 app.include_router(specialists_router)
 app.include_router(bookings_router)
+app.include_router(pricelist_router)
 
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...), current_user: User = Depends(get_current_user)):
     if not current_user.is_admin:
         raise HTTPException(status_code=403, detail="Недостаточно прав")
-    
-    file_extension = Path(file.filename).suffix
-    file_name = f"{datetime.now().timestamp()}{file_extension}"
+
+    allowed_types = {"image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp"}
+    content_type = (file.content_type or "").lower()
+    if content_type not in allowed_types:
+        raise HTTPException(status_code=400, detail="Разрешены только изображения (jpg, png, webp)")
+
+    max_bytes = int(os.getenv("UPLOAD_MAX_BYTES", str(5 * 1024 * 1024)))  # 5MB default
+    ext = allowed_types[content_type]
+    file_name = f"{uuid.uuid4().hex}{ext}"
     file_path = UPLOAD_DIR / file_name
-    
+
+    written = 0
     with file_path.open("wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-    
+        while True:
+            chunk = await file.read(1024 * 1024)  # 1MB
+            if not chunk:
+                break
+            written += len(chunk)
+            if written > max_bytes:
+                try:
+                    file_path.unlink(missing_ok=True)
+                except Exception:
+                    pass
+                raise HTTPException(status_code=413, detail="Файл слишком большой")
+            buffer.write(chunk)
+
     return {"url": f"/uploads/{file_name}"}
 
 @app.on_event("startup")

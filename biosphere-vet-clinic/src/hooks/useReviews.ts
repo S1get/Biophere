@@ -9,6 +9,7 @@ export interface Review {
   text: string;
   created_at: string;
   admin_reply?: string;
+  published?: boolean;
   user?: {
     id: number;
     name: string;

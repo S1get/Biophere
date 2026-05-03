@@ -41,8 +41,8 @@ export default function AdminPanel() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { specialists, loading: specialistsLoading, createSpecialist, updateSpecialist, deleteSpecialist } = useSpecialists();
-  const { reviews, loading: reviewsLoading } = useReviews();
-  const { questions, loading: questionsLoading, markAsRead, markAsUnread } = useQuestions();
+  const { reviews, loading: reviewsLoading, refetch: refetchReviews } = useReviews();
+  const { questions, loading: questionsLoading, markAsRead, markAsUnread, refetch: refetchQuestions } = useQuestions();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
@@ -181,7 +181,32 @@ export default function AdminPanel() {
   };
 
   // Функции для управления системой
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+
+  const adminHeaders = () => ({
+    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    'Content-Type': 'application/json'
+  });
+
+  const setReviewPublished = async (reviewId: number, published: boolean) => {
+    const response = await fetch(`${API_URL}/reviews/${reviewId}/publish`, {
+      method: 'PATCH',
+      headers: adminHeaders(),
+      body: JSON.stringify(published)
+    });
+    if (!response.ok) throw new Error('Ошибка изменения публикации отзыва');
+    await refetchReviews();
+  };
+
+  const setQuestionPublished = async (questionId: number, published: boolean) => {
+    const response = await fetch(`${API_URL}/questions/${questionId}/publish`, {
+      method: 'PATCH',
+      headers: adminHeaders(),
+      body: JSON.stringify(published)
+    });
+    if (!response.ok) throw new Error('Ошибка изменения публикации вопроса');
+    await refetchQuestions();
+  };
   
   const fetchBookings = async () => {
     setBookingsLoading(true);
@@ -527,6 +552,27 @@ export default function AdminPanel() {
                               <p className="text-xs text-gray-500">Телефон гостя: {review.guest_phone}</p>
                             )}
                           </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant={review.published ? "secondary" : "outline"}>
+                              {review.published ? 'Опубликован' : 'Скрыт'}
+                            </Badge>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={async () => {
+                                try {
+                                  await setReviewPublished(review.id, !review.published);
+                                } catch (e) {
+                                  console.error(e);
+                                  alert('Не удалось изменить публикацию отзыва');
+                                }
+                              }}
+                              className={review.published ? "text-gray-700" : "text-blue-700"}
+                              title={review.published ? "Скрыть отзыв" : "Опубликовать отзыв"}
+                            >
+                              {review.published ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </Button>
+                          </div>
                         </div>
                         <p className="text-gray-700 dark:text-gray-300">{review.text}</p>
                         {review.admin_reply && (
@@ -596,6 +642,9 @@ export default function AdminPanel() {
                               <Badge variant={question.is_read ? "outline" : "default"} className={question.is_read ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"}>
                                 {question.is_read ? 'Прочитано' : 'Непрочитано'}
                               </Badge>
+                              <Badge variant={question.published ? "secondary" : "outline"}>
+                                {question.published ? 'Опубликован' : 'Скрыт'}
+                              </Badge>
                             </div>
                           </div>
                           <div className="flex space-x-2">
@@ -606,6 +655,22 @@ export default function AdminPanel() {
                               className={question.is_read ? "text-gray-600" : "text-blue-600"}
                             >
                               {question.is_read ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={async () => {
+                                try {
+                                  await setQuestionPublished(question.id, !question.published);
+                                } catch (e) {
+                                  console.error(e);
+                                  alert('Не удалось изменить публикацию вопроса');
+                                }
+                              }}
+                              className={question.published ? "text-gray-700" : "text-blue-700"}
+                              title={question.published ? "Скрыть вопрос" : "Опубликовать вопрос"}
+                            >
+                              {question.published ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </Button>
                           </div>
                         </div>

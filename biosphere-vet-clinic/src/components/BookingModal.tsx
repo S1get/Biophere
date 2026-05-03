@@ -23,7 +23,7 @@ import {
 import { Calendar, Clock, MapPin, User, Phone, Mail, FileText, Search } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { useNavigate } from 'react-router-dom'
-import servicesData from './services-data.js'
+import { usePricelist } from '@/hooks/usePricelist'
 
 interface BookingModalProps {
   isOpen: boolean
@@ -53,19 +53,7 @@ const branches = [
   'ул. Украинская, 18',
 ]
 
-const serviceNames = Array.from(new Set(
-  servicesData
-    .map((s: any) => s.name)
-    .filter((name: string) => {
-      const lowerName = name.toLowerCase();
-      // Убираем технические строки и категории веса, которые попали в названия
-      return !lowerName.includes('кг') && 
-             !lowerName.includes('более') && 
-             !lowerName.includes('до 5') &&
-             !lowerName.includes('вкл. медикаменты') &&
-             name.length > 3; // Игнорируем слишком короткие технические строки
-    })
-)).sort((a: string, b: string) => a.localeCompare(b, 'ru'))
+// serviceNames берём из живого прейскуранта (с кэшем в localStorage)
 
 const doctors = [
   'Волкова Елена Сергеевна - Дерматолог',
@@ -86,6 +74,7 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
   const { toast } = useToast()
   const navigate = useNavigate()
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+  const { serviceNames, loading: pricelistLoading } = usePricelist()
   
   const [serviceSearch, setServiceSearch] = useState('')
    const [isServiceSelectOpen, setIsServiceSelectOpen] = useState(false)
@@ -190,7 +179,7 @@ export function BookingModal({ isOpen, onClose }: BookingModalProps) {
               onOpenChange={setIsServiceSelectOpen}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Выберите услугу" />
+                <SelectValue placeholder={pricelistLoading ? "Загрузка прейскуранта..." : "Выберите услугу"} />
               </SelectTrigger>
               <SelectContent 
                 className="max-h-[300px] w-[var(--radix-select-trigger-width)] overflow-x-hidden p-0"
