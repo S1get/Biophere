@@ -1,281 +1,135 @@
-import React, { useState } from 'react'
-import { Moon, Sun, MapPin, Menu, X } from 'lucide-react'
-import { useTheme } from '@/contexts/ThemeContext'
-import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { BookingModal } from './BookingModal'
-import { useNavigate, Link } from 'react-router-dom'
-import { useAuth } from '@/contexts/AuthContext'
-import { useToast } from '@/hooks/use-toast'
+import { useEffect, useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Menu, Phone, X } from 'lucide-react'
+import { Logo } from './Logo'
+import { useBooking } from './booking/BookingContext'
+import { EMERGENCY, branches } from '@/data/branches'
+import { cn, scrollToId, telHref } from '@/lib/utils'
 
-interface HeaderProps {
-  onNavigateToSection: (section: string) => void
+export const NAV = [
+  { id: 'services', label: 'Услуги' },
+  { id: 'doctors', label: 'Врачи' },
+  { href: '/prices', label: 'Цены' },
+  { id: 'branches', label: 'Филиалы' },
+  { id: 'reviews', label: 'Отзывы' },
+  { id: 'faq', label: 'Вопросы' },
+] as const
+
+export function useNavGo() {
+  const navigate = useNavigate()
+  const { pathname } = useLocation()
+  return (item: (typeof NAV)[number]) => {
+    if ('href' in item) return navigate(item.href)
+    if (pathname === '/' && scrollToId(item.id)) {
+      history.replaceState(null, '', `#${item.id}`)
+      return
+    }
+    navigate(`/#${item.id}`)
+  }
 }
 
-const branches = [
-  'ул. Солнечная, 19Б',
-  'ул. Московская, 4',
-  'ул. Молодой Гвардии, 2Д, Нововятский район',
-  'пр-т Строителей, 9, корпус 1',
-  'ул. Чернышевского, 7',
-  'ул. Украинская, 18',
-]
+export function Header() {
+  const [scrolled, setScrolled] = useState(false)
+  const [menu, setMenu] = useState(false)
+  const openBooking = useBooking()
+  const go = useNavGo()
+  const { pathname } = useLocation()
 
-export function Header({ onNavigateToSection }: HeaderProps) {
-  const { theme, toggleTheme } = useTheme()
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
-  const [isBookingOpen, setIsBookingOpen] = useState(false)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const navigate = useNavigate()
-  const { user, logout } = useAuth()
-  const { toast } = useToast()
-
-  const handleBranchClick = (branch: string) => {
-    const encodedAddress = encodeURIComponent('Киров, ' + branch.replace(/^Россия, г\. Киров, /, ''))
-    window.open(`https://yandex.ru/maps/?text=${encodedAddress}`, '_blank')
-  }
-
-  // Универсальная функция для перехода и скролла вверх
-  const handleNavScroll = (path: string) => {
-    if (window.location.pathname === path) {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    } else {
-      navigate(path)
-      setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' })
-      }, 100) // небольшой таймаут для корректного скролла после перехода
-    }
-  }
-
-  const navigationItems = [
-    { label: 'Вопрос–Ответ', action: () => handleNavScroll('/faq') },
-    { label: 'Прейскурант', action: () => handleNavScroll('/pricelist') },
-    // { label: 'Специалисты', action: () => handleNavScroll('/specialists') },
-    // { label: 'Отзывы', action: () => handleNavScroll('/testimonials') },
-  ]
-
-  const handleLogout = () => {
-    logout()
-    toast({
-      title: 'Выход выполнен',
-      description: 'Вы успешно вышли из аккаунта',
-    })
-  }
+  useEffect(() => setMenu(false), [pathname])
+  useEffect(() => {
+    document.body.style.overflow = menu ? 'hidden' : ''
+  }, [menu])
 
   return (
-    <>
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between">
-          {/* Left side - Logo and Theme Toggle */}
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => handleNavScroll('/')}
-              className="flex items-center space-x-3 group"
-            >
-              <div 
-                    className="h-10 w-10 rounded-lg overflow-hidden relative group-hover:shadow-md transition-all duration-300 bg-white dark:bg-transparent"
-                  >
-                    <img 
-                      src="/logo.jpg" 
-                      alt="Биосфера" 
-                      className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal dark:invert dark:hue-rotate-180 contrast-[1.1] dark:brightness-125"
-                    />
-                  </div>
-              <span className="text-2xl font-bold text-biosphere-primary hover:text-biosphere-accent transition-colors">
-                Биосфера
-              </span>
-            </button>
-            <Button
-              size="sm"
-              onClick={() => setIsBookingOpen(true)}
-              className="hidden md:inline-flex bg-gradient-to-r from-biosphere-primary to-biosphere-secondary text-white px-4 py-2 hover:shadow-lg"
-            >
-              Записаться онлайн
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleTheme}
-              className="h-8 w-8 p-0"
-            >
-              {theme === 'light' ? (
-                <Moon className="h-4 w-4" />
-              ) : (
-                <Sun className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
+    <header
+      className={cn(
+        'sticky top-0 z-40 transition-all duration-300',
+        scrolled || menu ? 'bg-cream/85 shadow-[0_1px_0_rgba(29,43,48,.06)] backdrop-blur-xl' : 'bg-transparent',
+      )}
+    >
+      <div className="container flex h-[72px] items-center gap-6">
+        <Link to="/" aria-label="Биосфера — на главную" onClick={() => pathname === '/' && window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          <Logo />
+        </Link>
 
-          {/* Right side - Navigation */}
-          <nav className="hidden lg:flex items-center space-x-6">
-            {user && (
-              <>
-                {user.is_admin && (
-                  <Link
-                    to="/admin-panel"
-                    className="text-sm font-medium hover:text-biosphere-primary transition-colors"
-                  >
-                    Админка
-                  </Link>
-                )}
-                <Button
-                  variant="ghost"
-                  onClick={handleLogout}
-                  className="text-sm font-medium hover:text-biosphere-primary"
-                >
-                  Выйти
-                </Button>
-              </>
-            )}
-            
-            {navigationItems.map((item) => (
+        <nav className="ml-4 hidden items-center gap-1 lg:flex" aria-label="Основное меню">
+          {NAV.map((item) => (
+            <button
+              key={item.label}
+              onClick={() => go(item)}
+              className={cn(
+                'rounded-full px-3.5 py-2 text-[15px] font-semibold text-ink-soft transition hover:bg-ink/5 hover:text-ink',
+                'href' in item && pathname === item.href && 'bg-ink/5 text-ink',
+              )}
+            >
+              {item.label}
+            </button>
+          ))}
+        </nav>
+
+        <div className="ml-auto flex items-center gap-2">
+          <a
+            href={telHref(EMERGENCY.phone)}
+            className="hidden items-center gap-2.5 rounded-full py-1.5 pl-1.5 pr-4 transition hover:bg-ink/5 md:flex lg:hidden xl:flex"
+          >
+            <span className="relative grid h-9 w-9 place-items-center rounded-full bg-alert-50 text-alert-500">
+              <span className="absolute inset-0 animate-pulse-ring rounded-full" />
+              <Phone className="h-4 w-4" />
+            </span>
+            <span className="leading-tight">
+              <span className="block text-[15px] font-bold">{EMERGENCY.phone}</span>
+              <span className="block text-[12px] font-medium text-ink-mute">круглосуточно</span>
+            </span>
+          </a>
+          <button onClick={() => openBooking()} className="btn btn-primary btn-sm hidden sm:inline-flex sm:h-11 sm:px-5">
+            Записаться
+          </button>
+          <button
+            className="grid h-11 w-11 place-items-center rounded-full bg-white/80 shadow-soft lg:hidden"
+            onClick={() => setMenu((v) => !v)}
+            aria-expanded={menu}
+            aria-label={menu ? 'Закрыть меню' : 'Открыть меню'}
+          >
+            {menu ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Мобильное меню */}
+      {menu && (
+        <div className="fixed inset-x-0 bottom-0 top-[72px] z-40 overflow-y-auto bg-cream px-5 pb-28 pt-4 animate-fade-in lg:hidden">
+          <nav className="grid gap-1" aria-label="Мобильное меню">
+            {NAV.map((item) => (
               <button
                 key={item.label}
-                onClick={item.action}
-                className="text-sm font-medium hover:text-biosphere-primary transition-colors"
+                onClick={() => {
+                  setMenu(false)
+                  setTimeout(() => go(item), 50)
+                }}
+                className="rounded-2xl px-4 py-3.5 text-left text-[22px] font-bold transition active:bg-ink/5"
               >
                 {item.label}
               </button>
             ))}
-            <Link
-              to="/specialists-page"
-              className="text-sm font-medium hover:text-biosphere-primary transition-colors"
-            >
-              Специалисты
-            </Link>
-            <Link
-              to="/reviews-page"
-              className="text-sm font-medium hover:text-biosphere-primary transition-colors"
-            >
-              Отзывы
-            </Link>
-
-            {/* Branches Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="text-sm font-medium hover:text-biosphere-primary">
-                  <MapPin className="h-4 w-4 mr-1" />
-                  Филиалы
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-80">
-                {branches.map((branch, index) => (
-                  <DropdownMenuItem
-                    key={index}
-                    onClick={() => handleBranchClick(branch)}
-                    className="cursor-pointer py-3 text-sm"
-                  >
-                    <MapPin className="h-4 w-4 mr-2 text-biosphere-primary" />
-                    {branch}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
           </nav>
-
-          {/* Mobile menu button */}
-          <Button
-            variant="ghost"
-            className="lg:hidden"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </Button>
-        </div>
-      </header>
-
-      {/* Mobile Navigation - Moved outside header for better stacking and isolation */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-[100] lg:hidden">
-          {/* Backdrop for closing menu */}
-          <div 
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" 
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
-          <div 
-            className="absolute right-0 top-0 h-full w-[280px] bg-background shadow-2xl border-l flex flex-col animate-in slide-in-from-right duration-300 ease-in-out"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between p-4 border-b bg-background sticky top-0 z-10">
-              <span className="font-bold text-biosphere-primary text-lg">Меню</span>
-              <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)}>
-                <X className="h-6 w-6" />
-              </Button>
-            </div>
-            <div className="flex-1 overflow-y-auto p-4 space-y-6">
-              <div className="space-y-1">
-                {navigationItems.map((item) => (
-                  <button
-                    key={item.label}
-                    onClick={() => {
-                      item.action()
-                      setIsMobileMenuOpen(false)
-                    }}
-                    className="flex items-center w-full px-4 py-3 text-base font-medium hover:bg-accent hover:text-accent-foreground rounded-lg transition-colors"
-                  >
-                    {item.label}
-                  </button>
-                ))}
-                <Link
-                  to="/specialists-page"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center w-full px-4 py-3 text-base font-medium hover:bg-accent hover:text-accent-foreground rounded-lg transition-colors"
-                >
-                  Специалисты
-                </Link>
-                <Link
-                  to="/reviews-page"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center w-full px-4 py-3 text-base font-medium hover:bg-accent hover:text-accent-foreground rounded-lg transition-colors"
-                >
-                  Отзывы
-                </Link>
-              </div>
-
-              <div className="pt-4 border-t">
-                <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider px-4 mb-2">Филиалы</div>
-                <div className="space-y-1">
-                  {branches.map((branch, index) => (
-                    <button
-                      key={index}
-                      onClick={() => {
-                        handleBranchClick(branch)
-                        setIsMobileMenuOpen(false)
-                      }}
-                      className="flex items-start w-full px-4 py-3 text-sm hover:bg-accent hover:text-accent-foreground rounded-lg transition-colors text-left"
-                    >
-                      <MapPin className="h-4 w-4 mr-3 mt-0.5 flex-shrink-0 text-biosphere-primary" />
-                      <span>{branch}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {user && user.is_admin && (
-                <div className="pt-4 border-t">
-                  <Button
-                    variant="destructive"
-                    className="w-full justify-start gap-2"
-                    onClick={() => {
-                      handleLogout()
-                      setIsMobileMenuOpen(false)
-                    }}
-                  >
-                    Выйти из системы
-                  </Button>
-                </div>
-              )}
-            </div>
+          <div className="mt-6 grid gap-2">
+            <p className="px-4 text-[13px] font-semibold uppercase tracking-[0.14em] text-ink-mute">Телефоны филиалов</p>
+            {branches.map((b) => (
+              <a key={b.id} href={telHref(b.phone)} className="flex items-center justify-between rounded-2xl bg-white px-4 py-3 shadow-soft">
+                <span className="text-[15px] font-semibold">{b.address}</span>
+                <span className="font-bold text-teal-600">{b.phone}</span>
+              </a>
+            ))}
           </div>
         </div>
       )}
-
-      <BookingModal isOpen={isBookingOpen} onClose={() => setIsBookingOpen(false)} />
-    </>
+    </header>
   )
 }

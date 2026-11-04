@@ -1,124 +1,143 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import '@fontsource-variable/manrope';
+@import '@fontsource/lora/400-italic.css';
+@import '@fontsource/lora/500-italic.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
-    --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-    --primary: 191 91% 32%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 122 39% 49%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
-    --accent: 191 91% 36%;
-    --accent-foreground: 210 20% 98%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 191 91% 32%;
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 224 71.4% 4.1%;
-    --foreground: 210 20% 98%;
-    --card: 224 71.4% 4.1%;
-    --card-foreground: 210 20% 98%;
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 20% 98%;
-    --primary: 191 91% 32%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 122 39% 49%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 215 27.9% 16.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
-    --accent: 191 91% 36%;
-    --accent-foreground: 210 20% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
-    --ring: 191 91% 32%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 88px;
+    -webkit-tap-highlight-color: transparent;
   }
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-cream text-ink antialiased;
+    font-feature-settings: 'ss01', 'cv11';
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    @apply bg-teal-200 text-ink;
+  }
+  :focus-visible {
+    @apply outline-none ring-2 ring-teal-500 ring-offset-2 ring-offset-cream;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply tracking-tight text-ink;
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  img {
+    @apply select-none;
   }
 }
 
-@keyframes paw-float {
-  0%, 100% {
-    transform: translateY(0) rotate(-5deg);
+@layer components {
+  .accent {
+    @apply font-serif font-medium italic text-teal-600;
+    letter-spacing: -0.01em;
   }
-  50% {
-    transform: translateY(-12px) rotate(5deg);
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-[13px] font-semibold uppercase tracking-[0.14em] text-teal-600;
+  }
+  .h2 {
+    @apply text-[34px] font-extrabold leading-[1.08] sm:text-[44px] lg:text-[52px];
+  }
+  .lead {
+    @apply text-[17px] leading-relaxed text-ink-soft sm:text-lg;
+  }
+  .btn {
+    @apply inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-full font-semibold transition-all duration-200 disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-lg {
+    @apply h-14 px-7 text-[16px];
+  }
+  .btn-md {
+    @apply h-12 px-6 text-[15px];
+  }
+  .btn-sm {
+    @apply h-10 px-4 text-sm;
+  }
+  .btn-primary {
+    @apply bg-teal-600 text-white shadow-glow hover:-translate-y-0.5 hover:bg-teal-700 active:translate-y-0;
+  }
+  .btn-ghost {
+    @apply border border-ink/10 bg-white/70 text-ink backdrop-blur hover:border-ink/20 hover:bg-white;
+  }
+  .btn-alert {
+    @apply bg-alert-500 text-white hover:bg-alert-600;
+  }
+  .card {
+    @apply rounded-3xl bg-white shadow-soft ring-1 ring-ink/[0.04];
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[13px] font-medium;
+  }
+  .input {
+    @apply h-12 w-full rounded-2xl border border-ink/10 bg-white px-4 text-[15px] text-ink outline-none transition placeholder:text-ink-mute focus:border-teal-500 focus:ring-4 focus:ring-teal-500/15;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-semibold text-ink;
+  }
+  .section {
+    @apply py-20 sm:py-28;
   }
 }
 
-.animate-paw {
-  animation: paw-float 3s ease-in-out infinite;
-}
-
-@keyframes dash {
-  0% {
-    stroke-dasharray: 1, 150;
-    stroke-dashoffset: 0;
+@layer utilities {
+  .no-scrollbar {
+    scrollbar-width: none;
   }
-  50% {
-    stroke-dasharray: 90, 150;
-    stroke-dashoffset: -35;
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
-  100% {
-    stroke-dasharray: 90, 150;
-    stroke-dashoffset: -124;
+  .mask-fade-x {
+    mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+  }
+  .grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.11 0 0 0 0 0.17 0 0 0 0 0.19 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 }
 
-@keyframes blob {
-  0% {
-    transform: translate(0px, 0px) scale(1);
+/* Появление блоков при прокрутке */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.8s cubic-bezier(0.2, 0.7, 0.2, 1),
+    transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition-delay: var(--delay, 0ms);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
-  33% {
-    transform: translate(30px, -50px) scale(1.1);
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
-  100% {
-    transform: translate(0px, 0px) scale(1);
-  }
 }
 
-.animate-blob {
-  animation: blob 7s infinite;
+details > summary {
+  list-style: none;
 }
-
-.animation-delay-2000 {
-  animation-delay: 2s;
-}
-
-.animation-delay-4000 {
-  animation-delay: 4s;
-}
-
-.smooth-scroll {
-  scroll-behavior: smooth;
-}
-
-img {
-  object-position: top;
+details > summary::-webkit-details-marker {
+  display: none;
 }

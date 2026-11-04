@@ -1,62 +1,23 @@
 services:
-  # Backend Service
-  - type: web
-    name: biosphere-backend
-    env: python
-    region: frankfurt
-    plan: free
-    rootDir: backend
-    buildCommand: pip install -r requirements.txt
-    # Миграции + сиды + запуск
-    startCommand: alembic upgrade head && python create_admin.py && python seed_specialists.py && uvicorn main:app --host 0.0.0.0 --port $PORT
-    healthCheckPath: /health
-    autoDeploy: true
-    envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: biosphere-db
-          property: connectionString
-      - key: SECRET_KEY
-        generateValue: true
-      - key: ENVIRONMENT
-        value: production
-      - key: PYTHON_VERSION
-        value: 3.13.4
-      - key: FRONTEND_ORIGIN
-        fromService:
-          name: biosphere-frontend
-          type: web
-          property: host
-        format: https://{{host}}
-      # ВАЖНО: задайте вручную в Render Dashboard (не храните в git)
-      # - ADMIN_EMAIL
-      # - ADMIN_PASSWORD
-
-  # Frontend Service
+  # Один сервис: Node раздаёт собранный сайт (dist) и API (/api/*)
   - type: web
     name: biosphere-frontend
-    env: node
+    runtime: node
     region: frankfurt
     plan: free
     rootDir: biosphere-vet-clinic
     buildCommand: npm install && npm run build
-    startCommand: npx vite preview --port $PORT --host
+    startCommand: npm start
+    healthCheckPath: /api/health
     autoDeploy: true
     envVars:
-      - key: VITE_API_URL
-        fromService:
-          name: biosphere-backend
-          type: web
-          property: host
-        format: https://{{host}}
       - key: NODE_VERSION
-        value: 20.x
-      - key: PORT
-        value: 10000
-
-databases:
-  - name: biosphere-db
-    region: frankfurt
-    plan: free
-    databaseName: biosphere
-    user: biosphere_user
+        value: 22.x
+      - key: SESSION_SECRET
+        generateValue: true
+      # Задайте вручную в Render Dashboard (не храните в git):
+      # - ADMIN_PASSWORD   — пароль входа в /admin (не короче 10 символов)
+      # Необязательные:
+      # - INDEXING=on      — разрешить индексацию поисковиками (когда сайт станет основным)
+      # - KEEPALIVE=off    — выключить «антисон» (самопинг каждые 10 минут)
+      # - KEEPALIVE_MIN=10 — интервал антисна в минутах

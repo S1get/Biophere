@@ -1,128 +1,85 @@
-import React from 'react'
-import { Separator } from '@/components/ui/separator'
-import { Button } from '@/components/ui/button'
-import { 
-  MapPin, 
-  Phone, 
-  Mail, 
-  Clock, 
-  Heart,
-  Instagram,
-  MessageCircle
-} from 'lucide-react'
-
-const branches = [
-  {
-    address: 'пр-т Строителей, 9, корпус 1',
-    hours: 'Ежедневно круглосуточно',
-    phone: '44-37-97',
-    mapUrl: 'https://yandex.ru/maps/-/CDT6mS2c'
-  },
-  {
-    address: 'ул. Солнечная, 19 Б',
-    hours: 'Ежедневно с 8:00 до 21:00',
-    phone: '44-97-97',
-    mapUrl: 'https://yandex.ru/maps/-/CDT6mS2c'
-  },
-  {
-    address: 'ул. Московская, 4',
-    hours: 'Будни: 8:00-21:00, Сб: 8:00-19:00, Вс: 8:00-17:00',
-    phone: '38-39-40',
-    mapUrl: 'https://yandex.ru/maps/-/CDT6mS2c'
-  },
-  {
-    address: 'ул. Чернышевского, 7',
-    hours: 'Будни: 8:00-21:00, Выходные: 8:00-17:00',
-    phone: '44-27-97',
-    mapUrl: 'https://yandex.ru/maps/-/CDT6mS2c'
-  },
-  {
-    address: 'ул. Украинская, 18',
-    hours: 'Будни: 8:00-21:00, Выходные: 8:00-17:00',
-    phone: '44-47-97',
-    mapUrl: 'https://yandex.ru/maps/-/CDT6mS2c'
-  },
-  {
-    address: 'ул. Молодой Гвардии, 2 Д (Нововятск)',
-    hours: 'Будни: 8:00-21:00, Выходные: 8:00-17:00',
-    phone: '44-67-97',
-    mapUrl: 'https://yandex.ru/maps/-/CDT6mS2c'
-  },
-]
+import { Link } from 'react-router-dom'
+import { Logo } from './Logo'
+import { NAV, useNavGo } from './Header'
+import { branches } from '@/data/branches'
+import { CURRENT_YEAR, FOUNDED, telHref } from '@/lib/utils'
 
 export function Footer() {
-  const currentYear = new Date().getFullYear()
-
+  const go = useNavGo()
   return (
-    <footer className="bg-white dark:bg-gray-900 text-black dark:text-white border-t border-gray-200 dark:border-gray-800">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-          {/* Company Info */}
-          <div className="space-y-6">
-            <div className="flex items-center space-x-2">
-              <Heart className="h-8 w-8 text-biosphere-secondary" />
-              <h3 className="text-3xl font-bold text-black dark:text-white">Биосфера</h3>
-            </div>
-            <p className="text-gray-700 dark:text-gray-300 leading-relaxed hidden md:block text-lg">
-              Современная ветеринарная клиника, обеспечивающая качественную медицинскую помощь домашним животным с 2004 года.
+    <footer className="relative overflow-hidden bg-teal-900 pb-28 pt-16 text-white/80 md:pb-12">
+      <div className="pointer-events-none absolute -right-40 -top-40 h-[480px] w-[480px] rounded-full bg-teal-700/40 blur-3xl" />
+      <div className="container relative">
+        <div className="grid gap-12 lg:grid-cols-[1.1fr_2fr]">
+          <div>
+            <Logo light />
+            <p className="mt-5 max-w-sm text-[15px] leading-relaxed text-white/70">
+              Сеть ветеринарных клиник в Кирове. Окружаем заботой с {FOUNDED} года.
             </p>
-            <div className="flex space-x-4">
-              <a 
-                href="https://vk.com/biosre" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-12 h-12 bg-[#0077FF] rounded-xl flex items-center justify-center hover:bg-[#0077FF]/90 transition-all hover:scale-110 shadow-lg"
-                aria-label="ВКонтакте"
-              >
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M13.37 16.5C8.41 16.5 5.47 13.23 5.35 7.5H8.02C8.1 11.41 9.98 13.13 11.41 13.47V7.5H13.92V11.09C15.32 10.94 16.79 9.37 17.28 7.5H19.8C19.48 9.13 17.91 10.7 16.81 11.32C17.91 11.81 19.66 13.13 20.2 16.5H17.41C16.87 14.41 15.56 13.19 13.92 13.03V16.5H13.37Z" fill="white"/>
-                </svg>
+            <a
+              href="https://vk.com/biosre"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/15"
+            >
+              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden="true">
+                <path d="M12.8 17.3c-5.5 0-8.6-3.8-8.7-10h2.7c.1 4.6 2.1 6.5 3.7 6.9V7.3h2.6v3.9c1.6-.2 3.2-2 3.8-3.9h2.6a7.6 7.6 0 0 1-3.5 5c1.3.6 3 2.2 3.7 5H17c-.6-1.9-2.1-3.3-4.1-3.5v3.5h-.1Z" />
+              </svg>
+              Мы ВКонтакте
+            </a>
+            <div className="mt-8 rounded-2xl bg-white/5 p-4 text-[14px] leading-relaxed ring-1 ring-white/10">
+              <b className="text-white">Ищем в команду</b> ассистента ветеринарного врача.
+              <br />
+              Справки по телефону{' '}
+              <a href={telHref('38-39-40')} className="font-semibold text-white underline-offset-2 hover:underline">
+                38-39-40
               </a>
             </div>
           </div>
 
-          {/* Branches Column 1 */}
-          <div className="space-y-6 md:col-span-1 lg:col-span-2">
-            <h4 className="text-xl font-bold text-black dark:text-white flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-biosphere-secondary" />
-              Наши филиалы
-            </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {branches.map((branch, index) => (
-                <div key={index} className="space-y-2 md:space-y-3 p-3 md:p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                  <h5 className="font-bold text-biosphere-secondary text-sm md:text-base">{branch.address}</h5>
-                  <div className="space-y-1 md:space-y-2 text-xs md:text-sm text-gray-700 dark:text-gray-300">
-                    <p className="flex items-center gap-2">
-                      <Clock className="h-3 w-3 md:h-4 md:w-4 text-biosphere-secondary" />
-                      {branch.hours}
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <Phone className="h-3 w-3 md:h-4 md:w-4 text-biosphere-secondary" />
-                      <a href={`tel:${branch.phone.replace(/-/g, '')}`} className="hover:text-biosphere-secondary transition-colors font-medium">
-                        {branch.phone}
-                      </a>
-                    </p>
-                  </div>
-                </div>
-              ))}
+          <div className="grid gap-10 sm:grid-cols-[2fr_1fr]">
+            <div>
+              <p className="text-[13px] font-semibold uppercase tracking-[0.14em] text-white/50">Филиалы</p>
+              <ul className="mt-4 grid gap-x-8 gap-y-4 sm:grid-cols-2">
+                {branches.map((b) => (
+                  <li key={b.id} className="text-[14px] leading-snug">
+                    <span className="block font-semibold text-white">{b.address}</span>
+                    <span className="block text-white/60">{b.hoursText.join(', ')}</span>
+                    <a href={telHref(b.phone)} className="mt-0.5 inline-block font-bold text-leaf-300 hover:text-leaf-200">
+                      {b.phone}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="text-[13px] font-semibold uppercase tracking-[0.14em] text-white/50">Разделы</p>
+              <ul className="mt-4 grid gap-2.5 text-[15px]">
+                {NAV.map((n) => (
+                  <li key={n.label}>
+                    <button onClick={() => go(n)} className="transition hover:text-white">
+                      {n.label}
+                    </button>
+                  </li>
+                ))}
+                <li>
+                  <Link to="/doctors" className="transition hover:text-white">
+                    Все врачи
+                  </Link>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
 
-        <Separator className="my-8 bg-gray-200 dark:bg-gray-700" />
-
-        {/* Bottom section */}
-        <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-          <div className="text-sm text-gray-700 dark:text-gray-400">
-            <p>© {currentYear} Ветеринарная клиника "Биосфера". Все права защищены.</p>
-          </div>
-          <div className="flex space-x-6 text-sm">
-            <a href="#" className="text-gray-700 dark:text-gray-400 hover:text-biosphere-secondary dark:hover:text-white transition-colors">
+        <div className="mt-14 flex flex-col gap-3 border-t border-white/10 pt-6 text-[13px] text-white/50 sm:flex-row sm:items-center sm:justify-between">
+          <p>
+            © {FOUNDED}–{CURRENT_YEAR} Сеть ветеринарных клиник «Биосфера», г. Киров
+          </p>
+          <div className="flex gap-5">
+            <Link to="/privacy" className="hover:text-white">
               Политика конфиденциальности
-            </a>
-            <a href="#" className="text-gray-700 dark:text-gray-400 hover:text-biosphere-secondary dark:hover:text-white transition-colors">
-              Пользовательское соглашение
-            </a>
+            </Link>
           </div>
         </div>
       </div>

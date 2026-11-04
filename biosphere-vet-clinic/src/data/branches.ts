@@ -1,0 +1,117 @@
+import type { Branch, DayHours } from './types'
+
+const weekdays = (open: number, close: number, sat: [number, number], sun: [number, number]): DayHours[] => [
+  sun, [open, close], [open, close], [open, close], [open, close], [open, close], sat,
+]
+
+const yandexSearch = (address: string) =>
+  `https://yandex.ru/maps/46/kirov/search/${encodeURIComponent(`Биосфера ветклиника ${address}`)}/`
+
+// Адреса, часы и телефоны — со старого сайта биосфера.рф (ноябрь 2026).
+// Координаты — по адресам (OpenStreetMap), сверены со ссылками Яндекс Карт старого сайта.
+export const branches: Branch[] = [
+  {
+    id: 'stl',
+    short: 'Строителей',
+    address: 'пр-т Строителей, 9, корп. 1',
+    district: 'Юго-Запад',
+    phone: '44-37-97',
+    hoursText: ['Ежедневно, круглосуточно'],
+    hours: 'always',
+    coords: [58.598739, 49.589066],
+    photo: '/photos/branch/stl.webp',
+    opened: '2 октября 2016',
+    openedYear: 2016,
+    about: 'Единственная круглосуточная клиника сети: помощь днём и ночью, без выходных и праздников.',
+    features: ['Круглосуточно', 'Экстренная хирургия', 'Кардиология', 'Тонометрия', 'Диагностика'],
+    yandexOrgId: '1733564993',
+    routeUrl: 'https://yandex.ru/maps/org/1733564993/',
+  },
+  {
+    id: 'sol',
+    short: 'Солнечная',
+    address: 'ул. Солнечная, 19 Б',
+    district: 'Юго-Запад',
+    phone: '44-97-97',
+    hoursText: ['Ежедневно с 8:00 до 21:00'],
+    hours: Array.from({ length: 7 }, () => [8, 21] as DayHours),
+    coords: [58.592345, 49.610823],
+    photo: '/photos/branch/dsc6390.webp',
+    opened: '1 февраля 2004',
+    openedYear: 2004,
+    about: 'Первая клиника «Биосферы». Здесь же — видеоэндоскопическая диагностика.',
+    features: ['Видеоэндоскопия', 'Стоматология', 'Кардиология', 'Хирургия'],
+    yandexOrgId: '1051798086',
+    routeUrl: 'https://yandex.ru/maps/org/1051798086/',
+  },
+  {
+    id: 'mos',
+    short: 'Московская',
+    address: 'ул. Московская, 4',
+    district: 'Дымково',
+    phone: '38-39-40',
+    hoursText: ['Пн–Пт с 8:00 до 21:00', 'Сб с 8:00 до 19:00', 'Вс с 8:00 до 17:00'],
+    hours: weekdays(8, 21, [8, 19], [8, 17]),
+    coords: [58.603485, 49.682847],
+    photo: '/photos/branch/dsc6437.webp',
+    opened: '3 мая 2009',
+    openedYear: 2009,
+    about: 'Специализированная хирургия: торакальная, нейрохирургия, ортопедия, онкология. Офтальмология и стационар.',
+    features: ['Нейрохирургия', 'Ортопедия', 'Офтальмология', 'Стационар', 'Кардиология'],
+    yandexOrgId: '1266617187',
+    routeUrl: 'https://yandex.ru/maps/org/1266617187/',
+  },
+  {
+    id: 'crn',
+    short: 'Чернышевского',
+    address: 'ул. Чернышевского, 7',
+    district: 'Филейка, ОЦМ',
+    phone: '44-27-97',
+    hoursText: ['Пн–Пт с 8:00 до 21:00', 'Сб–Вс с 8:00 до 17:00'],
+    hours: weekdays(8, 21, [8, 17], [8, 17]),
+    coords: [58.628591, 49.628092],
+    photo: '/photos/branch/crn.webp',
+    opened: '2 декабря 2018',
+    openedYear: 2018,
+    about: 'Клиника для северных районов города и тех, кто едет со стороны Нового моста.',
+    features: ['Кардиология', 'Хирургия', 'Груминг', 'Диагностика'],
+    routeUrl: yandexSearch('Чернышевского 7'),
+  },
+  {
+    id: 'ukr',
+    short: 'Украинская',
+    address: 'ул. Украинская, 18',
+    district: 'Чистые пруды',
+    phone: '44-47-97',
+    hoursText: ['Пн–Пт с 8:00 до 21:00', 'Сб–Вс с 8:00 до 17:00'],
+    hours: weekdays(8, 21, [8, 17], [8, 17]),
+    coords: [58.569997, 49.652073],
+    photo: '/photos/branch/ukr.webp',
+    opened: '26 марта 2024',
+    openedYear: 2024,
+    about: 'Новый светлый и просторный филиал с большой ветаптекой и кормами по доступным ценам.',
+    features: ['Стационар', 'УЗИ', 'Кардиология', 'Груминг', 'Хирургия'],
+    routeUrl: 'https://yandex.ru/maps/-/CDVPB0NI',
+  },
+  {
+    id: 'mgv',
+    short: 'Нововятск',
+    address: 'ул. Молодой Гвардии, 2 Д',
+    district: 'Нововятский район',
+    phone: '44-67-97',
+    hoursText: ['Пн–Пт с 8:00 до 21:00', 'Сб–Вс с 8:00 до 17:00'],
+    hours: weekdays(8, 21, [8, 17], [8, 17]),
+    coords: [58.506398, 49.704141],
+    photo: '/photos/branch/mgv.webp',
+    opened: '8 февраля 2015',
+    openedYear: 2015,
+    about: 'Самая большая клиника сети. Врачи, знакомые по Солнечной и Московской.',
+    features: ['Стоматология', 'Хирургия', 'Диагностика', 'Терапия'],
+    yandexOrgId: '1286282755',
+    routeUrl: 'https://yandex.ru/maps/org/1286282755/',
+  },
+]
+
+export const branchById = Object.fromEntries(branches.map((b) => [b.id, b])) as Record<Branch['id'], Branch>
+
+export const EMERGENCY = branchById.stl

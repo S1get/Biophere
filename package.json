@@ -1,9 +1,0 @@
-{
-  "name": "biosphere-root",
-  "private": true,
-  "version": "1.0.0",
-  "description": "Root package.json to prevent Render from running npm scripts here.",
-  "scripts": {
-    "start": "echo 'Set the Root Directory to biosphere-vet-clinic for frontend or backend for FastAPI!'"
-  }
-}
