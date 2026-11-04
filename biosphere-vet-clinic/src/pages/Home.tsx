@@ -26,13 +26,13 @@ export default function Home() {
       <Ticker />
       <Services />
       <Emergency />
+      <Faq />
       <Story />
       <Doctors />
       <Equipment />
       <Branches />
       <Reviews />
       <Pharmacy />
-      <Faq />
       <FinalCta />
     </>
   )

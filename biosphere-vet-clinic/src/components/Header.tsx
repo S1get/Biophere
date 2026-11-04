@@ -8,7 +8,7 @@ import { cn, scrollToId, telHref } from '@/lib/utils'
 
 export const NAV = [
   { id: 'services', label: 'Услуги' },
-  { id: 'doctors', label: 'Врачи' },
+  { href: '/doctors', label: 'Врачи' },
   { href: '/prices', label: 'Цены' },
   { id: 'branches', label: 'Филиалы' },
   { id: 'reviews', label: 'Отзывы' },

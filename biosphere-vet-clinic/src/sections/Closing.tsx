@@ -41,7 +41,7 @@ export function Pharmacy() {
 export function Faq() {
   const [ask, setAsk] = useState(false)
   return (
-    <section id="faq" className="section bg-white">
+    <section id="faq" className="section">
       <div className="container grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
         <Reveal>
           <span className="eyebrow">Вопросы</span>

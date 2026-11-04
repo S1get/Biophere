@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ExternalLink, Quote } from 'lucide-react'
+import { ArrowRight, ChevronDown, ExternalLink, Quote } from 'lucide-react'
 import { Reveal } from '@/components/Reveal'
 import { branches } from '@/data/branches'
 import reviews from '@/data/reviews.json'
@@ -39,9 +39,15 @@ function ReviewCard({ r }: { r: Review }) {
   )
 }
 
+const START = 3
+
 export function Reviews() {
+  const all = reviews as Review[]
+  const [expanded, setExpanded] = useState(false)
   const [org, setOrg] = useState(yandexBranches[0]?.yandexOrgId ?? '')
-  const [showWidget, setShowWidget] = useState(false)
+  const [showYandex, setShowYandex] = useState(false)
+  const list = expanded ? all : all.slice(0, START)
+
   return (
     <section id="reviews" className="section">
       <div className="container">
@@ -56,38 +62,52 @@ export function Reviews() {
         </Reveal>
 
         <div className="mt-12 columns-1 gap-5 sm:columns-2 lg:columns-3">
-          {(reviews as Review[]).slice(0, 9).map((r, i) => (
+          {list.map((r, i) => (
             <Reveal key={i} delay={(i % 3) * 70}>
               <ReviewCard r={r} />
             </Reveal>
           ))}
         </div>
 
-        <Reveal className="mt-10 overflow-hidden rounded-[32px] bg-white shadow-soft ring-1 ring-ink/[0.04]">
-          <div className="flex flex-col gap-5 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <h3 className="text-[22px] font-extrabold">Свежие отзывы на Яндекс Картах</h3>
-              <p className="mt-1 text-[15px] text-ink-soft">Выберите филиал — покажем, что пишут о нём сейчас.</p>
-            </div>
-            <div className="no-scrollbar -mx-6 flex gap-2 overflow-x-auto px-6 sm:mx-0 sm:px-0">
-              {yandexBranches.map((b) => (
-                <button
-                  key={b.id}
-                  onClick={() => {
-                    setOrg(b.yandexOrgId!)
-                    setShowWidget(true)
-                  }}
-                  className={cn(
-                    'shrink-0 rounded-full px-4 py-2 text-[14px] font-semibold transition',
-                    showWidget && org === b.yandexOrgId ? 'bg-ink text-white' : 'bg-cream text-ink-soft hover:text-ink',
-                  )}
-                >
-                  {b.short}
-                </button>
-              ))}
-            </div>
+        {!expanded && all.length > START && (
+          <div className="mt-6 text-center">
+            <button onClick={() => setExpanded(true)} className="btn btn-ghost btn-lg">
+              Показать больше <span className="text-ink-mute">· ещё {all.length - START}</span>
+              <ChevronDown className="h-5 w-5" />
+            </button>
           </div>
-          {showWidget ? (
+        )}
+
+        {expanded && !showYandex && (
+          <div className="mt-6 text-center">
+            <button onClick={() => setShowYandex(true)} className="btn btn-primary btn-lg">
+              Все отзывы на Яндекс Картах <ArrowRight className="h-5 w-5" />
+            </button>
+          </div>
+        )}
+
+        {showYandex && (
+          <div className="mt-10 overflow-hidden rounded-[32px] bg-white shadow-soft ring-1 ring-ink/[0.04] animate-fade-up">
+            <div className="flex flex-col gap-5 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <h3 className="text-[22px] font-extrabold">Свежие отзывы на Яндекс Картах</h3>
+                <p className="mt-1 text-[15px] text-ink-soft">Выберите филиал — покажем, что пишут о нём сейчас.</p>
+              </div>
+              <div className="no-scrollbar -mx-6 flex gap-2 overflow-x-auto px-6 sm:mx-0 sm:px-0">
+                {yandexBranches.map((b) => (
+                  <button
+                    key={b.id}
+                    onClick={() => setOrg(b.yandexOrgId!)}
+                    className={cn(
+                      'shrink-0 rounded-full px-4 py-2 text-[14px] font-semibold transition',
+                      org === b.yandexOrgId ? 'bg-ink text-white' : 'bg-cream text-ink-soft hover:text-ink',
+                    )}
+                  >
+                    {b.short}
+                  </button>
+                ))}
+              </div>
+            </div>
             <div className="border-t border-ink/5 bg-cream-50 p-3 sm:p-5">
               <iframe
                 key={org}
@@ -102,18 +122,11 @@ export function Reviews() {
                 rel="noopener noreferrer"
                 className="mx-auto mt-4 flex w-fit items-center gap-1.5 text-[14px] font-bold text-teal-600"
               >
-                Все отзывы и оставить свой <ExternalLink className="h-4 w-4" />
+                Открыть на Яндекс Картах и оставить отзыв <ExternalLink className="h-4 w-4" />
               </a>
             </div>
-          ) : (
-            <button
-              onClick={() => setShowWidget(true)}
-              className="flex w-full items-center justify-center gap-2 border-t border-ink/5 bg-cream-50 py-5 text-[15px] font-bold text-teal-600 transition hover:bg-teal-50"
-            >
-              Показать отзывы с Яндекс Карт
-            </button>
-          )}
-        </Reveal>
+          </div>
+        )}
       </div>
     </section>
   )

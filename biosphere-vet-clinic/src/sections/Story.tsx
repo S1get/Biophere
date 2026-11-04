@@ -1,4 +1,5 @@
 import { Reveal } from '@/components/Reveal'
+import { Rail, railItem } from '@/components/Rail'
 import { branches } from '@/data/branches'
 import { timeline } from '@/data/content'
 import { doctors } from '@/data/doctors'
@@ -44,9 +45,10 @@ export function Story() {
             )}
           </Reveal>
 
-          <ol className="relative grid gap-4 sm:grid-cols-2" aria-label="История открытия клиник">
+          <div className="min-w-0">
+          <Rail as="ol" className="relative sm:grid sm:grid-cols-2 sm:gap-4" label="История открытия клиник">
             {timeline.map((t, i) => (
-              <Reveal as="li" key={t.year} delay={(i % 2) * 90} className="group">
+              <Reveal as="li" key={t.year} delay={(i % 2) * 90} className={`group ${railItem}`}>
                 <div className="relative h-full overflow-hidden rounded-[28px] bg-cream shadow-soft">
                   <div className="aspect-[16/10] overflow-hidden">
                     <img src={t.photo} alt="" loading="lazy" className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
@@ -58,7 +60,8 @@ export function Story() {
                 </div>
               </Reveal>
             ))}
-          </ol>
+          </Rail>
+          </div>
         </div>
       </div>
     </section>

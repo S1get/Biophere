@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight, ArrowUpRight } from 'lucide-react'
 import { Reveal } from '@/components/Reveal'
+import { Rail, railItem } from '@/components/Rail'
 import { moreServices, services } from '@/data/content'
 import { priceFrom, usePricelist } from '@/lib/pricelist'
 import { rub } from '@/lib/utils'
@@ -28,11 +29,11 @@ export function Services() {
           </div>
         </Reveal>
 
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <Rail className="mt-10 sm:mt-12 sm:grid sm:grid-cols-2 sm:gap-5 lg:grid-cols-4" label="Услуги">
           {services.map((s, i) => {
             const price = priceFrom(data, s.price)
             return (
-              <Reveal key={s.id} delay={(i % 4) * 70}>
+              <Reveal key={s.id} delay={(i % 4) * 70} className={railItem}>
                 <Link
                   to={`/prices${s.section ? `?section=${s.section}` : ''}`}
                   className="group flex h-full flex-col overflow-hidden rounded-[28px] bg-white shadow-soft ring-1 ring-ink/[0.04] transition duration-300 hover:-translate-y-1 hover:shadow-lift"
@@ -62,12 +63,12 @@ export function Services() {
               </Reveal>
             )
           })}
-        </div>
+        </Rail>
 
-        <Reveal className="mt-8 flex flex-wrap items-center gap-2">
-          <span className="mr-2 text-[15px] font-semibold text-ink-soft">А ещё:</span>
+        <Reveal className="no-scrollbar -mx-5 mt-6 flex items-center gap-2 overflow-x-auto px-5 pb-2 sm:mx-0 sm:mt-8 sm:flex-wrap sm:px-0">
+          <span className="mr-2 shrink-0 text-[15px] font-semibold text-ink-soft">А ещё:</span>
           {moreServices.map((s) => (
-            <span key={s} className="chip bg-white px-4 py-2 text-[14px] text-ink shadow-soft ring-1 ring-ink/[0.04]">
+            <span key={s} className="chip shrink-0 bg-white px-4 py-2 text-[14px] text-ink shadow-soft ring-1 ring-ink/[0.04]">
               {s}
             </span>
           ))}
