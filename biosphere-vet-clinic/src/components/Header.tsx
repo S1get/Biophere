@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Menu, Phone, X } from 'lucide-react'
 import { Logo } from './Logo'
@@ -102,8 +103,10 @@ export function Header() {
         </div>
       </div>
 
-      {/* Мобильное меню */}
-      {menu && (
+      {/* Мобильное меню. Рендерится в body через портал: у шапки есть backdrop-blur,
+          а он делает «fixed»-потомков позиционированными относительно шапки, и меню обрезалось */}
+      {menu &&
+        createPortal(
         <div className="fixed inset-x-0 bottom-0 top-[72px] z-40 overflow-y-auto bg-cream px-5 pb-28 pt-4 animate-fade-in lg:hidden">
           <nav className="grid gap-1" aria-label="Мобильное меню">
             {NAV.map((item) => (
@@ -128,8 +131,9 @@ export function Header() {
               </a>
             ))}
           </div>
-        </div>
-      )}
+        </div>,
+          document.body,
+        )}
     </header>
   )
 }
