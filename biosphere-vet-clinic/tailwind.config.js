@@ -62,7 +62,7 @@ export default {
         },
       },
       animation: {
-        'fade-up': 'fade-up .7s cubic-bezier(.2,.7,.2,1) both',
+        'fade-up': 'fade-up .45s cubic-bezier(.2,.7,.2,1) both',
         'fade-in': 'fade-in .4s ease-out both',
         'scale-in': 'scale-in .25s cubic-bezier(.2,.7,.2,1) both',
         float: 'float 6s ease-in-out infinite',

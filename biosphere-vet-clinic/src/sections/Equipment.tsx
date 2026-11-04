@@ -31,7 +31,7 @@ export function Equipment() {
       </div>
       <div
         ref={track}
-        className="no-scrollbar mt-12 flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth px-5 pb-2 sm:px-[max(1.5rem,calc((100vw_-_1280px)/2_+_2rem))]"
+        className="no-scrollbar mt-12 flex snap-x snap-mandatory scroll-px-5 gap-5 overflow-x-auto scroll-smooth px-5 pb-2 sm:scroll-px-[max(1.5rem,calc((100vw_-_1280px)/2_+_2rem))] sm:px-[max(1.5rem,calc((100vw_-_1280px)/2_+_2rem))]"
       >
         {equipment.map((e) => (
           <article key={e.title} className="w-[78vw] max-w-[340px] shrink-0 snap-start overflow-hidden rounded-[28px] bg-white/[0.06] ring-1 ring-white/10">

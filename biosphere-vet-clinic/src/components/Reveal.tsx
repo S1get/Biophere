@@ -12,7 +12,8 @@ function getObserver() {
         }
       }
     },
-    { rootMargin: '0px 0px -8% 0px', threshold: 0.08 },
+    // срабатывает чуть раньше, чем блок покажется на экране
+    { rootMargin: '0px 0px 6% 0px', threshold: 0 },
   )
   return observer
 }

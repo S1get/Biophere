@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { ArrowRight, ChevronDown, ExternalLink, Quote } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { ArrowLeft, ArrowRight, ExternalLink, Quote } from 'lucide-react'
 import { Reveal } from '@/components/Reveal'
 import { branches } from '@/data/branches'
 import reviews from '@/data/reviews.json'
@@ -18,9 +18,9 @@ function ReviewCard({ r }: { r: Review }) {
   const [full, setFull] = useState(false)
   const long = r.text.length > LONG
   return (
-    <figure className="mb-5 break-inside-avoid rounded-[28px] bg-white p-6 shadow-soft ring-1 ring-ink/[0.04]">
+    <figure className="flex h-full flex-col rounded-[28px] bg-white p-6 shadow-soft ring-1 ring-ink/[0.04]">
       <Quote className="h-7 w-7 fill-leaf-100 text-leaf-400" />
-      <blockquote className="mt-3 text-[15.5px] leading-relaxed text-ink">
+      <blockquote className="mb-5 mt-3 text-[15.5px] leading-relaxed text-ink">
         {long && !full ? `${r.text.slice(0, LONG).replace(/\s+\S*$/, '')}…` : r.text}
       </blockquote>
       {long && (
@@ -28,7 +28,7 @@ function ReviewCard({ r }: { r: Review }) {
           {full ? 'Свернуть' : 'Читать полностью'}
         </button>
       )}
-      <figcaption className="mt-5 flex items-center gap-3 border-t border-ink/5 pt-4">
+      <figcaption className="mt-auto flex items-center gap-3 border-t border-ink/5 pt-4">
         <span className="grid h-10 w-10 place-items-center rounded-full bg-teal-50 font-extrabold text-teal-700">{r.name[0]}</span>
         <span>
           <span className="block font-bold">{r.name}</span>
@@ -39,55 +39,55 @@ function ReviewCard({ r }: { r: Review }) {
   )
 }
 
-const START = 3
+const PAD = 'px-5 scroll-px-5 sm:px-[max(1.5rem,calc((100vw_-_1280px)/2_+_2rem))] sm:scroll-px-[max(1.5rem,calc((100vw_-_1280px)/2_+_2rem))]'
 
 export function Reviews() {
   const all = reviews as Review[]
-  const [expanded, setExpanded] = useState(false)
+  const track = useRef<HTMLDivElement>(null)
   const [org, setOrg] = useState(yandexBranches[0]?.yandexOrgId ?? '')
   const [showYandex, setShowYandex] = useState(false)
-  const list = expanded ? all : all.slice(0, START)
+  const scroll = (dir: 1 | -1) => track.current?.scrollBy({ left: dir * track.current.clientWidth * 0.8, behavior: 'smooth' })
 
   return (
-    <section id="reviews" className="section">
+    <section id="reviews" className="section overflow-hidden">
       <div className="container">
-        <Reveal className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+        <Reveal className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
           <div className="max-w-2xl">
             <span className="eyebrow">Отзывы</span>
             <h2 className="h2 mt-3">
               Нам доверяют <span className="accent">самое дорогое</span>
             </h2>
+            <p className="lead mt-5 max-w-xl">Настоящие слова хозяев наших пациентов — из книги отзывов клиники и с Яндекс Карт.</p>
           </div>
-          <p className="lead max-w-md">Настоящие слова хозяев наших пациентов — из книги отзывов клиники и с Яндекс Карт.</p>
-        </Reveal>
-
-        <div className="mt-12 columns-1 gap-5 sm:columns-2 lg:columns-3">
-          {list.map((r, i) => (
-            <Reveal key={i} delay={(i % 3) * 70}>
-              <ReviewCard r={r} />
-            </Reveal>
-          ))}
-        </div>
-
-        {!expanded && all.length > START && (
-          <div className="mt-6 text-center">
-            <button onClick={() => setExpanded(true)} className="btn btn-ghost btn-lg">
-              Показать больше <span className="text-ink-mute">· ещё {all.length - START}</span>
-              <ChevronDown className="h-5 w-5" />
+          <div className="hidden shrink-0 gap-2 sm:flex">
+            <button onClick={() => scroll(-1)} className="grid h-12 w-12 place-items-center rounded-full bg-white shadow-soft ring-1 ring-ink/5 transition hover:bg-cream-200" aria-label="Предыдущие отзывы">
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <button onClick={() => scroll(1)} className="grid h-12 w-12 place-items-center rounded-full bg-white shadow-soft ring-1 ring-ink/5 transition hover:bg-cream-200" aria-label="Следующие отзывы">
+              <ArrowRight className="h-5 w-5" />
             </button>
           </div>
-        )}
+        </Reveal>
+      </div>
 
-        {expanded && !showYandex && (
-          <div className="mt-6 text-center">
-            <button onClick={() => setShowYandex(true)} className="btn btn-primary btn-lg">
+      <div ref={track} className={cn('no-scrollbar mt-10 flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4 pt-1', PAD)}>
+        {all.map((r, i) => (
+          <div key={i} className="w-[84%] max-w-[380px] shrink-0 snap-start">
+            <ReviewCard r={r} />
+          </div>
+        ))}
+      </div>
+
+      <div className="container">
+        {!showYandex ? (
+          <div className="mt-6 flex flex-col items-center gap-2 text-center">
+            <button onClick={() => setShowYandex(true)} className="btn btn-ghost btn-lg">
               Все отзывы на Яндекс Картах <ArrowRight className="h-5 w-5" />
             </button>
+            <p className="text-[13px] text-ink-mute">{all.length} отзывов из книги клиники · листайте вбок</p>
           </div>
-        )}
-
-        {showYandex && (
-          <div className="mt-10 overflow-hidden rounded-[32px] bg-white shadow-soft ring-1 ring-ink/[0.04] animate-fade-up">
+        ) : (
+          <div className="mt-8 overflow-hidden rounded-[32px] bg-white shadow-soft ring-1 ring-ink/[0.04] animate-fade-up">
             <div className="flex flex-col gap-5 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
               <div>
                 <h3 className="text-[22px] font-extrabold">Свежие отзывы на Яндекс Картах</h3>
@@ -113,7 +113,7 @@ export function Reviews() {
                 key={org}
                 src={`https://yandex.ru/maps-reviews-widget/${org}?comments`}
                 title="Отзывы с Яндекс Карт"
-                className="mx-auto block h-[640px] w-full max-w-[760px] rounded-2xl border-0 bg-white"
+                className="mx-auto block h-[560px] w-full max-w-[760px] rounded-2xl border-0 bg-white"
                 loading="lazy"
               />
               <a

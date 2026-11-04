@@ -116,8 +116,8 @@ function HeroCollage() {
   return (
     <div className="relative mx-auto aspect-[1/1.02] w-full max-w-[560px]">
       <Photo src="/photos/staff/ulvavilova.webp" className="left-0 top-[6%] h-[86%] w-[56%] rounded-b-[44px] rounded-t-[999px]" pos="50% 30%" />
-      <Photo src="/photos/staff/nbakina.webp" className="right-0 top-0 h-[47%] w-[41%] rounded-[36px]" pos="50% 45%" delay={120} />
-      <Photo src="/photos/staff/irpushkareva.webp" className="bottom-[2%] right-[3%] h-[45%] w-[38%] rounded-[36px] rounded-br-[90px]" pos="50% 35%" delay={240} />
+      <Photo src="/photos/staff/nbakina.webp" className="right-0 top-0 h-[47%] w-[41%] rounded-[36px]" pos="50% 45%" delay={60} />
+      <Photo src="/photos/staff/irpushkareva.webp" className="bottom-[2%] right-[3%] h-[45%] w-[38%] rounded-[36px] rounded-br-[90px]" pos="50% 35%" delay={120} />
 
       {/* плавающие карточки */}
       <div className="absolute -left-2 bottom-[10%] w-[230px] animate-float rounded-3xl bg-white/95 p-4 shadow-lift ring-1 ring-ink/5 backdrop-blur sm:-left-6">
