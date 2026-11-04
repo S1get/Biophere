@@ -43,8 +43,9 @@ ADMIN_PASSWORD=придумайте-пароль npm start   # http://localhost:
 
 ## Деплой на Render
 
-Один web-сервис по [`render.yaml`](render.yaml): build `npm install && npm run build`,
-start `npm start`, health check `/api/health`. На бесплатном тарифе сервис засыпает через 15 минут
+Сервис `biosphere-vet` → https://biosphere-vet.onrender.com (автодеплой из `main`).
+Настройки как в [`render.yaml`](render.yaml): build `cd biosphere-vet-clinic && npm install && npm run build`,
+start `cd biosphere-vet-clinic && npm start`. На бесплатном тарифе сервис засыпает через 15 минут
 без запросов — встроенный антисон пингует его каждые 10 минут.
 
 ## Что поправить в данных

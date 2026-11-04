@@ -1,13 +1,12 @@
 services:
   # Один сервис: Node раздаёт собранный сайт (dist) и API (/api/*)
   - type: web
-    name: biosphere-frontend
+    name: biosphere-vet
     runtime: node
     region: frankfurt
     plan: free
-    rootDir: biosphere-vet-clinic
-    buildCommand: npm install && npm run build
-    startCommand: npm start
+    buildCommand: cd biosphere-vet-clinic && npm install && npm run build
+    startCommand: cd biosphere-vet-clinic && npm start
     healthCheckPath: /api/health
     autoDeploy: true
     envVars:
