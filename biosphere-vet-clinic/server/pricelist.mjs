@@ -6,8 +6,11 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const API_BASE = 'https://p.bios.re/api'
-const ITEMS_URL = `${API_BASE}/pricelist?version=services`
-const SECTIONS_URL = `${API_BASE}/pricelist/sections?version=services`
+// версия biosphere — та же, что на странице клиники p.bios.re/pricelist/biosphere:
+// услуги (version: services) + медикаменты (drugs) и ветпрепараты (vetdrugs)
+const ITEMS_URL = `${API_BASE}/pricelist?version=biosphere`
+const SECTIONS_URL = `${API_BASE}/pricelist/sections?version=biosphere`
+const GOODS_LABEL = { drugs: 'медикаменты', vetdrugs: 'ветпрепараты' }
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000 // 6 часов
 const RETRY_AFTER_ERROR_MS = 10 * 60 * 1000 // при ошибке пробуем снова через 10 минут
 
@@ -18,24 +21,37 @@ const num = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : null)
 const clean = (s) => String(s ?? '').replace(/\s+/g, ' ').trim()
 
 export function normalize(rawItems, rawSections) {
-  const sections = Object.entries(rawSections ?? {})
-    .map(([id, name]) => ({ id: Number(id), name: clean(name) }))
-    .filter((s) => Number.isFinite(s.id) && s.name)
-    .sort((a, b) => a.id - b.id)
-
   const items = (Array.isArray(rawItems) ? rawItems : [])
     .map((it, i) => ({
       id: clean(it?._id?.$oid) || `i${i}`,
       section: Number(it?.section),
       name: clean(it?.name),
+      // услуги — не «товары»; медикаменты и ветпрепараты помечаем, чтобы показывать отдельной группой
+      goods: Boolean(it?.version) && it.version !== 'services',
+      kind: String(it?.version ?? ''),
       variants: (Array.isArray(it?.variants) ? it.variants : [])
-        .map((v) => ({ name: clean(v?.name), from: num(v?.service_start), to: num(v?.service_end) }))
+        .map((v) => ({ name: clean(v?.name), from: num(v?.service_start) ?? num(v?.medicine), to: num(v?.service_end) }))
         .filter((v) => v.name || v.from !== null),
     }))
     .filter((it) => it.name)
 
-  const used = new Set(items.map((i) => i.section))
-  return { sections: sections.filter((s) => used.has(s.id)), items }
+  // какой «вид» товаров в разделе — чтобы различать одинаковые названия («Антибиотики» есть и там, и там)
+  const kindOf = new Map()
+  for (const it of items) if (!kindOf.has(it.section)) kindOf.set(it.section, it)
+
+  const sections = Object.entries(rawSections ?? {})
+    .map(([id, name]) => ({ id: Number(id), name: clean(name) }))
+    .filter((s) => Number.isFinite(s.id) && s.name && kindOf.has(s.id))
+    .sort((a, b) => a.id - b.id)
+    .map((s) => ({ ...s, goods: kindOf.get(s.id).goods }))
+
+  const counts = sections.reduce((m, s) => m.set(s.name, (m.get(s.name) ?? 0) + 1), new Map())
+  for (const s of sections) {
+    const label = GOODS_LABEL[kindOf.get(s.id).kind]
+    if (counts.get(s.name) > 1 && label) s.name = `${s.name} (${label})`
+  }
+
+  return { sections, items: items.map(({ kind, ...it }) => it) }
 }
 
 export async function fetchFromSource(timeoutMs = 20000) {
@@ -47,7 +63,7 @@ export async function fetchFromSource(timeoutMs = 20000) {
   }
   const [rawSections, rawItems] = await Promise.all([get(SECTIONS_URL), get(ITEMS_URL)])
   const data = normalize(rawItems, rawSections)
-  if (data.items.length < 10) throw new Error(`Подозрительно мало позиций: ${data.items.length}`)
+  if (data.items.filter((i) => !i.goods).length < 10) throw new Error(`Подозрительно мало позиций: ${data.items.length}`)
   return data
 }
 

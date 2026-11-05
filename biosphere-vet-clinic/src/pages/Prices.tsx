@@ -1,4 +1,4 @@
-import { useDeferredValue, useMemo, useState } from 'react'
+import { Fragment, useDeferredValue, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { AlertCircle, Loader2, Phone, Search, X } from 'lucide-react'
 import { useBooking } from '@/components/booking/BookingContext'
@@ -85,8 +85,8 @@ export default function Prices() {
           Цены на <span className="accent">услуги</span>
         </h1>
         <p className="lead mt-4 max-w-2xl">
-          Прайс загружается напрямую из системы клиники, поэтому цены всегда актуальны. Точную стоимость лечения врач
-          назовёт после осмотра.
+          Цены на услуги, медикаменты и материалы — напрямую из системы клиники. Точную стоимость лечения врач назовёт
+          после осмотра.
         </p>
 
         <div className="sticky top-[72px] z-20 -mx-5 mt-8 bg-cream/90 px-5 py-3 backdrop-blur-xl sm:mx-0 sm:rounded-3xl sm:px-0">
@@ -131,11 +131,17 @@ export default function Prices() {
           <div className="mt-8 grid gap-8 lg:grid-cols-[260px_1fr]">
             <aside className="lg:sticky lg:top-[160px] lg:self-start">
               <div className="no-scrollbar -mx-5 flex gap-2 overflow-x-auto px-5 lg:mx-0 lg:max-h-[calc(100vh-190px)] lg:flex-col lg:overflow-y-auto lg:px-0">
-                {[{ id: 0, name: 'Все разделы' }, ...data.sections].map((s) => {
+                {[{ id: 0, name: 'Все разделы', goods: false }, ...data.sections].map((s, i, arr) => {
                   const active = (s.id || null) === section
+                  const firstGoods = s.goods && !arr[i - 1]?.goods
                   return (
+                    <Fragment key={s.id}>
+                    {firstGoods && (
+                      <span className="shrink-0 self-center px-2 text-[12px] font-bold uppercase tracking-[0.12em] text-ink-mute lg:mt-4 lg:self-start lg:px-4 lg:py-1">
+                        Препараты
+                      </span>
+                    )}
                     <button
-                      key={s.id}
                       onClick={() => setSection(s.id || null)}
                       className={cn(
                         'shrink-0 rounded-full px-4 py-2 text-left text-[14px] font-semibold transition lg:rounded-2xl',
@@ -144,17 +150,14 @@ export default function Prices() {
                     >
                       {s.name}
                     </button>
+                    </Fragment>
                   )
                 })}
               </div>
             </aside>
 
             <div>
-              <p className="mb-4 text-[14px] text-ink-mute">
-                {q ? `Найдено: ${total}` : `${total} услуг`} · обновлено{' '}
-                {new Date(data.updatedAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}
-                {data.source === 'snapshot' && ' (сохранённая копия)'}
-              </p>
+              {q && <p className="mb-4 text-[14px] text-ink-mute">Найдено: {total}</p>}
               {groups.length === 0 && (
                 <div className="rounded-3xl bg-white p-8 text-center shadow-soft">
                   <p className="text-lg font-bold">Ничего не нашли по запросу «{q}»</p>
@@ -162,8 +165,17 @@ export default function Prices() {
                 </div>
               )}
               <div className="grid gap-5">
-                {groups.map((g) => (
-                  <section key={g.id} className="rounded-[28px] bg-white px-6 py-2 shadow-soft ring-1 ring-ink/[0.04] sm:px-8">
+                {groups.map((g, i) => (
+                  <Fragment key={g.id}>
+                  {g.goods && !groups[i - 1]?.goods && (
+                    <div className="mt-6 px-1">
+                      <h2 className="text-[26px] font-extrabold">Препараты и материалы</h2>
+                      <p className="mt-1 text-[15px] text-ink-soft">
+                        Медикаменты, вакцины и расходные материалы, которые используются при лечении. Цена — за указанную единицу.
+                      </p>
+                    </div>
+                  )}
+                  <section className="rounded-[28px] bg-white px-6 py-2 shadow-soft ring-1 ring-ink/[0.04] sm:px-8">
                     <h2 className="border-b border-ink/5 py-5 text-[22px] font-extrabold">{g.name}</h2>
                     <ul className="divide-y divide-ink/5">
                       {g.items.map((i) => (
@@ -171,6 +183,7 @@ export default function Prices() {
                       ))}
                     </ul>
                   </section>
+                  </Fragment>
                 ))}
               </div>
               <div className="mt-8 flex flex-col items-start gap-4 rounded-[28px] bg-teal-50 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">

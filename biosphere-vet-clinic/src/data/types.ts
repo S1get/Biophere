@@ -47,11 +47,14 @@ export interface PriceItem {
   id: string
   section: number
   name: string
+  /** медикаменты и ветпрепараты (не услуги) */
+  goods?: boolean
   variants: PriceVariant[]
 }
 export interface PriceSection {
   id: number
   name: string
+  goods?: boolean
 }
 export interface Pricelist {
   updatedAt: string

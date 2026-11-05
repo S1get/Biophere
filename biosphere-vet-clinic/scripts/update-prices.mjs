@@ -4,4 +4,5 @@ import { fetchFromSource, writeSnapshot, SNAPSHOT_PATH } from '../server/priceli
 
 const data = await fetchFromSource(30000)
 await writeSnapshot(data)
-console.log(`Сохранено: ${data.items.length} услуг в ${data.sections.length} разделах → ${SNAPSHOT_PATH}`)
+const services = data.items.filter((i) => !i.goods).length
+console.log(`Сохранено: ${services} услуг и ${data.items.length - services} препаратов в ${data.sections.length} разделах → ${SNAPSHOT_PATH}`)

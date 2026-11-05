@@ -40,7 +40,7 @@ export function Story() {
             </dl>
             {data && (
               <p className="mt-8 text-[14px] text-ink-mute">
-                В прайсе {data.items.length} услуг в {data.sections.length} направлениях.
+                В прайсе {data.items.filter((i) => !i.goods).length} услуг в {data.sections.filter((s) => !s.goods).length} направлениях.
               </p>
             )}
           </Reveal>

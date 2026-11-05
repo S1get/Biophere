@@ -21,7 +21,7 @@ export function Services() {
           <div className="max-w-md">
             <p className="lead">
               От планового осмотра до сложнейших операций. Цены — из актуального прайса клиники
-              {data ? `: ${data.items.length} услуг` : ''}.
+              {data ? `: ${data.items.filter((i) => !i.goods).length} услуг` : ''}.
             </p>
             <Link to="/prices" className="mt-4 inline-flex items-center gap-2 font-bold text-teal-600 hover:gap-3 hover:text-teal-700">
               Смотреть все цены <ArrowRight className="h-5 w-5 transition-all" />

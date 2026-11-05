@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { CalendarHeart, ChevronDown, GraduationCap, MapPin, Sparkles } from 'lucide-react'
+import * as Dialog from '@radix-ui/react-dialog'
+import { CalendarHeart, ChevronDown, Expand, GraduationCap, MapPin, Sparkles, X } from 'lucide-react'
 import { Modal } from './Modal'
 import { useBooking } from './booking/BookingContext'
 import { branchById } from '@/data/branches'
@@ -89,6 +90,7 @@ export function DoctorDialog({ doctor, onClose }: { doctor: Doctor | null; onClo
 function DoctorDetails({ doctor, onClose }: { doctor: Doctor; onClose: () => void }) {
   const openBooking = useBooking()
   const [allTraining, setAllTraining] = useState(false)
+  const [zoom, setZoom] = useState(false)
   const exp = experience(doctor)
   const ids = doctor.branches as BranchId[]
   const training = allTraining ? doctor.training : doctor.training.slice(0, TRAINING_PREVIEW)
@@ -103,12 +105,22 @@ function DoctorDetails({ doctor, onClose }: { doctor: Doctor; onClose: () => voi
       <aside className="sm:sticky sm:top-0">
         <div className="relative aspect-[4/3] overflow-hidden bg-cream-200 sm:aspect-[4/5]">
           {doctor.photo && (
-            <img
-              src={doctor.photo}
-              alt={doctor.name}
-              className="absolute inset-0 h-full w-full object-cover"
-              style={{ objectPosition: doctor.focal ?? '50% 22%' }}
-            />
+            <button
+              type="button"
+              onClick={() => setZoom(true)}
+              className="group absolute inset-0 cursor-zoom-in"
+              aria-label={`Открыть фото: ${doctor.name}`}
+            >
+              <img
+                src={doctor.photo}
+                alt={doctor.name}
+                className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+                style={{ objectPosition: doctor.focal ?? '50% 22%' }}
+              />
+              <span className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-ink opacity-0 shadow-soft transition group-hover:opacity-100 sm:right-auto sm:left-3">
+                <Expand className="h-4 w-4" />
+              </span>
+            </button>
           )}
           {exp && (
             <span className="absolute bottom-3 left-3 rounded-full bg-white/95 px-3 py-1 text-[13px] font-bold shadow-soft">
@@ -122,6 +134,7 @@ function DoctorDetails({ doctor, onClose }: { doctor: Doctor; onClose: () => voi
           </button>
         </div>
       </aside>
+      {doctor.photo && <PhotoLightbox open={zoom} onOpenChange={setZoom} src={fullPhoto(doctor.photo)} alt={doctor.name} />}
 
       <div className="p-6 sm:p-8">
         <p className="pr-10 text-[12px] font-bold uppercase tracking-[0.1em] text-teal-600">{doctor.position}</p>
@@ -185,5 +198,40 @@ function DoctorDetails({ doctor, onClose }: { doctor: Doctor; onClose: () => voi
         </button>
       </div>
     </div>
+  )
+}
+
+/** /photos/staff/x.webp → /photos/staff/full/x.webp (исходный размер для просмотра) */
+const fullPhoto = (src: string) => src.replace('/photos/staff/', '/photos/staff/full/')
+
+function PhotoLightbox({ open, onOpenChange, src, alt }: { open: boolean; onOpenChange: (v: boolean) => void; src: string; alt: string }) {
+  const [ratio, setRatio] = useState<number | null>(null)
+  return (
+    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+      <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 z-[60] bg-ink/85 backdrop-blur-sm data-[state=open]:animate-fade-in" />
+        <Dialog.Content
+          className="fixed inset-0 z-[60] grid place-items-center p-4 outline-none data-[state=open]:animate-scale-in"
+          onClick={() => onOpenChange(false)}
+        >
+          <Dialog.Title className="sr-only">{alt}</Dialog.Title>
+          <Dialog.Description className="sr-only">Фото врача крупно. Нажмите в любом месте, чтобы закрыть.</Dialog.Description>
+          <img
+            src={src}
+            alt={alt}
+            onLoad={(e) => setRatio(e.currentTarget.naturalWidth / e.currentTarget.naturalHeight || null)}
+            // высота — сколько позволяет экран (до 860px), но не шире 94vw с учётом пропорций фото
+            style={ratio ? { height: `min(88dvh, 860px, calc(94vw / ${ratio}))`, width: 'auto' } : undefined}
+            className="max-h-[88dvh] max-w-[94vw] rounded-[20px] shadow-lift"
+          />
+          <Dialog.Close
+            className="absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-full bg-white/90 text-ink shadow-soft transition hover:bg-white"
+            aria-label="Закрыть фото"
+          >
+            <X className="h-5 w-5" />
+          </Dialog.Close>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   )
 }

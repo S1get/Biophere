@@ -52,11 +52,13 @@ const basePrice = (item: PriceItem) => item.variants.find((v) => v.from !== null
 /** Цена «от» по правилу; null если не нашли (тогда просто не показываем цену) */
 export function priceFrom(list: Pricelist | null, rule: PriceRule): number | null {
   if (!list) return null
+  // «от …» на главной считаем только по услугам, без медикаментов
+  const services = list.items.filter((i) => !i.goods)
   if (rule.startsWith) {
-    const item = list.items.find((i) => i.name.toLowerCase().startsWith(rule.startsWith!.toLowerCase()))
+    const item = services.find((i) => i.name.toLowerCase().startsWith(rule.startsWith!.toLowerCase()))
     return item ? basePrice(item) : null
   }
-  const vals = list.items
+  const vals = services
     .filter((i) => i.section === rule.section)
     .map(basePrice)
     .filter((v): v is number => v !== null)

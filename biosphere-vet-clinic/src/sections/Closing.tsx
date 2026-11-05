@@ -5,7 +5,7 @@ import { Modal } from '@/components/Modal'
 import { useBooking } from '@/components/booking/BookingContext'
 import { EMERGENCY, branches } from '@/data/branches'
 import { faq } from '@/data/content'
-import { telHref } from '@/lib/utils'
+import { cn, telHref } from '@/lib/utils'
 
 export function Pharmacy() {
   return (
@@ -40,8 +40,9 @@ export function Pharmacy() {
 
 export function Faq() {
   const [ask, setAsk] = useState(false)
+  const [open, setOpen] = useState<number | null>(0)
   return (
-    <section id="faq" className="section bg-white">
+    <section id="faq" className="section">
       <div className="container grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
         <Reveal>
           <span className="eyebrow">Вопросы</span>
@@ -53,18 +54,49 @@ export function Faq() {
             <MessageCircleQuestion className="h-5 w-5" /> Задать вопрос
           </button>
         </Reveal>
-        <Reveal className="divide-y divide-ink/10 border-y border-ink/10">
-          {faq.map((f) => (
-            <details key={f.q} className="group py-1">
-              <summary className="flex cursor-pointer items-center justify-between gap-6 py-5 text-[18px] font-bold transition hover:text-teal-700">
-                {f.q}
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-cream transition group-open:rotate-45 group-open:bg-teal-600 group-open:text-white">
-                  <Plus className="h-5 w-5" />
-                </span>
-              </summary>
-              <p className="pb-6 pr-12 text-[16px] leading-relaxed text-ink-soft">{f.a}</p>
-            </details>
-          ))}
+        <Reveal className="grid gap-3">
+          {faq.map((f, i) => {
+            const isOpen = open === i
+            return (
+              <div
+                key={f.q}
+                className={cn(
+                  'rounded-[24px] bg-white shadow-soft ring-1 ring-ink/[0.04] transition-shadow duration-300',
+                  isOpen && 'shadow-lift',
+                )}
+              >
+                <button
+                  onClick={() => setOpen(isOpen ? null : i)}
+                  aria-expanded={isOpen}
+                  aria-controls={`faq-${i}`}
+                  className="flex w-full items-center justify-between gap-6 px-6 py-5 text-left text-[17px] font-bold transition-colors hover:text-teal-700 sm:text-[18px]"
+                >
+                  {f.q}
+                  <span
+                    className={cn(
+                      'grid h-9 w-9 shrink-0 place-items-center rounded-full transition-all duration-300',
+                      isOpen ? 'rotate-45 bg-teal-600 text-white' : 'bg-cream',
+                    )}
+                  >
+                    <Plus className="h-5 w-5" />
+                  </span>
+                </button>
+                {/* плавное раскрытие: высота анимируется через grid-template-rows 0fr → 1fr */}
+                <div
+                  id={`faq-${i}`}
+                  role="region"
+                  className={cn(
+                    'grid transition-[grid-template-rows,opacity] duration-300 ease-out',
+                    isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0',
+                  )}
+                >
+                  <div className="overflow-hidden">
+                    <p className="px-6 pb-6 pr-14 text-[16px] leading-relaxed text-ink-soft">{f.a}</p>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
         </Reveal>
       </div>
       <AskDialog open={ask} onOpenChange={setAsk} />
