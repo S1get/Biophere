@@ -1,4 +1,4 @@
-import { ArrowRight, Phone, Star } from 'lucide-react'
+import { ArrowRight, Phone, PhoneCall, Star } from 'lucide-react'
 import { useBooking } from '@/components/booking/BookingContext'
 import { useMinuteTick } from '@/components/OpenBadge'
 import { EMERGENCY, branches } from '@/data/branches'
@@ -42,13 +42,13 @@ export function Hero() {
             <br className="hidden sm:block" /> ваших питомцев
           </h1>
           <p className="lead mt-6 max-w-xl">
-            Сеть ветеринарных клиник в Кирове с {FOUNDED} года: {doctors.length} врачей, {branches.length} филиалов
+            Сеть ветеринарных клиник в Кирове с {FOUNDED} года: более 50 специалистов, {branches.length} филиалов
             и круглосуточная помощь на проспекте Строителей.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <button onClick={() => openBooking()} className="btn btn-primary btn-lg">
-              Записаться на приём <ArrowRight className="h-5 w-5" />
+              <PhoneCall className="h-5 w-5" /> Обратный звонок
             </button>
             <a href={telHref(EMERGENCY.phone)} className="btn btn-ghost btn-lg">
               <Phone className="h-5 w-5 text-alert-500" /> Срочно? {EMERGENCY.phone}
@@ -72,7 +72,7 @@ export function Hero() {
                 })}
               </div>
               <p className="text-[14px] leading-snug text-ink-soft">
-                <b className="text-ink">{doctors.length} врачей</b>
+                <b className="text-ink">Более 50 специалистов</b>
                 <br />
                 терапевты, хирурги, кардиологи
               </p>

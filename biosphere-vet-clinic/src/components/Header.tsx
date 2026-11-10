@@ -90,7 +90,7 @@ export function Header() {
             </span>
           </a>
           <button onClick={() => openBooking()} className="btn btn-primary btn-sm hidden sm:inline-flex sm:h-11 sm:px-5">
-            Записаться
+            Обратный звонок
           </button>
           <button
             className="grid h-11 w-11 place-items-center rounded-full bg-white/80 shadow-soft lg:hidden"

@@ -1,10 +1,10 @@
-import { CalendarHeart, MapPin, Phone } from 'lucide-react'
+import { MapPin, Phone, PhoneCall } from 'lucide-react'
 import { useBooking } from './booking/BookingContext'
 import { useNavGo } from './Header'
 import { EMERGENCY } from '@/data/branches'
 import { telHref } from '@/lib/utils'
 
-/** Нижняя панель на телефонах: позвонить / записаться / филиалы */
+/** Нижняя панель на телефонах: позвонить / обратный звонок / филиалы */
 export function MobileBar() {
   const openBooking = useBooking()
   const go = useNavGo()
@@ -15,8 +15,8 @@ export function MobileBar() {
           <Phone className="h-5 w-5" />
           Позвонить 24/7
         </a>
-        <button onClick={() => openBooking()} className="btn btn-primary h-12 text-[15px]">
-          <CalendarHeart className="h-5 w-5" /> Записаться
+        <button onClick={() => openBooking()} className="btn btn-primary h-12 gap-1.5 px-2 text-[14px]">
+          <PhoneCall className="h-[18px] w-[18px] shrink-0" /> Обратный звонок
         </button>
         <button onClick={() => go({ id: 'branches', label: 'Филиалы' })} className="flex flex-col items-center gap-0.5 rounded-2xl py-1.5 text-[12px] font-semibold text-ink-soft active:bg-ink/5">
           <MapPin className="h-5 w-5" />

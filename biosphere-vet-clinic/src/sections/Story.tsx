@@ -2,7 +2,6 @@ import { Reveal } from '@/components/Reveal'
 import { Rail, railItem } from '@/components/Rail'
 import { branches } from '@/data/branches'
 import { timeline } from '@/data/content'
-import { doctors } from '@/data/doctors'
 import { usePricelist } from '@/lib/pricelist'
 import { FOUNDED, plural, yearsSince } from '@/lib/utils'
 
@@ -12,7 +11,7 @@ export function Story() {
   const stats = [
     { value: String(years), label: `${plural(years, ['год', 'года', 'лет'])} лечим животных Кирова` },
     { value: String(branches.length), label: 'клиник в разных районах города' },
-    { value: String(doctors.length), label: 'врачей разных специальностей' },
+    { value: '50+', label: 'специалистов разных направлений' },
     { value: '24/7', label: 'экстренная помощь на Строителей' },
   ]
   return (

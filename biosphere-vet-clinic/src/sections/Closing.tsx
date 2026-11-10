@@ -175,10 +175,10 @@ export function FinalCta() {
                 Запишитесь на приём — <span className="font-serif font-medium italic text-leaf-200">мы рядом</span>
               </h2>
               <p className="mt-5 max-w-lg text-[17px] leading-relaxed text-white/85">
-                Выберите филиал и удобное время онлайн или позвоните — администратор подберёт врача.
+                Позвоните в удобный филиал или оставьте номер — администратор перезвонит, подберёт врача и время.
               </p>
               <button onClick={() => openBooking()} className="btn btn-lg mt-8 bg-white text-teal-700 shadow-lift hover:-translate-y-0.5">
-                Записаться онлайн <ArrowRight className="h-5 w-5" />
+                Заказать обратный звонок <ArrowRight className="h-5 w-5" />
               </button>
             </div>
             <ul className="grid gap-2 sm:grid-cols-2">

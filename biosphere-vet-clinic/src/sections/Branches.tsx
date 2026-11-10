@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CalendarHeart, Clock, Navigation, Phone } from 'lucide-react'
+import { PhoneCall, Clock, Navigation, Phone } from 'lucide-react'
 import { Reveal } from '@/components/Reveal'
 import { OpenBadge } from '@/components/OpenBadge'
 import { useBooking } from '@/components/booking/BookingContext'
@@ -71,7 +71,7 @@ export function Branches() {
                         <Navigation className="h-4 w-4" /> Маршрут
                       </a>
                       <button onClick={() => openBooking({ branch: b.id })} className="inline-flex items-center gap-1.5 text-ink-soft hover:text-ink">
-                        <CalendarHeart className="h-4 w-4" /> Записаться
+                        <PhoneCall className="h-4 w-4" /> Обратный звонок
                       </button>
                     </div>
                   </div>

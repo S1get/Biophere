@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
-import { CalendarHeart, ChevronDown, Expand, GraduationCap, MapPin, Sparkles, X } from 'lucide-react'
+import { ChevronDown, Expand, GraduationCap, MapPin, PhoneCall, Sparkles, X } from 'lucide-react'
 import { Modal } from './Modal'
 import { useBooking } from './booking/BookingContext'
 import { branchById } from '@/data/branches'
@@ -130,7 +130,7 @@ function DoctorDetails({ doctor, onClose }: { doctor: Doctor; onClose: () => voi
         </div>
         <div className="hidden p-5 sm:block">
           <button className="btn btn-primary btn-md w-full" onClick={book}>
-            <CalendarHeart className="h-5 w-5" /> Записаться
+            <PhoneCall className="h-5 w-5" /> Обратный звонок
           </button>
         </div>
       </aside>
@@ -194,7 +194,7 @@ function DoctorDetails({ doctor, onClose }: { doctor: Doctor; onClose: () => voi
 
         {/* на мобильных кнопка внизу */}
         <button className="btn btn-primary btn-md mt-8 w-full sm:hidden" onClick={book}>
-          <CalendarHeart className="h-5 w-5" /> Записаться к врачу
+          <PhoneCall className="h-5 w-5" /> Обратный звонок
         </button>
       </div>
     </div>

@@ -189,7 +189,7 @@ export default function Prices() {
               <div className="mt-8 flex flex-col items-start gap-4 rounded-[28px] bg-teal-50 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
                 <p className="text-[16px] font-semibold">Остались вопросы по стоимости? Администратор подскажет.</p>
                 <button onClick={() => openBooking()} className="btn btn-primary btn-md">
-                  Записаться на приём
+                  Обратный звонок
                 </button>
               </div>
             </div>
