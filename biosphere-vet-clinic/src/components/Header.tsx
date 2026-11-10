@@ -78,15 +78,15 @@ export function Header() {
         <div className="ml-auto flex items-center gap-2">
           <a
             href={telHref(EMERGENCY.phone)}
-            className="hidden items-center gap-2.5 rounded-full bg-alert-50 py-1.5 pl-1.5 pr-4 ring-1 ring-alert-100 transition hover:bg-alert-100 md:flex lg:hidden xl:flex"
+            className="hidden items-center gap-2.5 rounded-full py-1.5 pl-1.5 pr-4 transition hover:bg-ink/5 md:flex lg:hidden xl:flex"
           >
-            <span className="relative grid h-9 w-9 place-items-center rounded-full bg-alert-500 text-white">
+            <span className="relative grid h-9 w-9 place-items-center rounded-full bg-alert-50 text-alert-500">
               <span className="absolute inset-0 animate-pulse-ring rounded-full" />
               <Phone className="h-4 w-4" />
             </span>
             <span className="leading-tight">
-              <span className="block text-[15px] font-bold text-alert-600">{EMERGENCY.phone}</span>
-              <span className="block text-[12px] font-semibold text-alert-600/75">срочно, 24/7</span>
+              <span className="block text-[15px] font-bold">{EMERGENCY.phone}</span>
+              <span className="block text-[12px] font-medium text-ink-mute">круглосуточно</span>
             </span>
           </a>
           <button onClick={() => openBooking()} className="btn btn-primary btn-sm hidden sm:inline-flex sm:h-11 sm:px-5">
@@ -125,19 +125,9 @@ export function Header() {
           <div className="mt-6 grid gap-2">
             <p className="px-4 text-[13px] font-semibold uppercase tracking-[0.14em] text-ink-mute">Телефоны филиалов</p>
             {branches.map((b) => (
-              <a
-                key={b.id}
-                href={telHref(b.phone)}
-                className={cn(
-                  'flex items-center justify-between gap-3 rounded-2xl px-4 py-3',
-                  b.hours === 'always' ? 'bg-alert-50 ring-1 ring-alert-100' : 'bg-white shadow-soft',
-                )}
-              >
-                <span className="text-[15px] font-semibold">
-                  {b.address}
-                  {b.hours === 'always' && <span className="block text-[12px] font-bold text-alert-600">круглосуточно, срочно</span>}
-                </span>
-                <span className={cn('shrink-0 font-bold', b.hours === 'always' ? 'text-alert-600' : 'text-teal-600')}>{b.phone}</span>
+              <a key={b.id} href={telHref(b.phone)} className="flex items-center justify-between rounded-2xl bg-white px-4 py-3 shadow-soft">
+                <span className="text-[15px] font-semibold">{b.address}</span>
+                <span className="font-bold text-teal-600">{b.phone}</span>
               </a>
             ))}
           </div>

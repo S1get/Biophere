@@ -50,11 +50,8 @@ export function Hero() {
             <button onClick={() => openBooking()} className="btn btn-primary btn-lg">
               <PhoneCall className="h-5 w-5" /> Обратный звонок
             </button>
-            <a
-              href={telHref(EMERGENCY.phone)}
-              className="btn btn-alert btn-lg shadow-[0_12px_30px_-12px_rgba(217,74,56,0.7)] hover:-translate-y-0.5 active:translate-y-0"
-            >
-              <Phone className="h-5 w-5" /> Срочно? {EMERGENCY.phone}
+            <a href={telHref(EMERGENCY.phone)} className="btn btn-ghost btn-lg">
+              <Phone className="h-5 w-5 text-alert-500" /> Срочно? {EMERGENCY.phone}
             </a>
           </div>
 
@@ -128,7 +125,7 @@ function HeroCollage() {
           <span className="h-2 w-2 animate-pulse-ring rounded-full bg-alert-500" /> Круглосуточно
         </div>
         <p className="mt-1.5 text-[15px] font-bold leading-snug">Экстренная помощь на Строителей, 9к1</p>
-        <a href={telHref(EMERGENCY.phone)} className="mt-1 inline-block text-[15px] font-bold text-alert-600">
+        <a href={telHref(EMERGENCY.phone)} className="mt-1 inline-block text-[15px] font-bold text-teal-600">
           {EMERGENCY.phone}
         </a>
       </div>
