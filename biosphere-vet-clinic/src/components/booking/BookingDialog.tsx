@@ -159,12 +159,12 @@ export function BookingDialog({
           <button type="submit" className="btn btn-primary btn-lg w-full">
             <PhoneCall className="h-5 w-5" /> Перезвоните мне
           </button>
-          <p className="text-center text-[13px] text-ink-mute">
-            Срочно? Круглосуточно:{' '}
-            <a href={telHref(EMERGENCY.phone)} className="font-bold text-alert-600">
-              {EMERGENCY.phone}
-            </a>
-          </p>
+          <a
+            href={telHref(EMERGENCY.phone)}
+            className="btn btn-md w-full bg-alert-50 text-alert-600 ring-1 ring-alert-100 hover:bg-alert-100"
+          >
+            <Phone className="h-5 w-5" /> Срочно? Круглосуточно: {EMERGENCY.phone}
+          </a>
         </form>
       )}
     </Modal>

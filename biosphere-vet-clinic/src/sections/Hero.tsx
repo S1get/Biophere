@@ -50,8 +50,11 @@ export function Hero() {
             <button onClick={() => openBooking()} className="btn btn-primary btn-lg">
               <PhoneCall className="h-5 w-5" /> Обратный звонок
             </button>
-            <a href={telHref(EMERGENCY.phone)} className="btn btn-ghost btn-lg">
-              <Phone className="h-5 w-5 text-alert-500" /> Срочно? {EMERGENCY.phone}
+            <a
+              href={telHref(EMERGENCY.phone)}
+              className="btn btn-alert btn-lg shadow-[0_12px_30px_-12px_rgba(217,74,56,0.7)] hover:-translate-y-0.5 active:translate-y-0"
+            >
+              <Phone className="h-5 w-5" /> Срочно? {EMERGENCY.phone}
             </a>
           </div>
 
