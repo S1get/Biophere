@@ -128,7 +128,7 @@ function HeroCollage() {
           <span className="h-2 w-2 animate-pulse-ring rounded-full bg-alert-500" /> Круглосуточно
         </div>
         <p className="mt-1.5 text-[15px] font-bold leading-snug">Экстренная помощь на Строителей, 9к1</p>
-        <a href={telHref(EMERGENCY.phone)} className="mt-1 inline-block text-[15px] font-bold text-teal-600">
+        <a href={telHref(EMERGENCY.phone)} className="mt-1 inline-block text-[15px] font-bold text-alert-600">
           {EMERGENCY.phone}
         </a>
       </div>
